@@ -1,0 +1,165 @@
+---
+/**
+ * @component EventCard
+ * @description Card for displaying event summaries in listings.
+ *
+ * @example
+ * <EventCard
+ *   title="Friedenswoche 2026"
+ *   href="/aktionen/friedenswoche-2026/"
+ *   startDate={new Date('2026-06-20')}
+ *   endDate={new Date('2026-06-28')}
+ *   location="Ramstein"
+ *   eventType="friedenswoche"
+ * />
+ */
+
+interface Props {
+  /** Event title */
+  title: string;
+  /** Link to event page */
+  href: string;
+  /** Event start date */
+  startDate: Date;
+  /** Event end date (optional) */
+  endDate?: Date;
+  /** Location name */
+  location: string;
+  /** Event type */
+  eventType: 'friedenswoche' | 'demonstration' | 'konferenz' | 'workshop' | 'sonstiges';
+  /** Event status */
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  /** Short description */
+  description?: string;
+  /** Featured image */
+  image?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  title,
+  href,
+  startDate,
+  endDate,
+  location,
+  eventType,
+  status = 'upcoming',
+  description,
+  image,
+  class: className = '',
+} = Astro.props;
+
+// Format dates
+const formatDateRange = (start: Date, end?: Date) => {
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+
+  if (!end || start.toDateString() === end.toDateString()) {
+    return start.toLocaleDateString('de-DE', { ...options, year: 'numeric' });
+  }
+
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${start.getDate()}. – ${end.toLocaleDateString('de-DE', { ...options, year: 'numeric' })}`;
+  }
+
+  return `${start.toLocaleDateString('de-DE', options)} – ${end.toLocaleDateString('de-DE', { ...options, year: 'numeric' })}`;
+};
+
+// Event type labels and colors
+const eventTypeConfig = {
+  friedenswoche: { label: 'Friedenswoche', color: 'bg-accent-amber/20 text-accent-amber' },
+  demonstration: { label: 'Demo', color: 'bg-accent-red/20 text-accent-red' },
+  konferenz: { label: 'Konferenz', color: 'bg-accent-sky/20 text-accent-sky' },
+  workshop: { label: 'Workshop', color: 'bg-accent-emerald/20 text-accent-emerald' },
+  sonstiges: { label: 'Event', color: 'bg-surface-700 text-content-secondary' },
+};
+
+// Status styling
+const statusConfig = {
+  upcoming: { label: 'Demnächst', show: true },
+  ongoing: { label: 'Läuft', show: true },
+  completed: { label: 'Beendet', show: false },
+  cancelled: { label: 'Abgesagt', show: true },
+};
+
+const typeInfo = eventTypeConfig[eventType];
+const statusInfo = statusConfig[status];
+---
+
+<a
+  href={href}
+  class:list={[
+    'group block rounded-lg border border-surface-700 bg-surface-800 transition-all hover:border-surface-600 hover:bg-surface-700/50 no-underline overflow-hidden',
+    className,
+  ]}
+>
+  <!-- Image (optional) -->
+  {image && (
+    <div class="aspect-video overflow-hidden">
+      <img
+        src={image}
+        alt=""
+        class="h-full w-full object-cover transition-transform group-hover:scale-105"
+        loading="lazy"
+      />
+    </div>
+  )}
+
+  <div class="p-5">
+    <!-- Badges -->
+    <div class="mb-3 flex flex-wrap items-center gap-2">
+      <span class={`rounded-full px-2.5 py-1 text-xs font-medium ${typeInfo.color}`}>
+        {typeInfo.label}
+      </span>
+      {statusInfo.show && status !== 'completed' && (
+        <span class:list={[
+          'rounded-full px-2.5 py-1 text-xs font-medium',
+          status === 'cancelled' ? 'bg-accent-red/20 text-accent-red' : 'bg-surface-700 text-content-muted',
+        ]}>
+          {statusInfo.label}
+        </span>
+      )}
+    </div>
+
+    <!-- Title -->
+    <h3 class="mb-2 text-lg font-semibold text-content-primary group-hover:text-accent-sky transition-colors">
+      {title}
+    </h3>
+
+    <!-- Description -->
+    {description && (
+      <p class="mb-4 text-sm text-content-secondary line-clamp-2">
+        {description}
+      </p>
+    )}
+
+    <!-- Meta info -->
+    <div class="flex flex-wrap items-center gap-4 text-sm text-content-muted">
+      <!-- Date -->
+      <span class="flex items-center gap-1.5">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+        {formatDateRange(startDate, endDate)}
+      </span>
+
+      <!-- Location -->
+      <span class="flex items-center gap-1.5">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+        {location}
+      </span>
+    </div>
+  </div>
+</a>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

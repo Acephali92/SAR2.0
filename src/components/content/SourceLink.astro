@@ -1,0 +1,80 @@
+---
+/**
+ * @component SourceLink
+ * @description External source link with proper attributes and visual indicator.
+ *              Used for citing sources in articles.
+ *
+ * @example
+ * <SourceLink href="https://example.com" label="The Guardian" />
+ * <SourceLink href="https://un.org/..." label="UN Human Rights Council" date="2023-05-15" />
+ */
+
+interface Props {
+  /** URL of the source */
+  href: string;
+  /** Display label */
+  label: string;
+  /** Optional publication date */
+  date?: string | Date;
+  /** Show as inline link (vs block) */
+  inline?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  href,
+  label,
+  date,
+  inline = false,
+  class: className = '',
+} = Astro.props;
+
+// Format date if provided
+const formattedDate = date
+  ? new Date(date).toLocaleDateString('de-DE', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  : null;
+---
+
+{inline ? (
+  <a
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    class:list={[
+      'text-accent-sky hover:text-content-primary underline underline-offset-2',
+      className,
+    ]}
+  >
+    {label}
+    <svg class="ml-0.5 inline h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+  </a>
+) : (
+  <div class:list={['flex items-start gap-2 text-sm', className]}>
+    <svg class="mt-0.5 h-4 w-4 shrink-0 text-content-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+    </svg>
+    <div>
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-accent-sky hover:text-content-primary no-underline"
+      >
+        {label}
+        <svg class="ml-1 inline h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+      </a>
+      {formattedDate && (
+        <span class="ml-2 text-content-muted">({formattedDate})</span>
+      )}
+    </div>
+  </div>
+)}

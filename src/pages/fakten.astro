@@ -1,0 +1,1103 @@
+---
+/**
+ * Fakten Page — Editorial Dossier
+ *
+ * Designed as a serious political dossier:
+ * quiet confidence, precision, and longevity.
+ *
+ * Features a persistent sticky ToC for desktop navigation.
+ */
+
+import PageLayout from '@layouts/PageLayout.astro';
+
+// Document metadata
+const documentMeta = {
+  title: 'Fakten',
+  subtitle: 'Dokumentation zur Air Base Ramstein',
+  classification: 'Öffentliches Dokument',
+  lastUpdated: '2024',
+  sections: 4,
+};
+
+// Table of contents structure
+const chapters = [
+  {
+    id: 'kapitel-1',
+    number: 'I',
+    title: 'Die Verbrechen des Drohnenkriegs',
+    subsections: [
+      { id: 'hinrichtungen', title: 'Außergerichtliche Hinrichtungen' },
+      { id: 'praezision', title: 'Die Lüge der „chirurgisch präzisen" Angriffe' },
+      { id: 'radikalisierung', title: 'Radikalisierung durch Drohnenmorde' },
+      { id: 'whistleblower', title: 'Der Whistleblower' },
+    ],
+  },
+  {
+    id: 'kapitel-2',
+    number: 'II',
+    title: 'Mittäter Deutschland',
+    subsections: [
+      { id: 'groesste-basis', title: 'Die größte US-Basis außerhalb der USA' },
+      { id: 'unverzichtbar', title: 'Unverzichtbar für den Drohnenkrieg' },
+      { id: 'vertuschung', title: 'Vertuschung durch die Bundesregierung' },
+    ],
+  },
+  {
+    id: 'kapitel-3',
+    number: 'III',
+    title: 'Die Kriege über Ramstein',
+    subsections: [
+      { id: 'relaisstation', title: 'Satelliten-Relaisstation' },
+      { id: 'voelkerrecht', title: 'Völkerrechtswidrige Kriegsführung' },
+      { id: 'kriegszentrale', title: 'Globale Kriegszentrale' },
+      { id: 'raketenabwehr', title: 'NATO-Raketenabwehr' },
+      { id: 'miesau', title: 'Munitionsdepot Miesau' },
+      { id: 'bilanz', title: 'Die Bilanz' },
+    ],
+  },
+  {
+    id: 'kapitel-4',
+    number: 'IV',
+    title: 'Umwelt- und Gesundheitskiller',
+    subsections: [
+      { id: 'umweltzerstoerer', title: 'Größter Umweltzerstörer der Welt' },
+      { id: 'pfas', title: 'PFAS-Kontamination' },
+      { id: 'gesundheit', title: 'Gesundheitsschäden' },
+      { id: 'kerosin', title: 'Kerosinablass' },
+    ],
+  },
+];
+
+// Sources organized by section
+const sources = {
+  drohnenkrieg: [
+    { id: 1, label: 'RBB Kontraste: Drohnenkrieg', url: 'https://www.rbb-online.de/kontraste/ueber_den_tag_hinaus/terrorismus/drohnenkrieg.html' },
+    { id: 2, label: 'The Guardian: US drone strikes kill 1,147', url: 'https://www.theguardian.com/us-news/2014/nov/24/-sp-us-drone-strikes-kill-1147' },
+    { id: 3, label: 'IPPNW Drohnenreport 2019', url: 'http://www.ippnw.de/commonFiles/pdfs/Frieden/Drohnenreport_2019.pdf' },
+    { id: 4, label: 'The Guardian: Noor Behram', url: 'https://www.theguardian.com/world/2011/jul/17/us-drone-strikes-pakistan-waziristan' },
+    { id: 5, label: 'Zeit Online: Faisal bin Ali Jaber', url: 'https://www.zeit.de/politik/deutschland/2015-04/drohnen-krieg-ramstein-toetung-bundesregierung/komplettansicht' },
+    { id: 6, label: 'Zeit Online: Brandon Bryant', url: 'https://www.zeit.de/politik/ausland/2013-10/usa-drohnen-pilot' },
+  ],
+  deutschland: [
+    { id: 7, label: 'Deutsche Welle: US-Stützpunkt Ramstein', url: 'https://www.dw.com/de/us-st%C3%BCtzpunkt-ramstein-kuschen-die-deutschen-vor-den-usa/a-48112090' },
+    { id: 8, label: 'Luftpost: Ramstein und Drohnenkrieg', url: 'http://www.luftpost-kl.de/luftpost-archiv/LP_13/LP08515_230415.pdf' },
+    { id: 9, label: 'Zeit Online: Drohnenkrieg Bundesregierung', url: 'https://www.zeit.de/politik/deutschland/2015-04/drohnen-krieg-ramstein-toetung-bundesregierung' },
+  ],
+  kriege: [
+    { id: 10, label: 'The Intercept: Ramstein', url: 'https://theintercept.com/2015/04/17/ramstein/' },
+    { id: 11, label: 'Amnesty International: Deadly Assistance', url: 'https://www.amnesty.de/sites/default/files/2018-04/Amnesty-Bericht-USA-Deadly-Assistance-Bericht-April2018.pdf' },
+    { id: 12, label: 'Luftpost: Ramstein Logistik', url: 'http://www.luftpost-kl.de/luftpost-archiv/LP_13/LP14415_060815.pdf' },
+    { id: 13, label: 'Luftpost: Miesau', url: 'http://www.luftpost-kl.de/luftpost-archiv/LP_13/LP18715_031015.pdf' },
+    { id: 14, label: 'ND: Anti-Terrorkrieg Bilanz', url: 'https://www.nd-aktuell.de/artikel/1156225.krieg-gegen-den-terror-anti-terrorkrieg-fordert-eine-million-tote.html' },
+  ],
+  umwelt: [
+    { id: 15, label: 'Tagesanzeiger: US-Militär Umweltverschmutzung', url: 'https://www.tagesanzeiger.ch/wissen/natur/das-usmilitaer-verschmutzt-die-umwelt-staerker-als-140-laender/story/23828059' },
+    { id: 16, label: 'Volksfreund: Chemikalien versickern', url: 'https://www.volksfreund.de/region/rheinland-pfalz/und-die-chemikalien-versickern-_aid-24204715' },
+    { id: 17, label: 'Volksfreund: Gift im Grundwasser', url: 'https://www.volksfreund.de/nachrichten/politik/neue-funde-dickes-problem-gift-im-grundwasser-der-region_aid-24202197' },
+    { id: 18, label: 'Umwelt & Militär: PFAS', url: 'https://umwelt-militaer.org/us-air-base-ramstein-altlasten/#PFAS-Belastung' },
+    { id: 19, label: 'Umwelt & Militär: Fluglärm', url: 'https://umwelt-militaer.org/fluglaerm-rheinland-pfalz/' },
+    { id: 20, label: 'Geo: Fuel Dumping', url: 'https://www.geo.de/natur/18269-rtkl-fuel-dumping-jedes-jahr-regnen-hunderte-tonnen-flugbenzin-auf-deutschland' },
+    { id: 21, label: 'Rheinpfalz: Kerosinablass', url: 'https://www.rheinpfalz.de/pfalz_artikel,-ramstein-us-milit%C3%A4rmaschine-l%C3%A4sst-43-tonnen-kerosin-%C3%BCber-der-pfalz-ab-_arid,1137372.html' },
+    { id: 22, label: 'Umwelt & Militär: Kerosinablass', url: 'https://umwelt-militaer.org/kerosinablass/' },
+  ],
+};
+
+// Further reading
+const furtherReading = [
+  { title: 'The Drone Papers', org: 'The Intercept', url: 'https://theintercept.com/drone-papers/' },
+  { title: 'Drone Strikes Database', org: 'Bureau of Investigative Journalism', url: 'https://www.thebureauinvestigates.com/projects/drone-war' },
+  { title: 'Umwelt & Militär', org: 'Forschungsplattform', url: 'https://umwelt-militaer.org/' },
+  { title: 'National Bird', org: 'Dokumentarfilm', url: 'http://nationalbirdfilm.com/' },
+];
+---
+
+<PageLayout
+  title="Fakten zur Air Base Ramstein"
+  description="Die wichtigsten Fakten über die Air Base Ramstein: Drohnenkrieg, Völkerrechtsbrüche, Umweltzerstörung. Mit Quellenangaben."
+  wide={true}
+>
+  <div class="dossier-layout">
+    <!-- Sticky Side ToC (Desktop only) -->
+    <aside class="toc-sidebar" aria-label="Inhaltsverzeichnis">
+      <nav class="toc-nav">
+        <p class="toc-label">Inhalt</p>
+        <ol class="toc-list">
+          {chapters.map((chapter) => (
+            <li class="toc-chapter">
+              <a
+                href={`#${chapter.id}`}
+                class="toc-chapter-link"
+                data-toc-link={chapter.id}
+              >
+                <span class="toc-number">{chapter.number}</span>
+                <span class="toc-title">{chapter.title}</span>
+              </a>
+              <ol class="toc-subsections">
+                {chapter.subsections.map((sub) => (
+                  <li>
+                    <a
+                      href={`#${sub.id}`}
+                      class="toc-sub-link"
+                      data-toc-link={sub.id}
+                    >
+                      {sub.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </li>
+          ))}
+          <li class="toc-chapter toc-appendix">
+            <a href="#quellenverzeichnis" class="toc-chapter-link" data-toc-link="quellenverzeichnis">
+              <span class="toc-title">Quellenverzeichnis</span>
+            </a>
+          </li>
+        </ol>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <article class="dossier-content">
+      <!-- Document Header -->
+      <header class="dossier-header">
+        <p class="classification">
+          {documentMeta.classification}
+        </p>
+        <h1 class="dossier-title">
+          {documentMeta.title}
+        </h1>
+        <p class="dossier-subtitle">
+          {documentMeta.subtitle}
+        </p>
+        <div class="dossier-meta">
+          <span>Stand: {documentMeta.lastUpdated}</span>
+          <span>{documentMeta.sections} Kapitel</span>
+          <span>22 Quellenangaben</span>
+        </div>
+      </header>
+
+      <!-- Mobile ToC (visible on small screens) -->
+      <nav class="toc-mobile" aria-label="Inhaltsverzeichnis">
+        <details>
+          <summary class="toc-mobile-toggle">
+            <span>Inhaltsverzeichnis</span>
+            <svg class="toc-mobile-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </summary>
+          <ol class="toc-mobile-list">
+            {chapters.map((chapter) => (
+              <li>
+                <a href={`#${chapter.id}`} class="toc-mobile-link">
+                  <span class="toc-number">{chapter.number}</span>
+                  {chapter.title}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </details>
+      </nav>
+
+      <!-- Chapter I: Drone War Crimes -->
+      <section id="kapitel-1" class="chapter" aria-labelledby="chapter-1-title">
+        <header class="chapter-header">
+          <span class="chapter-number">Kapitel I</span>
+          <h2 id="chapter-1-title" class="chapter-title">
+            Die Verbrechen des Drohnenkriegs
+          </h2>
+        </header>
+
+        <div class="prose-dossier">
+          <section id="hinrichtungen" class="subsection">
+            <h3>Außergerichtliche Hinrichtungen</h3>
+            <p>
+              Im Drohnenkrieg der USA werden Menschen ohne Gerichtsurteil auf bloßen Verdacht hingerichtet.
+              <a href={sources.drohnenkrieg[0].url} class="source-ref" target="_blank" rel="noopener">[1]</a>
+            </p>
+          </section>
+
+          <section id="praezision" class="subsection">
+            <h3>Die Lüge der „chirurgisch präzisen" Angriffe</h3>
+            <p>
+              Dass Drohnenangriffe „chirurgisch präzise" wären, ist eine Lüge. Untersuchungen zeigen, dass
+              pro Drohnenangriff bis zu 28 Männer, Frauen und Kinder getötet werden.
+              <a href={sources.drohnenkrieg[1].url} class="source-ref" target="_blank" rel="noopener">[2]</a>
+            </p>
+          </section>
+
+          <section id="radikalisierung" class="subsection">
+            <h3>Radikalisierung durch Drohnenmorde</h3>
+            <p>
+              Die Morde an unschuldigen Drohnenopfern provozieren immer mehr Gewalt und Terror.
+              Die willkürliche Tötung von nahestehenden Menschen radikalisiert Angehörige und Freunde der Opfer.
+              <a href={sources.drohnenkrieg[2].url} class="source-ref" target="_blank" rel="noopener">[3]</a>
+            </p>
+          </section>
+
+          <!-- Witness Testimonies -->
+          <section class="testimonies">
+            <h3 class="sr-only">Zeugenaussagen</h3>
+
+            <figure class="testimony">
+              <blockquote>
+                <p>
+                  „Nach der Explosion der Rakete liegen nur noch Fleischfetzen herum, keine kompletten Leichen.
+                  Die Hinterbliebenen sammeln die Leichenteile ein und verfluchen die USA."
+                </p>
+              </blockquote>
+              <figcaption>
+                <cite>Noor Behram</cite>, pakistanischer Fotograf
+                <a href={sources.drohnenkrieg[3].url} class="source-ref" target="_blank" rel="noopener">[4]</a>
+              </figcaption>
+            </figure>
+
+            <figure class="testimony">
+              <blockquote>
+                <p>
+                  „Ohne Deutschland wären mein Schwager und mein Neffe noch am Leben.
+                  Ohne Deutschland, ohne Ramstein könnten die USA keine Drohnenangriffe im Jemen fliegen."
+                </p>
+              </blockquote>
+              <figcaption>
+                <cite>Faisal bin Ali Jaber</cite>, Überlebender eines Drohnenangriffs
+                <a href={sources.drohnenkrieg[4].url} class="source-ref" target="_blank" rel="noopener">[5]</a>
+              </figcaption>
+            </figure>
+          </section>
+
+          <section id="whistleblower" class="subsection">
+            <h3>Der Whistleblower</h3>
+            <p>
+              Brandon Bryant, Ex-Drohnenpilot und Whistleblower, hat im Drohneneinsatz 1.626 Menschen getötet.
+              <a href={sources.drohnenkrieg[5].url} class="source-ref" target="_blank" rel="noopener">[6]</a>
+            </p>
+            <aside class="stat-callout">
+              <span class="stat-number">1.626</span>
+              <span class="stat-label">Getötete durch einen einzigen Drohnenpiloten</span>
+            </aside>
+          </section>
+        </div>
+      </section>
+
+      <!-- Chapter II: Germany's Complicity -->
+      <section id="kapitel-2" class="chapter" aria-labelledby="chapter-2-title">
+        <header class="chapter-header">
+          <span class="chapter-number">Kapitel II</span>
+          <h2 id="chapter-2-title" class="chapter-title">
+            Mittäter Deutschland
+          </h2>
+        </header>
+
+        <div class="prose-dossier">
+          <section id="groesste-basis" class="subsection">
+            <h3>Die größte US-Basis außerhalb der USA</h3>
+            <p>
+              Die US Air Base Ramstein liegt in Deutschland. Sie ist die größte US-amerikanische
+              Militärbasis außerhalb der USA.
+              <a href={sources.deutschland[0].url} class="source-ref" target="_blank" rel="noopener">[7]</a>
+            </p>
+            <aside class="fact-box">
+              <p class="fact-box-content">Ramstein ist die größte US-Militärbasis außerhalb der Vereinigten Staaten</p>
+            </aside>
+          </section>
+
+          <section id="unverzichtbar" class="subsection">
+            <h3>Unverzichtbar für den Drohnenkrieg</h3>
+            <p>
+              Ohne Ramstein wäre der völkerrechtswidrige Drohnenkrieg der USA nicht möglich.
+              <a href={sources.deutschland[1].url} class="source-ref" target="_blank" rel="noopener">[8]</a>
+            </p>
+          </section>
+
+          <section id="vertuschung" class="subsection">
+            <h3>Vertuschung durch die Bundesregierung</h3>
+            <p>
+              Über Jahre hinweg wurde die Rolle Ramsteins – und damit Deutschlands – im blutigen
+              Drohnenkrieg der USA von der deutschen Regierung verheimlicht.
+              <a href={sources.deutschland[2].url} class="source-ref" target="_blank" rel="noopener">[9]</a>
+            </p>
+          </section>
+        </div>
+      </section>
+
+      <!-- Chapter III: Wars Through Ramstein -->
+      <section id="kapitel-3" class="chapter" aria-labelledby="chapter-3-title">
+        <header class="chapter-header">
+          <span class="chapter-number">Kapitel III</span>
+          <h2 id="chapter-3-title" class="chapter-title">
+            Die Kriege über Ramstein
+          </h2>
+        </header>
+
+        <div class="prose-dossier">
+          <section id="relaisstation" class="subsection">
+            <h3>Satelliten-Relaisstation</h3>
+            <p>
+              Die Satelliten-Relaisstation in Ramstein ist das notwendige technische Bindeglied zwischen
+              Drohnenpiloten in den USA und Kampfdrohnen in Afrika und dem Nahen Osten. Sie ist außerdem
+              die Zentrale für die Auswertung von Überwachungsdrohnen zur Vorbereitung von illegalen Tötungen.
+              <a href={sources.kriege[0].url} class="source-ref" target="_blank" rel="noopener">[10]</a>
+            </p>
+          </section>
+
+          <section id="voelkerrecht" class="subsection">
+            <h3>Völkerrechtswidrige Kriegsführung</h3>
+            <p>
+              Die Drohnenmorde der USA, bei denen Deutschland mithilft, sind völkerrechtswidrig.
+              <a href={sources.kriege[1].url} class="source-ref" target="_blank" rel="noopener">[11]</a>
+            </p>
+          </section>
+
+          <section id="kriegszentrale" class="subsection">
+            <h3>Globale Kriegszentrale</h3>
+            <p>
+              Ramstein besitzt für die aktuellen Operationen des US-Militärs in Ost- und Südosteuropa
+              eine zentrale Rolle als logistische Drehscheibe. Darüber hinaus sind die Kommandozentralen
+              von US-Militär und NATO von besonderer Bedeutung, wie das NATO Allied Air Command.
+              <a href={sources.kriege[2].url} class="source-ref" target="_blank" rel="noopener">[12]</a>
+            </p>
+          </section>
+
+          <section id="raketenabwehr" class="subsection">
+            <h3>NATO-Raketenabwehr</h3>
+            <p>
+              In Ramstein sind die Kommandozentralen für sogenannte Raketenabwehrsysteme in Osteuropa
+              untergebracht, die auch für Ersteinsätze gegen Russland geeignet sind.
+            </p>
+          </section>
+
+          <section id="miesau" class="subsection">
+            <h3>Munitionsdepot Miesau</h3>
+            <p>
+              Mit dem nahegelegenen riesigen Munitionsdepot Miesau sowie dem Giftdepot in Germersheim
+              dient die Air Base Ramstein für die wichtigsten militärischen Materialtransporte in Einsatzgebiete.
+              <a href={sources.kriege[3].url} class="source-ref" target="_blank" rel="noopener">[13]</a>
+            </p>
+          </section>
+
+          <section id="bilanz" class="subsection">
+            <h3>Die Bilanz</h3>
+            <p>
+              Der Krieg gegen den Terror forderte rund 1 Million Tote.
+              <a href={sources.kriege[4].url} class="source-ref" target="_blank" rel="noopener">[14]</a>
+            </p>
+            <aside class="stat-callout stat-callout-large">
+              <span class="stat-number">~1.000.000</span>
+              <span class="stat-label">Tote im „Krieg gegen den Terror"</span>
+            </aside>
+          </section>
+        </div>
+      </section>
+
+      <!-- Chapter IV: Environmental Destruction -->
+      <section id="kapitel-4" class="chapter" aria-labelledby="chapter-4-title">
+        <header class="chapter-header">
+          <span class="chapter-number">Kapitel IV</span>
+          <h2 id="chapter-4-title" class="chapter-title">
+            Umwelt- und Gesundheitskiller Militär
+          </h2>
+        </header>
+
+        <div class="prose-dossier">
+          <section id="umweltzerstoerer" class="subsection">
+            <h3>Größter Umweltzerstörer der Welt</h3>
+            <p>
+              Das US-Militär ist der größte Umweltzerstörer der Welt. Die US-Armee verbraucht mehr
+              Brennstoffe und verursacht mehr Treibhausgase als die meisten mittelgroßen Länder der Welt.
+              <a href={sources.umwelt[0].url} class="source-ref" target="_blank" rel="noopener">[15]</a>
+            </p>
+            <aside class="fact-box">
+              <p class="fact-box-content">Das US-Militär verschmutzt die Umwelt stärker als 140 Länder</p>
+            </aside>
+          </section>
+
+          <section id="pfas" class="subsection">
+            <h3>PFAS-Kontamination</h3>
+            <p>
+              Gifte aus Luftschadstoffen und Altlasten im Boden, vor allem durch PFAS aus Löschschäumen,
+              belasten den Boden und das Grundwasser. Übliche Grenzwerte für relevante Schadstoffe werden
+              teilweise um das Tausendfache überschritten.
+              <a href={sources.umwelt[1].url} class="source-ref" target="_blank" rel="noopener">[16]</a>
+              <a href={sources.umwelt[2].url} class="source-ref" target="_blank" rel="noopener">[17]</a>
+              <a href={sources.umwelt[3].url} class="source-ref" target="_blank" rel="noopener">[18]</a>
+            </p>
+          </section>
+
+          <section id="gesundheit" class="subsection">
+            <h3>Gesundheitsschäden</h3>
+            <p>
+              Neben den umfangreichen Transportflügen über Ramstein wird die gesamte Region Westpfalz
+              als Übungszone für Kampfjets genutzt. Fluglärm, Abgase und Kerosinablass sorgen zusammen
+              mit der Trinkwasserbelastung für hohe Raten von Krebserkrankungen wie in kaum einer
+              anderen Region Deutschlands.
+              <a href={sources.umwelt[4].url} class="source-ref" target="_blank" rel="noopener">[19]</a>
+            </p>
+          </section>
+
+          <section id="kerosin" class="subsection">
+            <h3>Kerosinablass</h3>
+            <p>
+              Jedes Jahr regnen rund um die Militärbasen hunderte Tonnen Kerosin auf Deutschland nieder.
+              Allein im Jahr 2017 waren es rund 580 Tonnen.
+              <a href={sources.umwelt[5].url} class="source-ref" target="_blank" rel="noopener">[20]</a>
+              <a href={sources.umwelt[6].url} class="source-ref" target="_blank" rel="noopener">[21]</a>
+              <a href={sources.umwelt[7].url} class="source-ref" target="_blank" rel="noopener">[22]</a>
+            </p>
+            <aside class="stat-callout">
+              <span class="stat-number">580 t</span>
+              <span class="stat-label">Kerosin über Deutschland abgelassen (2017)</span>
+            </aside>
+          </section>
+        </div>
+      </section>
+
+      <!-- Sources Index -->
+      <footer id="quellenverzeichnis" class="sources-section">
+        <h2 class="sources-title">Quellenverzeichnis</h2>
+        <ol class="sources-list">
+          {[...sources.drohnenkrieg, ...sources.deutschland, ...sources.kriege, ...sources.umwelt].map((source) => (
+            <li class="source-item">
+              <span class="source-id">[{source.id}]</span>
+              <a href={source.url} target="_blank" rel="noopener noreferrer" class="source-link">
+                {source.label}
+                <svg class="external-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </footer>
+
+      <!-- Further Reading -->
+      <section class="further-reading">
+        <h2 class="further-reading-title">Weiterführende Quellen</h2>
+        <ul class="further-reading-list">
+          {furtherReading.map((item) => (
+            <li>
+              <a href={item.url} target="_blank" rel="noopener noreferrer" class="further-reading-link">
+                <span class="further-reading-name">{item.title}</span>
+                <span class="further-reading-org">{item.org}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </article>
+  </div>
+</PageLayout>
+
+<script>
+  // Intersection Observer for active ToC highlighting
+  document.addEventListener('DOMContentLoaded', () => {
+    const tocLinks = document.querySelectorAll('[data-toc-link]');
+    const sections = document.querySelectorAll('.chapter, .subsection, #quellenverzeichnis');
+
+    if (!tocLinks.length || !sections.length) return;
+
+    // Track which sections are visible
+    const visibleSections = new Set<string>();
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const id = entry.target.id;
+          if (entry.isIntersecting) {
+            visibleSections.add(id);
+          } else {
+            visibleSections.delete(id);
+          }
+        });
+
+        // Find the topmost visible section
+        let activeId: string | null = null;
+        for (const section of sections) {
+          if (visibleSections.has(section.id)) {
+            activeId = section.id;
+            break;
+          }
+        }
+
+        // Update active states
+        tocLinks.forEach((link) => {
+          const linkId = link.getAttribute('data-toc-link');
+          const isActive = linkId === activeId;
+
+          // Also check if this is a parent chapter of an active subsection
+          const isParentActive = activeId &&
+            linkId?.startsWith('kapitel-') &&
+            document.getElementById(activeId)?.closest(`#${linkId}`);
+
+          if (isActive || isParentActive) {
+            link.classList.add('is-active');
+          } else {
+            link.classList.remove('is-active');
+          }
+        });
+      },
+      {
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0,
+      }
+    );
+
+    sections.forEach((section) => observer.observe(section));
+  });
+</script>
+
+<style>
+  /* ========================================
+     Layout Structure
+     ======================================== */
+
+  .dossier-layout {
+    display: block;
+    max-width: 48rem;
+    margin: 0 auto;
+  }
+
+  @media (min-width: 1280px) {
+    .dossier-layout {
+      display: grid;
+      grid-template-columns: 1fr 14rem;
+      gap: 4rem;
+      max-width: 72rem;
+      align-items: start;
+    }
+  }
+
+  /* ========================================
+     Sticky Side ToC (Desktop)
+     ======================================== */
+
+  .toc-sidebar {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .toc-sidebar {
+      display: block;
+      order: 2;
+      position: sticky;
+      top: 6rem;
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+      padding-right: 1rem;
+      margin-right: -1rem;
+    }
+
+    /* Subtle scrollbar */
+    .toc-sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .toc-sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .toc-sidebar::-webkit-scrollbar-thumb {
+      background: #e2e8f0;
+      border-radius: 2px;
+    }
+
+    .toc-sidebar::-webkit-scrollbar-thumb:hover {
+      background: #cbd5e1;
+    }
+  }
+
+  .toc-nav {
+    font-family: var(--font-sans);
+  }
+
+  .toc-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-chapter {
+    margin-bottom: 1rem;
+  }
+
+  .toc-chapter-link {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 0.15s ease;
+  }
+
+  .toc-chapter-link:hover {
+    color: #0f172a;
+  }
+
+  .toc-chapter-link.is-active {
+    color: #0f172a;
+  }
+
+  .toc-number {
+    flex-shrink: 0;
+    font-family: var(--font-serif);
+    font-weight: 400;
+    color: #94a3b8;
+  }
+
+  .toc-chapter-link.is-active .toc-number {
+    color: #64748b;
+  }
+
+  .toc-subsections {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0 1rem;
+    border-left: 1px solid #f1f5f9;
+  }
+
+  .toc-sub-link {
+    display: block;
+    padding: 0.25rem 0 0.25rem 0.75rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-decoration: none;
+    line-height: 1.5;
+    transition: color 0.15s ease;
+  }
+
+  .toc-sub-link:hover {
+    color: #64748b;
+  }
+
+  .toc-sub-link.is-active {
+    color: #0f172a;
+  }
+
+  .toc-appendix {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  /* ========================================
+     Mobile ToC
+     ======================================== */
+
+  .toc-mobile {
+    margin-bottom: 2rem;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.375rem;
+  }
+
+  @media (min-width: 1280px) {
+    .toc-mobile {
+      display: none;
+    }
+  }
+
+  .toc-mobile-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .toc-mobile-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-mobile-icon {
+    transition: transform 0.2s ease;
+  }
+
+  details[open] .toc-mobile-icon {
+    transform: rotate(180deg);
+  }
+
+  .toc-mobile-list {
+    list-style: none;
+    padding: 0 1rem 1rem;
+    margin: 0;
+  }
+
+  .toc-mobile-link {
+    display: block;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    color: #64748b;
+    text-decoration: none;
+    border-bottom: 1px solid #f8fafc;
+  }
+
+  .toc-mobile-link:last-child {
+    border-bottom: none;
+  }
+
+  .toc-mobile-link:hover {
+    color: #0f172a;
+  }
+
+  .toc-mobile-link .toc-number {
+    margin-right: 0.5rem;
+    font-family: var(--font-serif);
+    color: #94a3b8;
+  }
+
+  /* ========================================
+     Main Content
+     ======================================== */
+
+  .dossier-content {
+    order: 1;
+    min-width: 0;
+  }
+
+  /* Document Header */
+  .dossier-header {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .classification {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #94a3b8;
+    margin-bottom: 1rem;
+  }
+
+  .dossier-title {
+    font-family: var(--font-serif);
+    font-size: clamp(2.5rem, 2rem + 2.5vw, 4rem);
+    font-weight: 400;
+    color: #0f172a;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.75rem;
+  }
+
+  .dossier-subtitle {
+    font-size: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+    font-weight: 300;
+    color: #64748b;
+    max-width: 36rem;
+  }
+
+  .dossier-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+  }
+
+  /* Chapters */
+  .chapter {
+    margin-bottom: 4rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .chapter-header {
+    margin-bottom: 2rem;
+  }
+
+  .chapter-number {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #94a3b8;
+    margin-bottom: 0.5rem;
+  }
+
+  .chapter-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 1.25rem + 1.25vw, 2.25rem);
+    font-weight: 400;
+    color: #0f172a;
+    line-height: 1.2;
+  }
+
+  /* Subsections */
+  .subsection {
+    margin-bottom: 2rem;
+    scroll-margin-top: 5rem;
+  }
+
+  /* Prose Styling */
+  .prose-dossier {
+    font-family: var(--font-serif);
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.8;
+    color: #475569;
+  }
+
+  .prose-dossier h3 {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 0.625rem;
+  }
+
+  .prose-dossier p {
+    margin-bottom: 1.25rem;
+  }
+
+  /* Source References */
+  .source-ref {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: #94a3b8;
+    text-decoration: none;
+    vertical-align: super;
+    padding: 0 0.125rem;
+    transition: color 0.15s ease;
+  }
+
+  .source-ref:hover {
+    color: #0284c7;
+  }
+
+  /* Testimonies */
+  .testimonies {
+    margin: 2.5rem 0;
+  }
+
+  .testimony {
+    margin-bottom: 2rem;
+    padding-left: 1.25rem;
+    border-left: 2px solid #e2e8f0;
+  }
+
+  .testimony blockquote {
+    margin: 0;
+    padding: 0;
+  }
+
+  .testimony blockquote p {
+    font-style: italic;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: #334155;
+    margin-bottom: 0.625rem;
+  }
+
+  .testimony figcaption {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: #94a3b8;
+  }
+
+  .testimony figcaption cite {
+    font-weight: 500;
+    font-style: normal;
+    color: #64748b;
+  }
+
+  /* Stat Callouts */
+  .stat-callout {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 1.5rem 0;
+    padding: 1.25rem 1.5rem;
+    background-color: #fafafa;
+    border-radius: 0.25rem;
+  }
+
+  .stat-callout-large {
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .stat-number {
+    font-family: var(--font-mono);
+    font-size: 2rem;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.2;
+  }
+
+  .stat-callout-large .stat-number {
+    font-size: 2.5rem;
+  }
+
+  .stat-label {
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin-top: 0.25rem;
+  }
+
+  /* Fact Boxes */
+  .fact-box {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    background-color: #f8fafc;
+    border-left: 2px solid #cbd5e1;
+    border-radius: 0 0.25rem 0.25rem 0;
+  }
+
+  .fact-box-content {
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #334155;
+    margin: 0;
+  }
+
+  /* Sources Section */
+  .sources-section {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid #e2e8f0;
+    scroll-margin-top: 5rem;
+  }
+
+  .sources-title {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
+  }
+
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    columns: 1;
+  }
+
+  @media (min-width: 640px) {
+    .sources-list {
+      columns: 2;
+      column-gap: 2rem;
+    }
+  }
+
+  .source-item {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.375rem 0;
+    font-size: 0.8125rem;
+    break-inside: avoid;
+  }
+
+  .source-id {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: #94a3b8;
+    flex-shrink: 0;
+  }
+
+  .source-link {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .source-link:hover {
+    color: #0f172a;
+  }
+
+  .external-icon {
+    display: inline-block;
+    margin-left: 0.25rem;
+    opacity: 0.5;
+    vertical-align: middle;
+  }
+
+  /* Further Reading */
+  .further-reading {
+    margin-top: 3rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .further-reading-title {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 1.5rem;
+  }
+
+  .further-reading-list {
+    display: grid;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  @media (min-width: 640px) {
+    .further-reading-list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .further-reading-link {
+    display: block;
+    padding: 1rem 1.25rem;
+    border: 1px solid #f1f5f9;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .further-reading-link:hover {
+    border-color: #e2e8f0;
+    background-color: #fafafa;
+  }
+
+  .further-reading-name {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    color: #0f172a;
+  }
+
+  .further-reading-org {
+    display: block;
+    font-size: 0.8125rem;
+    color: #94a3b8;
+    margin-top: 0.125rem;
+  }
+
+  /* Screen reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>

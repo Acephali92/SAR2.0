@@ -1,0 +1,155 @@
+---
+/**
+ * @component Header
+ * @description Site header with logo, navigation, and mobile menu.
+ *              Sticky on scroll with blur backdrop.
+ */
+
+// Navigation items - centralized for consistency
+const navItems = [
+  { href: '/warum-ramstein/', label: 'Warum Ramstein' },
+  { href: '/fakten/', label: 'Fakten' },
+  { href: '/analysen/', label: 'Analysen' },
+  { href: '/aktionen/', label: 'Aktionen' },
+  { href: '/mitmachen/', label: 'Mitmachen' },
+  { href: '/ueber-uns/', label: 'Über uns' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header
+  class="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm"
+>
+  <div class="container mx-auto px-4 md:px-6">
+    <nav class="flex h-16 items-center justify-between" aria-label="Hauptnavigation">
+      <!-- Logo / Site Name -->
+      <a
+        href="/"
+        class="flex items-center gap-3 text-lg font-semibold text-slate-900 no-underline transition-colors hover:text-sky-600"
+      >
+        <img
+          src="/images/Logo_Header.png"
+          alt="Stopp Air Base Ramstein Logo"
+          class="h-10 w-auto"
+        />
+        <span class="hidden lg:inline">Stopp Air Base Ramstein</span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <ul class="hidden items-center gap-1 md:flex" role="list">
+        {
+          navItems.map((item) => {
+            const isActive = currentPath.startsWith(item.href);
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={[
+                    'px-3 py-2 text-sm font-medium no-underline rounded-md transition-colors',
+                    isActive
+                      ? 'text-sky-600 bg-sky-50'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                  ]}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+
+      <!-- CTA Button (Desktop) -->
+      <div class="hidden md:block">
+        <a
+          href="/mitmachen/spenden/"
+          class="btn-primary inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-emerald-700"
+        >
+          Spenden
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button
+        type="button"
+        class="inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+        id="mobile-menu-button"
+      >
+        <span class="sr-only">Menü öffnen</span>
+        <!-- Hamburger Icon -->
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Mobile Menu (Hidden by default) -->
+  <div
+    id="mobile-menu"
+    class="hidden border-t border-slate-200 bg-white md:hidden"
+    aria-labelledby="mobile-menu-button"
+  >
+    <div class="container mx-auto px-4 py-4">
+      <ul class="space-y-1" role="list">
+        {
+          navItems.map((item) => {
+            const isActive = currentPath.startsWith(item.href);
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={[
+                    'block px-3 py-2 text-base font-medium no-underline rounded-md transition-colors',
+                    isActive
+                      ? 'text-sky-600 bg-sky-50'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                  ]}
+                  aria-current={isActive ? 'page' : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+        <li class="pt-2">
+          <a
+            href="/mitmachen/spenden/"
+            class="block rounded-md bg-emerald-600 px-3 py-2 text-center text-base font-medium text-white no-underline transition-colors hover:bg-emerald-700"
+          >
+            Spenden
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<script>
+  // Mobile menu toggle (minimal JS)
+  const menuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (menuButton && mobileMenu) {
+    menuButton.addEventListener('click', () => {
+      const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
+      menuButton.setAttribute('aria-expanded', String(!isExpanded));
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+</script>

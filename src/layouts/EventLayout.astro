@@ -1,0 +1,302 @@
+---
+/**
+ * @component EventLayout
+ * @description Layout for event pages (Friedenswoche, demonstrations, etc.)
+ *              Features hero section, event details, and schedule.
+ *
+ * @example
+ * <EventLayout
+ *   title="Friedenswoche 2026"
+ *   description="Die jährliche Aktionswoche"
+ *   eventType="friedenswoche"
+ *   startDate={new Date('2026-06-20')}
+ *   endDate={new Date('2026-06-28')}
+ *   location={{ name: 'Ramstein', city: 'Ramstein-Miesenbach' }}
+ * >
+ *   <Content />
+ * </EventLayout>
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  eventType: 'friedenswoche' | 'demonstration' | 'konferenz' | 'workshop' | 'sonstiges';
+  startDate: Date;
+  endDate?: Date;
+  location: {
+    name: string;
+    address?: string;
+    city?: string;
+  };
+  registrationUrl?: string;
+  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  image?: {
+    src: string;
+    alt: string;
+  };
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description,
+  eventType,
+  startDate,
+  endDate,
+  location,
+  registrationUrl,
+  status = 'upcoming',
+  image,
+  canonicalUrl,
+  ogImage,
+} = Astro.props;
+
+// Format dates in German
+const formatDate = (date: Date, options?: Intl.DateTimeFormatOptions) => {
+  return date.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    ...options,
+  });
+};
+
+const formatDateRange = (start: Date, end?: Date) => {
+  if (!end || start.toDateString() === end.toDateString()) {
+    return formatDate(start);
+  }
+
+  // Same month and year
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${start.getDate()}. – ${formatDate(end)}`;
+  }
+
+  return `${formatDate(start)} – ${formatDate(end)}`;
+};
+
+// Event type labels
+const eventTypeLabels = {
+  friedenswoche: 'Friedenswoche',
+  demonstration: 'Demonstration',
+  konferenz: 'Konferenz',
+  workshop: 'Workshop',
+  sonstiges: 'Veranstaltung',
+};
+
+// Status styling
+const statusStyles = {
+  upcoming: { label: 'Demnächst', class: 'bg-accent-sky text-white' },
+  ongoing: { label: 'Läuft gerade', class: 'bg-accent-emerald text-white' },
+  completed: { label: 'Abgeschlossen', class: 'bg-surface-600 text-content-secondary' },
+  cancelled: { label: 'Abgesagt', class: 'bg-accent-red text-white' },
+};
+
+const currentStatus = statusStyles[status];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  ogImage={ogImage || image?.src}
+>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main id="main-content" class="flex-1">
+      <!-- Hero Section -->
+      <section class="relative bg-surface-800 py-16 lg:py-24">
+        <div class="container mx-auto px-4 md:px-6">
+          <div class="mx-auto max-w-3xl text-center">
+            <!-- Event Type Badge -->
+            <div class="mb-4 flex items-center justify-center gap-3">
+              <span class="rounded-full bg-surface-700 px-3 py-1 text-xs font-medium uppercase tracking-wider text-content-secondary">
+                {eventTypeLabels[eventType]}
+              </span>
+              <span class={`rounded-full px-3 py-1 text-xs font-medium ${currentStatus.class}`}>
+                {currentStatus.label}
+              </span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="mb-6 text-4xl font-bold text-balance md:text-5xl lg:text-6xl">
+              {title}
+            </h1>
+
+            <!-- Description -->
+            <p class="mb-8 text-lg text-content-secondary md:text-xl">
+              {description}
+            </p>
+
+            <!-- Event Details Bar -->
+            <div class="flex flex-wrap items-center justify-center gap-6 text-content-primary">
+              <!-- Date -->
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="font-medium">{formatDateRange(startDate, endDate)}</span>
+              </div>
+
+              <!-- Location -->
+              <div class="flex items-center gap-2">
+                <svg class="h-5 w-5 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span class="font-medium">
+                  {location.name}{location.city && `, ${location.city}`}
+                </span>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            {
+              status === 'upcoming' && (
+                <div class="mt-8 flex flex-wrap justify-center gap-4">
+                  {registrationUrl && (
+                    <a
+                      href={registrationUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="inline-flex items-center gap-2 rounded-md bg-accent-amber px-6 py-3 font-semibold text-surface-900 no-underline transition-colors hover:bg-amber-400"
+                    >
+                      Jetzt anmelden
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </a>
+                  )}
+                  <a
+                    href="/mitmachen/spenden/"
+                    class="inline-flex items-center gap-2 rounded-md border border-content-primary px-6 py-3 font-semibold text-content-primary no-underline transition-colors hover:bg-surface-700"
+                  >
+                    Veranstaltung unterstützen
+                  </a>
+                </div>
+              )
+            }
+          </div>
+        </div>
+
+        <!-- Decorative gradient -->
+        <div class="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-surface-600 to-transparent"></div>
+      </section>
+
+      <!-- Main Content -->
+      <article class="container mx-auto px-4 py-12 md:px-6 lg:py-16">
+        <div class="mx-auto max-w-3xl">
+          <!-- Event content slot -->
+          <div class="prose-custom font-serif">
+            <slot />
+          </div>
+
+          <!-- Location Details (if address provided) -->
+          {
+            location.address && (
+              <section class="mt-12 rounded-lg border border-surface-700 bg-surface-800 p-6">
+                <h2 class="mb-4 font-sans text-lg font-semibold">Veranstaltungsort</h2>
+                <div class="flex items-start gap-4">
+                  <svg class="mt-1 h-5 w-5 shrink-0 text-accent-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <div>
+                    <p class="font-medium">{location.name}</p>
+                    <p class="text-content-secondary">{location.address}</p>
+                    {location.city && <p class="text-content-secondary">{location.city}</p>}
+                  </div>
+                </div>
+              </section>
+            )
+          }
+
+          <!-- Share Section -->
+          <section class="mt-12 border-t border-surface-700 pt-8">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <p class="text-sm text-content-muted">Teile diese Veranstaltung:</p>
+              <div class="flex gap-2">
+                <button
+                  type="button"
+                  class="rounded-md border border-surface-700 px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-800 hover:text-content-primary"
+                  onclick="navigator.clipboard.writeText(window.location.href)"
+                >
+                  Link kopieren
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <!-- Related Events / CTA Section -->
+      <section class="border-t border-surface-700 bg-surface-800 py-12 lg:py-16">
+        <div class="container mx-auto px-4 text-center md:px-6">
+          <h2 class="mb-4 text-2xl font-semibold">Werde aktiv</h2>
+          <p class="mx-auto mb-8 max-w-xl text-content-secondary">
+            Unterstütze die Kampagne und hilf uns, ein Zeichen für den Frieden zu setzen.
+          </p>
+          <div class="flex flex-wrap justify-center gap-4">
+            <a
+              href="/aktionen/"
+              class="rounded-md border border-surface-600 px-5 py-2 text-sm font-medium no-underline transition-colors hover:bg-surface-700"
+            >
+              Alle Aktionen
+            </a>
+            <a
+              href="/mitmachen/ehrenamt/"
+              class="rounded-md border border-surface-600 px-5 py-2 text-sm font-medium no-underline transition-colors hover:bg-surface-700"
+            >
+              Ehrenamtlich helfen
+            </a>
+            <a
+              href="/mitmachen/spenden/"
+              class="rounded-md bg-accent-emerald px-5 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-emerald-600"
+            >
+              Spenden
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>
+
+<style>
+  /* Prose styling for event content */
+  .prose-custom :global(h2) {
+    @apply mt-10 mb-4 text-2xl font-semibold font-sans;
+  }
+
+  .prose-custom :global(h3) {
+    @apply mt-8 mb-3 text-xl font-semibold font-sans;
+  }
+
+  .prose-custom :global(p) {
+    @apply mb-6;
+  }
+
+  .prose-custom :global(ul),
+  .prose-custom :global(ol) {
+    @apply mb-6 pl-6;
+  }
+
+  .prose-custom :global(li) {
+    @apply mb-2;
+  }
+
+  .prose-custom :global(a) {
+    @apply text-accent-sky underline underline-offset-2 hover:text-content-primary;
+  }
+
+  .prose-custom :global(strong) {
+    @apply font-semibold text-content-primary;
+  }
+</style>

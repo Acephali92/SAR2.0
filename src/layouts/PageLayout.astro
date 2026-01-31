@@ -1,0 +1,59 @@
+---
+/**
+ * @component PageLayout
+ * @description Standard page wrapper with Header and Footer.
+ *              Use this for all regular pages.
+ *
+ * @example
+ * <PageLayout title="Fakten" description="Die Fakten über Ramstein">
+ *   <h1>Page Content</h1>
+ * </PageLayout>
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  canonicalUrl?: string;
+  ogImage?: string;
+  /** Wide layout removes max-width constraint */
+  wide?: boolean;
+  /** Show breadcrumbs (future feature) */
+  showBreadcrumbs?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonicalUrl,
+  ogImage,
+  wide = false,
+  showBreadcrumbs = false,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  ogImage={ogImage}
+>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main
+      id="main-content"
+      class:list={[
+        'flex-1 py-8 md:py-12 lg:py-16',
+        wide ? 'w-full' : 'container mx-auto px-4 md:px-6',
+      ]}
+    >
+      <slot />
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>

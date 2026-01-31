@@ -1,0 +1,64 @@
+---
+/**
+ * @component Badge
+ * @description Small label for categories, tags, or status indicators.
+ *
+ * @example
+ * <Badge>Default</Badge>
+ * <Badge variant="warning">Warnung</Badge>
+ * <Badge variant="success" size="lg">Aktiv</Badge>
+ */
+
+interface Props {
+  /** Visual variant */
+  variant?: 'default' | 'primary' | 'secondary' | 'warning' | 'danger' | 'success';
+  /** Size variant */
+  size?: 'sm' | 'md' | 'lg';
+  /** Rounded style */
+  rounded?: 'default' | 'full';
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  variant = 'default',
+  size = 'md',
+  rounded = 'default',
+  class: className = '',
+} = Astro.props;
+
+// Variant styles
+const variantStyles = {
+  default: 'bg-surface-700 text-content-secondary',
+  primary: 'bg-accent-sky/20 text-accent-sky',
+  secondary: 'bg-surface-700 text-content-primary',
+  warning: 'bg-accent-amber/20 text-accent-amber',
+  danger: 'bg-accent-red/20 text-accent-red',
+  success: 'bg-accent-emerald/20 text-accent-emerald',
+};
+
+// Size styles
+const sizeStyles = {
+  sm: 'px-2 py-0.5 text-xs',
+  md: 'px-2.5 py-1 text-xs',
+  lg: 'px-3 py-1.5 text-sm',
+};
+
+// Rounded styles
+const roundedStyles = {
+  default: 'rounded',
+  full: 'rounded-full',
+};
+
+const combinedStyles = [
+  'inline-flex items-center font-medium',
+  variantStyles[variant],
+  sizeStyles[size],
+  roundedStyles[rounded],
+  className,
+].join(' ');
+---
+
+<span class={combinedStyles}>
+  <slot />
+</span>

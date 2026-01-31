@@ -1,0 +1,132 @@
+---
+/**
+ * @component Callout
+ * @description Highlighted content block for important information.
+ *              Use in articles to emphasize key facts, warnings, or quotes.
+ *
+ * @example
+ * <Callout type="warning" title="Achtung">
+ *   Important warning message here.
+ * </Callout>
+ *
+ * <Callout type="fact">
+ *   <strong>5.000+</strong> Zivilisten wurden durch Drohnenangriffe getötet.
+ * </Callout>
+ */
+
+interface Props {
+  /** Callout type determines color and icon */
+  type?: 'info' | 'warning' | 'danger' | 'success' | 'fact' | 'quote';
+  /** Optional title */
+  title?: string;
+  /** Source attribution for quotes/facts */
+  source?: string;
+  /** Source URL */
+  sourceUrl?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  type = 'info',
+  title,
+  source,
+  sourceUrl,
+  class: className = '',
+} = Astro.props;
+
+// Type configurations
+const typeConfig = {
+  info: {
+    bgColor: 'bg-accent-sky/10',
+    borderColor: 'border-accent-sky/30',
+    iconColor: 'text-accent-sky',
+    icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  },
+  warning: {
+    bgColor: 'bg-accent-amber/10',
+    borderColor: 'border-accent-amber/30',
+    iconColor: 'text-accent-amber',
+    icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
+  },
+  danger: {
+    bgColor: 'bg-accent-red/10',
+    borderColor: 'border-accent-red/30',
+    iconColor: 'text-accent-red',
+    icon: 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+  },
+  success: {
+    bgColor: 'bg-accent-emerald/10',
+    borderColor: 'border-accent-emerald/30',
+    iconColor: 'text-accent-emerald',
+    icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+  },
+  fact: {
+    bgColor: 'bg-surface-800',
+    borderColor: 'border-accent-amber',
+    iconColor: 'text-accent-amber',
+    icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+  },
+  quote: {
+    bgColor: 'bg-surface-800',
+    borderColor: 'border-content-muted',
+    iconColor: 'text-content-muted',
+    icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
+  },
+};
+
+const config = typeConfig[type];
+---
+
+<aside
+  class:list={[
+    'my-6 rounded-lg border-l-4 p-4 md:p-6',
+    config.bgColor,
+    config.borderColor,
+    className,
+  ]}
+  role={type === 'warning' || type === 'danger' ? 'alert' : 'note'}
+>
+  <div class="flex gap-4">
+    <!-- Icon -->
+    <div class={`shrink-0 ${config.iconColor}`}>
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={config.icon} />
+      </svg>
+    </div>
+
+    <!-- Content -->
+    <div class="flex-1">
+      {title && (
+        <h4 class="mb-2 font-sans font-semibold text-content-primary">
+          {title}
+        </h4>
+      )}
+
+      <div class:list={[
+        'text-content-secondary',
+        type === 'quote' && 'italic',
+        type === 'fact' && 'text-lg',
+      ]}>
+        <slot />
+      </div>
+
+      {source && (
+        <footer class="mt-3 text-sm text-content-muted">
+          — {sourceUrl ? (
+            <a
+              href={sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-accent-sky hover:text-content-primary"
+            >
+              {source}
+            </a>
+          ) : (
+            source
+          )}
+        </footer>
+      )}
+    </div>
+  </div>
+</aside>

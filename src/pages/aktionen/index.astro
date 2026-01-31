@@ -1,0 +1,98 @@
+---
+/**
+ * Aktionen - Events listing page
+ */
+
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PageLayout from '@layouts/PageLayout.astro';
+import EventCard from '@components/content/EventCard.astro';
+
+type EventEntry = CollectionEntry<'aktionen'>;
+
+const allEvents = await getCollection('aktionen');
+const events = allEvents
+  .filter((event: EventEntry) => !event.data.draft)
+  .sort((a: EventEntry, b: EventEntry) => b.data.startDate.getTime() - a.data.startDate.getTime());
+
+// Separate upcoming and past events
+const now = new Date();
+const upcomingEvents = events.filter(
+  (e: EventEntry) => e.data.startDate >= now || e.data.status === 'upcoming' || e.data.status === 'ongoing'
+);
+const pastEvents = events.filter(
+  (e: EventEntry) => e.data.startDate < now && e.data.status !== 'upcoming' && e.data.status !== 'ongoing'
+);
+---
+
+<PageLayout
+  title="Aktionen & Veranstaltungen"
+  description="Friedenswochen, Demonstrationen, Workshops und mehr. Werde aktiv gegen die Air Base Ramstein."
+>
+  <section class="mb-12">
+    <h1 class="mb-6 text-4xl font-bold text-balance md:text-5xl">
+      Aktionen & Veranstaltungen
+    </h1>
+    <p class="max-w-2xl text-xl text-content-secondary">
+      Sei dabei bei unseren Aktionen für den Frieden. Friedenswochen, Demonstrationen,
+      Workshops und mehr – es gibt viele Möglichkeiten, aktiv zu werden.
+    </p>
+  </section>
+
+  {
+    upcomingEvents.length > 0 && (
+      <section class="mb-16">
+        <h2 class="mb-6 text-2xl font-semibold">Kommende Veranstaltungen</h2>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {upcomingEvents.map((event: EventEntry) => (
+            <EventCard
+              title={event.data.title}
+              href={`/aktionen/${event.slug}/`}
+              startDate={event.data.startDate}
+              endDate={event.data.endDate}
+              location={event.data.location.name}
+              eventType={event.data.eventType}
+              status={event.data.status}
+              description={event.data.description}
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    pastEvents.length > 0 && (
+      <section>
+        <h2 class="mb-6 text-2xl font-semibold">Vergangene Veranstaltungen</h2>
+        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {pastEvents.map((event: EventEntry) => (
+            <EventCard
+              title={event.data.title}
+              href={`/aktionen/${event.slug}/`}
+              startDate={event.data.startDate}
+              endDate={event.data.endDate}
+              location={event.data.location.name}
+              eventType={event.data.eventType}
+              status="completed"
+              description={event.data.description}
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <section class="mt-16 rounded-lg border border-surface-700 bg-surface-800 p-8 text-center">
+    <h2 class="mb-4 text-2xl font-semibold">Eigene Aktion organisieren?</h2>
+    <p class="mx-auto mb-6 max-w-xl text-content-secondary">
+      Du möchtest eine eigene Aktion für den Frieden organisieren?
+      Wir unterstützen dich mit Material und Vernetzung.
+    </p>
+    <a
+      href="/kontakt/"
+      class="inline-flex items-center gap-2 rounded-md border border-surface-600 px-6 py-3 font-semibold text-content-primary no-underline transition-colors hover:bg-surface-700"
+    >
+      Kontakt aufnehmen
+    </a>
+  </section>
+</PageLayout>

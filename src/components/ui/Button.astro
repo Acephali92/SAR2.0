@@ -1,0 +1,100 @@
+---
+/**
+ * @component Button
+ * @description Reusable button/link component with variants.
+ *
+ * @example
+ * <Button href="/contact/" variant="primary">Contact Us</Button>
+ * <Button type="submit" variant="secondary">Submit</Button>
+ */
+
+interface Props {
+  /** URL for link buttons */
+  href?: string;
+  /** Button type for form buttons */
+  type?: 'button' | 'submit' | 'reset';
+  /** Visual variant */
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'success';
+  /** Size variant */
+  size?: 'sm' | 'md' | 'lg';
+  /** Full width */
+  fullWidth?: boolean;
+  /** Disabled state */
+  disabled?: boolean;
+  /** External link (adds target="_blank") */
+  external?: boolean;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  href,
+  type = 'button',
+  variant = 'primary',
+  size = 'md',
+  fullWidth = false,
+  disabled = false,
+  external = false,
+  class: className = '',
+} = Astro.props;
+
+const isLink = !!href;
+
+// Base styles
+const baseStyles = 'inline-flex items-center justify-center gap-2 font-medium rounded-md transition-colors focus-ring no-underline';
+
+// Variant styles - use standard Tailwind colors for light mode compatibility
+const variantStyles = {
+  primary: 'bg-sky-500 text-white hover:bg-sky-600',
+  secondary: 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-slate-400',
+  ghost: 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+  danger: 'bg-red-600 text-white hover:bg-red-700',
+  success: 'bg-emerald-600 text-white hover:bg-emerald-700',
+};
+
+// Size styles
+const sizeStyles = {
+  sm: 'px-3 py-1.5 text-sm',
+  md: 'px-4 py-2 text-sm',
+  lg: 'px-6 py-3 text-base',
+};
+
+// Disabled styles
+const disabledStyles = 'opacity-50 cursor-not-allowed pointer-events-none';
+
+// Combine styles
+const combinedStyles = [
+  baseStyles,
+  variantStyles[variant],
+  sizeStyles[size],
+  fullWidth && 'w-full',
+  disabled && disabledStyles,
+  className,
+].filter(Boolean).join(' ');
+
+// External link attributes
+const externalAttrs = external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
+---
+
+{isLink ? (
+  <a
+    href={href}
+    class={combinedStyles}
+    {...externalAttrs}
+  >
+    <slot />
+    {external && (
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+    )}
+  </a>
+) : (
+  <button
+    type={type}
+    class={combinedStyles}
+    disabled={disabled}
+  >
+    <slot />
+  </button>
+)}

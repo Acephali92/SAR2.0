@@ -1,0 +1,82 @@
+---
+/**
+ * @component Card
+ * @description Flexible card component for content blocks.
+ *
+ * @example
+ * <Card>
+ *   <h3>Card Title</h3>
+ *   <p>Card content</p>
+ * </Card>
+ *
+ * <Card href="/link/" hoverable>
+ *   <p>Clickable card</p>
+ * </Card>
+ */
+
+interface Props {
+  /** Makes entire card a link */
+  href?: string;
+  /** Adds hover effect */
+  hoverable?: boolean;
+  /** Padding size */
+  padding?: 'none' | 'sm' | 'md' | 'lg';
+  /** Border variant */
+  variant?: 'default' | 'outlined' | 'filled';
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  href,
+  hoverable = false,
+  padding = 'md',
+  variant = 'default',
+  class: className = '',
+} = Astro.props;
+
+const isLink = !!href;
+
+// Base styles
+const baseStyles = 'block rounded-lg transition-all';
+
+// Variant styles
+const variantStyles = {
+  default: 'bg-white border border-slate-200 shadow-sm',
+  outlined: 'bg-transparent border border-slate-200',
+  filled: 'bg-slate-50 border-none',
+};
+
+// Padding styles
+const paddingStyles = {
+  none: '',
+  sm: 'p-4',
+  md: 'p-6',
+  lg: 'p-8',
+};
+
+// Hover styles
+const hoverStyles = hoverable || isLink
+  ? 'hover:border-slate-300 hover:shadow-md'
+  : '';
+
+// Combine styles
+const combinedStyles = [
+  baseStyles,
+  variantStyles[variant],
+  paddingStyles[padding],
+  hoverStyles,
+  isLink && 'no-underline',
+  className,
+].filter(Boolean).join(' ');
+---
+
+{isLink ? (
+  <a href={href} class={combinedStyles}>
+    <slot />
+  </a>
+) : (
+  <div class={combinedStyles}>
+    <slot />
+  </div>
+)}

@@ -1,0 +1,761 @@
+---
+/**
+ * @component ArgumentLayout
+ * @description Editorial layout for argument pages (/warum-ramstein/).
+ *              Features category-based accent colors, sticky ToC, and modern typography.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  category: 'drohnenkrieg' | 'umwelt' | 'voelkerrecht' | 'deutschland';
+  sources?: Array<{ label: string; url: string }>;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description,
+  publishedAt,
+  updatedAt,
+  category,
+  sources = [],
+  canonicalUrl,
+  ogImage,
+} = Astro.props;
+
+// Category configuration
+const categoryConfig = {
+  drohnenkrieg: {
+    label: 'Drohnenkrieg',
+    accentColor: 'amber',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />`,
+  },
+  umwelt: {
+    label: 'Umwelt',
+    accentColor: 'emerald',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+  },
+  voelkerrecht: {
+    label: 'Völkerrecht',
+    accentColor: 'red',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />`,
+  },
+  deutschland: {
+    label: 'Deutschland',
+    accentColor: 'sky',
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />`,
+  },
+};
+
+const config = categoryConfig[category];
+
+// Format dates in German locale
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+// Accent color classes based on category
+const accentClasses = {
+  amber: {
+    badge: 'bg-amber-50 text-amber-700 border-amber-200',
+    icon: 'text-amber-600',
+    border: 'border-amber-200',
+    tocActive: 'text-amber-700',
+  },
+  emerald: {
+    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+    icon: 'text-emerald-600',
+    border: 'border-emerald-200',
+    tocActive: 'text-emerald-700',
+  },
+  red: {
+    badge: 'bg-red-50 text-red-700 border-red-200',
+    icon: 'text-red-600',
+    border: 'border-red-200',
+    tocActive: 'text-red-700',
+  },
+  sky: {
+    badge: 'bg-sky-50 text-sky-700 border-sky-200',
+    icon: 'text-sky-600',
+    border: 'border-sky-200',
+    tocActive: 'text-sky-700',
+  },
+};
+
+const accent = accentClasses[config.accentColor];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  ogImage={ogImage}
+>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main id="main-content" class="flex-1 py-8 md:py-12 lg:py-16">
+      <div class="argument-layout">
+        <!-- Sticky Side ToC (Desktop only) -->
+        <aside class="toc-sidebar" aria-label="Inhaltsverzeichnis">
+          <nav class="toc-nav">
+            <p class="toc-label">Inhalt</p>
+            <div id="toc" class="toc-content" data-accent={config.accentColor}>
+              <p class="toc-loading">Wird geladen...</p>
+            </div>
+          </nav>
+
+          <!-- Back to overview -->
+          <a href="/warum-ramstein/" class="back-link">
+            <svg class="back-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Zur Übersicht
+          </a>
+        </aside>
+
+        <!-- Main Content -->
+        <article class="argument-content">
+          <!-- Article Header -->
+          <header class="article-header">
+            <!-- Category Badge -->
+            <div class={`category-badge ${accent.badge}`}>
+              <svg class={`category-icon ${accent.icon}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <Fragment set:html={config.icon} />
+              </svg>
+              <span>{config.label}</span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="article-title">{title}</h1>
+
+            <!-- Description -->
+            <p class="article-lead">{description}</p>
+
+            <!-- Meta -->
+            <div class="article-meta">
+              <time datetime={publishedAt.toISOString()}>
+                {formatDate(publishedAt)}
+              </time>
+              {updatedAt && (
+                <span class="meta-updated">
+                  (aktualisiert: {formatDate(updatedAt)})
+                </span>
+              )}
+            </div>
+          </header>
+
+          <!-- Mobile ToC -->
+          <nav class="toc-mobile" aria-label="Inhaltsverzeichnis">
+            <details>
+              <summary class="toc-mobile-toggle">
+                <span>Inhaltsverzeichnis</span>
+                <svg class="toc-mobile-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </summary>
+              <div id="toc-mobile" class="toc-mobile-content">
+                <p class="toc-loading">Wird geladen...</p>
+              </div>
+            </details>
+          </nav>
+
+          <!-- Article Body -->
+          <div class="prose-argument" data-accent={config.accentColor}>
+            <slot />
+          </div>
+
+          <!-- Sources -->
+          {sources.length > 0 && (
+            <footer class="sources-section">
+              <h2 class="sources-title">Quellen</h2>
+              <ol class="sources-list">
+                {sources.map((source, index) => (
+                  <li class="source-item">
+                    <span class="source-number">{index + 1}.</span>
+                    <a href={source.url} target="_blank" rel="noopener noreferrer" class="source-link">
+                      {source.label}
+                      <svg class="external-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </footer>
+          )}
+
+          <!-- Navigation -->
+          <nav class="article-nav">
+            <a href="/warum-ramstein/" class="nav-back">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              <span>Alle Themen</span>
+            </a>
+          </nav>
+        </article>
+      </div>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>
+
+<script>
+  // Generate Table of Contents from headings
+  document.addEventListener('DOMContentLoaded', () => {
+    const article = document.querySelector('.prose-argument');
+    const tocDesktop = document.getElementById('toc');
+    const tocMobile = document.getElementById('toc-mobile');
+
+    if (!article) return;
+
+    const headings = article.querySelectorAll('h2, h3');
+    const accent = article.getAttribute('data-accent') || 'sky';
+
+    if (headings.length === 0) {
+      if (tocDesktop) tocDesktop.innerHTML = '<p class="toc-empty">Keine Abschnitte</p>';
+      if (tocMobile) tocMobile.innerHTML = '<p class="toc-empty">Keine Abschnitte</p>';
+      return;
+    }
+
+    // Create ToC list
+    const createTocList = (isMobile: boolean = false) => {
+      const list = document.createElement('ul');
+      list.className = isMobile ? 'toc-mobile-list' : 'toc-list';
+
+      headings.forEach((heading, index) => {
+        if (!heading.id) {
+          heading.id = `section-${index}`;
+        }
+
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+
+        a.href = `#${heading.id}`;
+        a.textContent = heading.textContent;
+        a.setAttribute('data-toc-link', heading.id);
+
+        if (isMobile) {
+          a.className = `toc-mobile-link ${heading.tagName === 'H3' ? 'toc-mobile-link-sub' : ''}`;
+        } else {
+          a.className = `toc-link ${heading.tagName === 'H3' ? 'toc-link-sub' : ''}`;
+        }
+
+        li.appendChild(a);
+        list.appendChild(li);
+      });
+
+      return list;
+    };
+
+    if (tocDesktop) {
+      tocDesktop.innerHTML = '';
+      tocDesktop.appendChild(createTocList(false));
+    }
+
+    if (tocMobile) {
+      tocMobile.innerHTML = '';
+      tocMobile.appendChild(createTocList(true));
+    }
+
+    // Intersection Observer for active highlighting (desktop only)
+    if (tocDesktop) {
+      const tocLinks = tocDesktop.querySelectorAll('[data-toc-link]');
+      const visibleSections = new Set<string>();
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const id = entry.target.id;
+            if (entry.isIntersecting) {
+              visibleSections.add(id);
+            } else {
+              visibleSections.delete(id);
+            }
+          });
+
+          // Find topmost visible section
+          let activeId: string | null = null;
+          for (const heading of headings) {
+            if (visibleSections.has(heading.id)) {
+              activeId = heading.id;
+              break;
+            }
+          }
+
+          // Update active states
+          tocLinks.forEach((link) => {
+            const linkId = link.getAttribute('data-toc-link');
+            if (linkId === activeId) {
+              link.classList.add('is-active');
+            } else {
+              link.classList.remove('is-active');
+            }
+          });
+        },
+        {
+          rootMargin: '-100px 0px -60% 0px',
+          threshold: 0,
+        }
+      );
+
+      headings.forEach((heading) => observer.observe(heading));
+    }
+  });
+</script>
+
+<style>
+  /* ========================================
+     Layout Structure
+     ======================================== */
+
+  .argument-layout {
+    display: block;
+    max-width: 48rem;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .argument-layout {
+      padding: 0 1.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .argument-layout {
+      display: grid;
+      grid-template-columns: 1fr 13rem;
+      gap: 4rem;
+      max-width: 72rem;
+      align-items: start;
+    }
+  }
+
+  /* ========================================
+     Sticky Side ToC (Desktop)
+     ======================================== */
+
+  .toc-sidebar {
+    display: none;
+  }
+
+  @media (min-width: 1280px) {
+    .toc-sidebar {
+      display: block;
+      order: 2;
+      position: sticky;
+      top: 6rem;
+      max-height: calc(100vh - 8rem);
+      overflow-y: auto;
+    }
+  }
+
+  .toc-nav {
+    font-family: var(--font-sans);
+  }
+
+  .toc-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-bottom: 0.875rem;
+  }
+
+  .toc-content :global(.toc-list) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-content :global(.toc-link) {
+    display: block;
+    padding: 0.375rem 0;
+    font-size: 0.8125rem;
+    color: #64748b;
+    text-decoration: none;
+    line-height: 1.4;
+    transition: color 0.15s ease;
+  }
+
+  .toc-content :global(.toc-link:hover) {
+    color: #0f172a;
+  }
+
+  .toc-content :global(.toc-link-sub) {
+    padding-left: 0.75rem;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    border-left: 1px solid #f1f5f9;
+  }
+
+  .toc-content :global(.toc-link.is-active) {
+    color: #0f172a;
+    font-weight: 500;
+  }
+
+  /* Category-specific active colors */
+  .toc-content[data-accent="amber"] :global(.toc-link.is-active) {
+    color: #b45309;
+  }
+  .toc-content[data-accent="emerald"] :global(.toc-link.is-active) {
+    color: #047857;
+  }
+  .toc-content[data-accent="red"] :global(.toc-link.is-active) {
+    color: #b91c1c;
+  }
+  .toc-content[data-accent="sky"] :global(.toc-link.is-active) {
+    color: #0369a1;
+  }
+
+  .toc-loading,
+  .toc-empty {
+    font-size: 0.8125rem;
+    color: #94a3b8;
+    font-style: italic;
+  }
+
+  .back-link {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.8125rem;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .back-link:hover {
+    color: #0f172a;
+  }
+
+  .back-icon {
+    flex-shrink: 0;
+  }
+
+  /* ========================================
+     Mobile ToC
+     ======================================== */
+
+  .toc-mobile {
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    background: #fafafa;
+  }
+
+  @media (min-width: 1280px) {
+    .toc-mobile {
+      display: none;
+    }
+  }
+
+  .toc-mobile-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .toc-mobile-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .toc-mobile-icon {
+    transition: transform 0.2s ease;
+    color: #64748b;
+  }
+
+  details[open] .toc-mobile-icon {
+    transform: rotate(180deg);
+  }
+
+  .toc-mobile-content {
+    padding: 0 1rem 1rem;
+  }
+
+  .toc-mobile-content :global(.toc-mobile-list) {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-mobile-content :global(.toc-mobile-link) {
+    display: block;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+    color: #475569;
+    text-decoration: none;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .toc-mobile-content :global(.toc-mobile-link:last-child) {
+    border-bottom: none;
+  }
+
+  .toc-mobile-content :global(.toc-mobile-link-sub) {
+    padding-left: 1rem;
+    font-size: 0.8125rem;
+    color: #64748b;
+  }
+
+  /* ========================================
+     Article Content
+     ======================================== */
+
+  .argument-content {
+    order: 1;
+    min-width: 0;
+  }
+
+  /* Article Header */
+  .article-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .category-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    border: 1px solid;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .category-icon {
+    flex-shrink: 0;
+  }
+
+  .article-title {
+    font-family: var(--font-serif);
+    font-size: clamp(1.75rem, 1.5rem + 1.25vw, 2.75rem);
+    font-weight: 400;
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1rem;
+  }
+
+  .article-lead {
+    font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+    color: #475569;
+    line-height: 1.6;
+    max-width: 42rem;
+  }
+
+  .article-meta {
+    margin-top: 1.25rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+  }
+
+  .meta-updated {
+    margin-left: 0.5rem;
+  }
+
+  /* ========================================
+     Prose Styling
+     ======================================== */
+
+  .prose-argument {
+    font-family: var(--font-serif);
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.8;
+    color: #334155;
+  }
+
+  .prose-argument :global(h2) {
+    font-family: var(--font-sans);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .prose-argument :global(h3) {
+    font-family: var(--font-sans);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
+    scroll-margin-top: 5rem;
+  }
+
+  .prose-argument :global(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  .prose-argument :global(ul),
+  .prose-argument :global(ol) {
+    margin-bottom: 1.25rem;
+    padding-left: 1.5rem;
+  }
+
+  .prose-argument :global(li) {
+    margin-bottom: 0.5rem;
+  }
+
+  .prose-argument :global(strong) {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .prose-argument :global(a) {
+    color: #0369a1;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.15s ease;
+  }
+
+  .prose-argument :global(a:hover) {
+    color: #0f172a;
+  }
+
+  .prose-argument :global(blockquote) {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem;
+    border-left: 3px solid #e2e8f0;
+    background: #f8fafc;
+    border-radius: 0 0.375rem 0.375rem 0;
+    font-style: italic;
+    color: #475569;
+  }
+
+  /* Category-specific blockquote accents */
+  .prose-argument[data-accent="amber"] :global(blockquote) {
+    border-left-color: #fbbf24;
+    background: #fffbeb;
+  }
+  .prose-argument[data-accent="emerald"] :global(blockquote) {
+    border-left-color: #34d399;
+    background: #ecfdf5;
+  }
+  .prose-argument[data-accent="red"] :global(blockquote) {
+    border-left-color: #f87171;
+    background: #fef2f2;
+  }
+  .prose-argument[data-accent="sky"] :global(blockquote) {
+    border-left-color: #38bdf8;
+    background: #f0f9ff;
+  }
+
+  .prose-argument :global(blockquote p:last-child) {
+    margin-bottom: 0;
+  }
+
+  /* ========================================
+     Sources Section
+     ======================================== */
+
+  .sources-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .sources-title {
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 1rem;
+  }
+
+  .sources-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .source-item {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.375rem 0;
+    font-size: 0.875rem;
+  }
+
+  .source-number {
+    color: #94a3b8;
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .source-link {
+    color: #475569;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .source-link:hover {
+    color: #0f172a;
+    text-decoration: underline;
+  }
+
+  .external-icon {
+    display: inline-block;
+    margin-left: 0.25rem;
+    opacity: 0.5;
+    vertical-align: middle;
+  }
+
+  /* ========================================
+     Article Navigation
+     ======================================== */
+
+  .article-nav {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .nav-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .nav-back:hover {
+    color: #0f172a;
+  }
+</style>

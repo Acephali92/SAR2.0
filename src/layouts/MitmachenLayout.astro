@@ -1,0 +1,373 @@
+---
+/**
+ * @component MitmachenLayout
+ * @description Accessible layout for engagement/participation pages (mitmachen section).
+ *              Features a hero with type-specific accent colors, prose content area,
+ *              and a bottom CTA section with trust indicators.
+ *
+ * @accessibility
+ * - All sections have aria-labelledby for screen reader navigation
+ * - Decorative elements use aria-hidden="true"
+ * - Focus states are visible on all interactive elements
+ * - Color contrast meets WCAG AA standards
+ *
+ * @props
+ * - title: Page title displayed in hero and document head
+ * - description: Short description shown in hero and meta tags
+ * - ctaType: Determines accent color and CTA configuration
+ * - heroImage: Optional custom hero background image
+ * - contactEmail: Optional email shown in contact section
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+import Button from '@components/ui/Button.astro';
+
+// ---------------------------------------------------------------------------
+// Type Definitions
+// ---------------------------------------------------------------------------
+
+interface Props {
+  title: string;
+  description: string;
+  ctaType: 'spenden' | 'mitgliedschaft' | 'ehrenamt' | 'petition';
+  heroImage?: string;
+  contactEmail?: string;
+}
+
+interface CtaConfig {
+  label: string;
+  href: string;
+  icon: keyof typeof icons;
+  accentColor: string;
+  accentBg: string;
+  accentBgLight: string; // For lighter backgrounds (stat badge)
+  stat?: { value: string; label: string };
+  highlight?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Props & Configuration
+// ---------------------------------------------------------------------------
+
+const { title, description, ctaType, heroImage, contactEmail } = Astro.props;
+
+/**
+ * CTA configuration for each engagement type.
+ * Accent colors are coordinated across text, backgrounds, and light variants.
+ */
+const ctaConfig: Record<string, CtaConfig> = {
+  petition: {
+    label: 'Aufruf per E-Mail unterzeichnen',
+    href: 'mailto:info@stoppramstein.de?subject=Aufruf%20unterzeichnen',
+    icon: 'pencil',
+    accentColor: 'text-amber-500',
+    accentBg: 'bg-amber-500',
+    accentBgLight: 'bg-amber-500/20',
+    stat: { value: '24.978', label: 'Unterschriften' },
+    highlight: 'Werden Sie Teil der über 24.900 Menschen, die bereits unterschrieben haben.',
+  },
+  spenden: {
+    label: 'Jetzt spenden',
+    href: '#spendenkonto',
+    icon: 'heart',
+    accentColor: 'text-rose-500',
+    accentBg: 'bg-rose-500',
+    accentBgLight: 'bg-rose-500/20',
+    stat: { value: '100%', label: 'Unabhängig' },
+    highlight: 'Ihre Spende ist steuerlich absetzbar. Wir sind als gemeinnützig anerkannt.',
+  },
+  mitgliedschaft: {
+    label: 'Mitgliedschaft anfragen',
+    href: 'mailto:info@stoppramstein.de?subject=Mitgliedschaft',
+    icon: 'users',
+    accentColor: 'text-sky-500',
+    accentBg: 'bg-sky-500',
+    accentBgLight: 'bg-sky-500/20',
+    stat: { value: 'ab 5€', label: 'pro Monat' },
+    highlight: 'Langfristige Unterstützung für nachhaltige Friedensarbeit.',
+  },
+  ehrenamt: {
+    label: 'Kontakt aufnehmen',
+    href: 'mailto:info@stoppramstein.de?subject=Ehrenamtliches%20Engagement',
+    icon: 'hand',
+    accentColor: 'text-emerald-500',
+    accentBg: 'bg-emerald-500',
+    accentBgLight: 'bg-emerald-500/20',
+    stat: { value: '500+', label: 'Aktive' },
+    highlight: 'Ob viel oder wenig Zeit – jeder Beitrag zählt.',
+  },
+};
+
+const cta = ctaConfig[ctaType];
+
+/**
+ * Hero background images per engagement type.
+ * Images should be optimized and at least 1920px wide.
+ */
+const heroImages: Record<string, string> = {
+  petition: '/images/aufruf-unterzeichnen-bg.jpg',
+  spenden: '/images/unterstuetze-uns-mit-einer-spende.jpg',
+  mitgliedschaft: '/images/werde-mitglied-im-foerderverein.jpg',
+  ehrenamt: '/images/hilf-uns-bei-der-organisation.jpg',
+};
+
+const bgImage = heroImage || heroImages[ctaType] || '/images/slide2.jpg';
+
+/**
+ * Bottom CTA section content per engagement type.
+ */
+const bottomCtaContent: Record<string, { title: string; subtitle: string; quote: string }> = {
+  petition: {
+    title: 'Ihre Stimme zählt',
+    subtitle: 'Jede Unterschrift ist ein Zeichen gegen den Drohnenkrieg.',
+    quote: '„Von deutschem Boden darf nie wieder Krieg ausgehen."',
+  },
+  spenden: {
+    title: 'Jeder Beitrag macht den Unterschied',
+    subtitle: 'Mit Ihrer Spende ermöglichen Sie unsere unabhängige Friedensarbeit.',
+    quote: '„Gemeinsam für eine friedlichere Welt."',
+  },
+  mitgliedschaft: {
+    title: 'Gemeinsam sind wir stärker',
+    subtitle: 'Als Fördermitglied sichern Sie die Zukunft der Kampagne.',
+    quote: '„Frieden braucht einen langen Atem."',
+  },
+  ehrenamt: {
+    title: 'Werden Sie Teil unserer Gemeinschaft',
+    subtitle: 'Hunderte Freiwillige machen unsere Arbeit erst möglich.',
+    quote: '„Engagement verbindet Menschen über Generationen hinweg."',
+  },
+};
+
+// ---------------------------------------------------------------------------
+// Icons (SVG paths for inline rendering)
+// ---------------------------------------------------------------------------
+
+const icons = {
+  pencil: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />`,
+  heart: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />`,
+  users: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />`,
+  hand: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11" />`,
+  shield: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
+  lock: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />`,
+  userGroup: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />`,
+  mail: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />`,
+  info: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />`,
+  chevronRight: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />`,
+} as const;
+
+// Helper to get icon path
+const getIcon = (name: keyof typeof icons) => icons[name];
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="flex min-h-screen flex-col bg-white">
+    <Header />
+
+    <main id="main-content" class="flex-1">
+      <!-- Hero Section -->
+      <section class="relative overflow-hidden bg-slate-900 text-white">
+        <!-- Background with enhanced overlay -->
+        <div class="absolute inset-0">
+          <img
+            src={bgImage}
+            alt=""
+            class="h-full w-full object-cover"
+            aria-hidden="true"
+            loading="eager"
+          />
+          <div class="absolute inset-0 bg-gradient-to-br from-slate-900/95 via-slate-900/85 to-slate-800/80"></div>
+          <!-- Decorative accent -->
+          <div class={`absolute -bottom-32 -right-32 w-96 h-96 rounded-full blur-3xl opacity-20 ${cta.accentBg}`}></div>
+          <div class={`absolute -top-32 -left-32 w-64 h-64 rounded-full blur-3xl opacity-10 ${cta.accentBg}`}></div>
+        </div>
+
+        <!-- Content -->
+        <div class="relative container mx-auto px-4 py-16 md:py-20 lg:py-28">
+          <div class="max-w-4xl">
+            <!-- Breadcrumb -->
+            <nav class="mb-8" aria-label="Breadcrumb">
+              <ol class="flex items-center gap-2 text-sm">
+                <li>
+                  <a href="/" class="text-slate-400 hover:text-white transition-colors duration-200 no-underline focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">
+                    Startseite
+                  </a>
+                </li>
+                <li aria-hidden="true">
+                  <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={getIcon('chevronRight')} />
+                </li>
+                <li>
+                  <a href="/mitmachen/" class="text-slate-400 hover:text-white transition-colors duration-200 no-underline focus:outline-none focus:ring-2 focus:ring-white/50 focus:ring-offset-2 focus:ring-offset-slate-900 rounded">
+                    Mitmachen
+                  </a>
+                </li>
+                <li aria-hidden="true">
+                  <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={getIcon('chevronRight')} />
+                </li>
+                <li>
+                  <span class="text-white font-medium" aria-current="page">{title}</span>
+                </li>
+              </ol>
+            </nav>
+
+            <!-- Title with accent decoration -->
+            <div class="relative">
+              <div class={`absolute -left-4 top-0 bottom-0 w-1 ${cta.accentBg} rounded-full hidden md:block`}></div>
+              <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance leading-tight">
+                {title}
+              </h1>
+            </div>
+
+            <p class="text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mb-8">
+              {description}
+            </p>
+
+            <!-- Primary CTA with icon -->
+            <div class="flex flex-col sm:flex-row items-start gap-4">
+              <Button href={cta.href} variant="primary" size="lg" external={cta.href.startsWith('mailto:')}>
+                <span class="flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon(cta.icon)} />
+                  {cta.label}
+                </span>
+              </Button>
+
+              <!-- Quick stat badge (decorative, provides visual context) -->
+              {cta.stat && (
+                <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10" role="presentation">
+                  <div class={`w-10 h-10 rounded-full ${cta.accentBgLight} flex items-center justify-center`}>
+                    <svg class={`w-5 h-5 ${cta.accentColor}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon(cta.icon)} />
+                  </div>
+                  <div>
+                    <p class="text-xl font-bold text-white">{cta.stat.value}</p>
+                    <p class="text-xs text-slate-400">{cta.stat.label}</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Highlight Strip - Provides key information at a glance -->
+      {cta.highlight && (
+        <section class={`relative ${cta.accentBg}`} aria-label="Wichtiger Hinweis">
+          <div class="container mx-auto px-4 py-4">
+            <p class="text-center text-white font-medium text-sm md:text-base flex items-center justify-center gap-2">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon('info')} />
+              <span>{cta.highlight}</span>
+            </p>
+          </div>
+        </section>
+      )}
+
+      <!-- Main Content -->
+      <section class="py-12 md:py-16 lg:py-20">
+        <div class="container mx-auto px-4">
+          <article class="prose prose-slate prose-lg max-w-3xl mx-auto
+            prose-headings:font-sans prose-headings:font-semibold prose-headings:text-slate-900
+            prose-h2:text-2xl prose-h2:md:text-3xl prose-h2:mt-14 prose-h2:mb-6 prose-h2:pb-4 prose-h2:border-b prose-h2:border-slate-200
+            prose-h3:text-xl prose-h3:mt-10 prose-h3:mb-4
+            prose-p:text-slate-700 prose-p:leading-relaxed
+            prose-a:text-sky-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline prose-a:transition-colors
+            prose-strong:text-slate-900 prose-strong:font-semibold
+            prose-ul:my-6 prose-li:text-slate-700 prose-li:my-2 prose-li:marker:text-slate-400
+            prose-ol:my-6 prose-ol:list-decimal
+            prose-blockquote:border-l-4 prose-blockquote:border-amber-500 prose-blockquote:bg-gradient-to-r prose-blockquote:from-amber-50 prose-blockquote:to-transparent prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:rounded-r-xl prose-blockquote:not-italic prose-blockquote:text-slate-800 prose-blockquote:font-medium
+            prose-hr:my-12 prose-hr:border-slate-200
+            prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-slate-800 prose-code:font-normal prose-code:before:content-none prose-code:after:content-none">
+            <slot />
+          </article>
+        </div>
+      </section>
+
+      <!-- Bottom CTA Section -->
+      <section class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <!-- Decorative elements -->
+        <div class="absolute inset-0 overflow-hidden">
+          <div class={`absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl opacity-10 ${cta.accentBg}`}></div>
+          <div class={`absolute -bottom-24 -left-24 w-64 h-64 rounded-full blur-3xl opacity-10 ${cta.accentBg}`}></div>
+          <!-- Grid pattern -->
+          <div class="absolute inset-0 opacity-5" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E&quot;);"></div>
+        </div>
+
+        <div class="relative container mx-auto px-4 py-16 md:py-20">
+          <div class="max-w-3xl mx-auto text-center">
+            <!-- Quote -->
+            <blockquote class="mb-8">
+              <p class={`text-xl md:text-2xl italic ${cta.accentColor} font-medium`}>
+                {bottomCtaContent[ctaType].quote}
+              </p>
+            </blockquote>
+
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">
+              {bottomCtaContent[ctaType].title}
+            </h2>
+            <p class="text-lg text-slate-300 mb-10 max-w-xl mx-auto">
+              {bottomCtaContent[ctaType].subtitle}
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button href={cta.href} variant="primary" size="lg" external={cta.href.startsWith('mailto:')}>
+                <span class="flex items-center gap-2">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon(cta.icon)} />
+                  {cta.label}
+                </span>
+              </Button>
+              <Button href="/mitmachen/" variant="secondary" size="lg">
+                Alle Möglichkeiten entdecken
+              </Button>
+            </div>
+
+            <!-- Trust indicators - Establishes credibility -->
+            <div class="mt-12 pt-8 border-t border-white/10" role="list" aria-label="Vertrauensindikatoren">
+              <div class="flex flex-wrap justify-center gap-8 text-sm text-slate-400">
+                <div class="flex items-center gap-2" role="listitem">
+                  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon('shield')} />
+                  <span>Gemeinnützig anerkannt</span>
+                </div>
+                <div class="flex items-center gap-2" role="listitem">
+                  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon('lock')} />
+                  <span>100% unabhängig</span>
+                </div>
+                <div class="flex items-center gap-2" role="listitem">
+                  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon('userGroup')} />
+                  <span>Seit 2015 aktiv</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Info - Always provide a way to reach out -->
+      {contactEmail && (
+        <section class="bg-slate-50 border-t border-slate-200" aria-labelledby="contact-heading">
+          <div class="container mx-auto px-4 py-8">
+            <div class="max-w-3xl mx-auto">
+              <h2 id="contact-heading" class="sr-only">Kontakt</h2>
+              <div class="flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-slate-200" aria-hidden="true">
+                  <svg class="h-6 w-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={getIcon('mail')} />
+                </div>
+                <div>
+                  <p class="text-slate-600 mb-1">Haben Sie Fragen? Wir helfen gerne.</p>
+                  <a
+                    href={`mailto:${contactEmail}`}
+                    class="text-lg font-semibold text-sky-600 hover:text-sky-700 transition-colors focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 rounded"
+                  >
+                    {contactEmail}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>

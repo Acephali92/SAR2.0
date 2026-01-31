@@ -1,0 +1,317 @@
+---
+/**
+ * @component ArticleLayout
+ * @description Layout for long-form articles with table of contents sidebar.
+ *              Used for /analysen/ and /warum-ramstein/ content.
+ *
+ * @example
+ * <ArticleLayout
+ *   title="Article Title"
+ *   description="Meta description"
+ *   publishedAt={new Date()}
+ * >
+ *   <Content />
+ * </ArticleLayout>
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  publishedAt: Date;
+  updatedAt?: Date;
+  author?: string;
+  tags?: string[];
+  /** Related article slugs for "weiterlesen" section */
+  relatedSlugs?: string[];
+  /** Source citations */
+  sources?: Array<{ label: string; url: string }>;
+  canonicalUrl?: string;
+  ogImage?: string;
+}
+
+const {
+  title,
+  description,
+  publishedAt,
+  updatedAt,
+  author,
+  tags = [],
+  relatedSlugs = [],
+  sources = [],
+  canonicalUrl,
+  ogImage,
+} = Astro.props;
+
+// Format dates in German locale
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+// Estimate reading time (German average: 200 words/min)
+// This is a rough estimate; actual calculation happens at build time
+const readingTime = '5 Min. Lesezeit';
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalUrl={canonicalUrl}
+  ogImage={ogImage}
+>
+  <div class="flex min-h-screen flex-col">
+    <Header />
+
+    <main id="main-content" class="flex-1">
+      <article class="container mx-auto px-4 py-8 md:px-6 lg:py-12">
+        <!-- Article Header -->
+        <header class="mx-auto mb-8 max-w-prose lg:mb-12">
+          <!-- Tags -->
+          {
+            tags.length > 0 && (
+              <div class="mb-4 flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <span class="rounded-full bg-surface-800 px-3 py-1 text-xs font-medium text-content-secondary">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )
+          }
+
+          <!-- Title -->
+          <h1 class="mb-4 text-3xl font-bold text-balance md:text-4xl lg:text-5xl">
+            {title}
+          </h1>
+
+          <!-- Description / Lead -->
+          <p class="mb-6 text-lg text-content-secondary md:text-xl">
+            {description}
+          </p>
+
+          <!-- Meta Information -->
+          <div class="flex flex-wrap items-center gap-4 text-sm text-content-muted">
+            {
+              author && (
+                <span class="flex items-center gap-1">
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  {author}
+                </span>
+              )
+            }
+            <span class="flex items-center gap-1">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {formatDate(publishedAt)}
+            </span>
+            {
+              updatedAt && (
+                <span class="text-content-muted">
+                  (aktualisiert: {formatDate(updatedAt)})
+                </span>
+              )
+            }
+            <span class="flex items-center gap-1">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {readingTime}
+            </span>
+          </div>
+        </header>
+
+        <!-- Article Content -->
+        <div class="lg:grid lg:grid-cols-[1fr_250px] lg:gap-12">
+          <!-- Main Content -->
+          <div class="prose-custom mx-auto max-w-prose font-serif">
+            <slot />
+
+            <!-- Sources Section -->
+            {
+              sources.length > 0 && (
+                <section class="mt-12 border-t border-surface-700 pt-8">
+                  <h2 class="mb-4 font-sans text-lg font-semibold">Quellen</h2>
+                  <ol class="list-decimal space-y-2 pl-4 text-sm">
+                    {sources.map((source, index) => (
+                      <li>
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="text-accent-sky hover:text-content-primary"
+                        >
+                          {source.label}
+                          <svg class="ml-1 inline h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )
+            }
+          </div>
+
+          <!-- Sidebar (Table of Contents) - Desktop Only -->
+          <aside class="hidden lg:block">
+            <div class="sticky top-20">
+              <nav class="rounded-lg border border-surface-700 bg-surface-800 p-4" aria-label="Inhaltsverzeichnis">
+                <h2 class="mb-3 text-sm font-semibold uppercase tracking-wider text-content-muted">
+                  Inhalt
+                </h2>
+                <div id="toc" class="space-y-2 text-sm">
+                  <!-- ToC is populated by JavaScript -->
+                  <p class="text-content-muted italic">Wird geladen...</p>
+                </div>
+              </nav>
+
+              <!-- Share / Actions -->
+              <div class="mt-6 space-y-3">
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-center gap-2 rounded-md border border-surface-700 px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-800 hover:text-content-primary"
+                  onclick="navigator.clipboard.writeText(window.location.href)"
+                >
+                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                  Link kopieren
+                </button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <!-- Tags Footer -->
+        {
+          tags.length > 0 && (
+            <footer class="mx-auto mt-12 max-w-prose border-t border-surface-700 pt-8">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sm text-content-muted">Themen:</span>
+                {tags.map((tag) => (
+                  <a
+                    href={`/themen/${tag.toLowerCase()}/`}
+                    class="rounded-full border border-surface-700 px-3 py-1 text-xs font-medium text-content-secondary no-underline transition-colors hover:bg-surface-800"
+                  >
+                    {tag}
+                  </a>
+                ))}
+              </div>
+            </footer>
+          )
+        }
+      </article>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>
+
+<script>
+  // Generate Table of Contents from headings
+  document.addEventListener('DOMContentLoaded', () => {
+    const article = document.querySelector('.prose-custom');
+    const toc = document.getElementById('toc');
+
+    if (!article || !toc) return;
+
+    const headings = article.querySelectorAll('h2, h3');
+
+    if (headings.length === 0) {
+      toc.innerHTML = '<p class="text-content-muted italic">Keine Abschnitte</p>';
+      return;
+    }
+
+    const list = document.createElement('ul');
+    list.className = 'space-y-2';
+
+    headings.forEach((heading, index) => {
+      // Add ID to heading if not present
+      if (!heading.id) {
+        heading.id = `section-${index}`;
+      }
+
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+
+      a.href = `#${heading.id}`;
+      a.textContent = heading.textContent;
+      a.className = `block text-content-secondary no-underline hover:text-content-primary transition-colors ${
+        heading.tagName === 'H3' ? 'pl-3 text-xs' : ''
+      }`;
+
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+
+    toc.innerHTML = '';
+    toc.appendChild(list);
+  });
+</script>
+
+<style>
+  /* Prose styling for article content */
+  .prose-custom :global(h2) {
+    @apply mt-10 mb-4 text-2xl font-semibold font-sans;
+  }
+
+  .prose-custom :global(h3) {
+    @apply mt-8 mb-3 text-xl font-semibold font-sans;
+  }
+
+  .prose-custom :global(p) {
+    @apply mb-6;
+  }
+
+  .prose-custom :global(ul),
+  .prose-custom :global(ol) {
+    @apply mb-6 pl-6;
+  }
+
+  .prose-custom :global(li) {
+    @apply mb-2;
+  }
+
+  .prose-custom :global(blockquote) {
+    @apply border-l-4 border-accent-amber pl-4 italic text-content-secondary my-6;
+  }
+
+  .prose-custom :global(a) {
+    @apply text-accent-sky underline underline-offset-2 hover:text-content-primary;
+  }
+
+  .prose-custom :global(strong) {
+    @apply font-semibold text-content-primary;
+  }
+
+  .prose-custom :global(code) {
+    @apply bg-surface-800 px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .prose-custom :global(pre) {
+    @apply bg-surface-800 p-4 rounded-lg overflow-x-auto my-6;
+  }
+
+  .prose-custom :global(img) {
+    @apply rounded-lg my-6;
+  }
+
+  .prose-custom :global(figure) {
+    @apply my-8;
+  }
+
+  .prose-custom :global(figcaption) {
+    @apply text-sm text-content-muted mt-2 text-center;
+  }
+</style>

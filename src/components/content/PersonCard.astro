@@ -1,0 +1,113 @@
+---
+/**
+ * @component PersonCard
+ * @description Card for displaying person information (board members, speakers).
+ *
+ * @example
+ * <PersonCard
+ *   name="Reiner Braun"
+ *   role="Vorstand"
+ *   organization="Stopp Air Base Ramstein e.V."
+ *   image="/images/people/reiner-braun.jpg"
+ * />
+ */
+
+interface Props {
+  /** Person's name */
+  name: string;
+  /** Role or title */
+  role?: string;
+  /** Organization or affiliation */
+  organization?: string;
+  /** Profile image URL */
+  image?: string;
+  /** Short biography */
+  bio?: string;
+  /** Email address */
+  email?: string;
+  /** Additional CSS classes */
+  class?: string;
+}
+
+const {
+  name,
+  role,
+  organization,
+  image,
+  bio,
+  email,
+  class: className = '',
+} = Astro.props;
+
+// Generate initials for placeholder
+const initials = name
+  .split(' ')
+  .map((n) => n[0])
+  .join('')
+  .toUpperCase()
+  .slice(0, 2);
+---
+
+<article class:list={['flex gap-4 rounded-lg border border-surface-700 bg-surface-800 p-4', className]}>
+  <!-- Avatar -->
+  <div class="shrink-0">
+    {image ? (
+      <img
+        src={image}
+        alt={`Foto von ${name}`}
+        class="h-16 w-16 rounded-full object-cover"
+        loading="lazy"
+      />
+    ) : (
+      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-surface-700 text-lg font-semibold text-content-secondary">
+        {initials}
+      </div>
+    )}
+  </div>
+
+  <!-- Info -->
+  <div class="flex-1 min-w-0">
+    <h3 class="font-semibold text-content-primary truncate">
+      {name}
+    </h3>
+
+    {role && (
+      <p class="text-sm text-accent-sky">
+        {role}
+      </p>
+    )}
+
+    {organization && (
+      <p class="text-sm text-content-muted truncate">
+        {organization}
+      </p>
+    )}
+
+    {bio && (
+      <p class="mt-2 text-sm text-content-secondary line-clamp-2">
+        {bio}
+      </p>
+    )}
+
+    {email && (
+      <a
+        href={`mailto:${email}`}
+        class="mt-2 inline-flex items-center gap-1 text-sm text-content-muted hover:text-content-primary"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+        {email}
+      </a>
+    )}
+  </div>
+</article>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>
