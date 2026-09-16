@@ -25,3 +25,9 @@ npm-debug.log*
 
 # Misc
 nul
+
+# Temporary/working files
+audit-*.png
+scraper.txt
+wordpress-theme/
+wordpress-theme.zip
