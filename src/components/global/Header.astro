@@ -52,8 +52,8 @@ const currentPath = Astro.url.pathname;
                     class:list={[
                       'nav-link px-4 py-1.5 text-sm font-bold no-underline transition-all duration-200',
                       isActive
-                        ? 'text-[#dc2626]'
-                        : 'text-slate-800 hover:text-[#dc2626]',
+                        ? 'text-brand-red'
+                        : 'text-slate-800 hover:text-brand-red',
                     ]}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -73,7 +73,7 @@ const currentPath = Astro.url.pathname;
       <div class="relative z-10 hidden lg:block">
         <a
           href="/mitmachen/spenden/"
-          class="spenden-btn inline-flex items-center gap-2 rounded-full bg-[#dc2626] px-7 py-3 text-sm font-bold text-white no-underline shadow-lg transition-all duration-200 hover:bg-[#ef4444] hover:shadow-xl hover:scale-105"
+          class="spenden-btn inline-flex items-center gap-2 rounded-full bg-brand-red px-7 py-3 text-sm font-bold text-white no-underline shadow-lg transition-all duration-200 hover:bg-brand-red-hover hover:shadow-xl hover:scale-105"
         >
           Spenden
         </a>
@@ -138,8 +138,8 @@ const currentPath = Astro.url.pathname;
                   class:list={[
                     'block px-4 py-3 text-lg font-bold no-underline rounded-xl transition-all',
                     isActive
-                      ? 'text-[#dc2626] bg-red-50'
-                      : 'text-slate-900 hover:text-[#dc2626] hover:bg-red-50/50',
+                      ? 'text-brand-red bg-red-50'
+                      : 'text-slate-900 hover:text-brand-red hover:bg-red-50/50',
                   ]}
                   aria-current={isActive ? 'page' : undefined}
                 >
@@ -152,7 +152,7 @@ const currentPath = Astro.url.pathname;
         <li class="pt-4">
           <a
             href="/mitmachen/spenden/"
-            class="block rounded-full bg-[#dc2626] px-4 py-3.5 text-center text-lg font-bold text-white no-underline transition-all hover:bg-[#ef4444]"
+            class="block rounded-full bg-brand-red px-4 py-3.5 text-center text-lg font-bold text-white no-underline transition-all hover:bg-brand-red-hover"
           >
             Spenden
           </a>
@@ -192,7 +192,7 @@ const currentPath = Astro.url.pathname;
     left: 50%;
     width: 0;
     height: 2px;
-    background: #dc2626;
+    background: rgb(var(--color-brand-red));
     transition: width 0.2s ease, left 0.2s ease;
   }
 
@@ -208,10 +208,10 @@ const currentPath = Astro.url.pathname;
 
   @keyframes subtle-pulse {
     0%, 100% {
-      box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);
+      box-shadow: 0 10px 25px -5px rgb(var(--color-brand-red) / 0.4);
     }
     50% {
-      box-shadow: 0 10px 30px -5px rgba(220, 38, 38, 0.6);
+      box-shadow: 0 10px 30px -5px rgb(var(--color-brand-red) / 0.6);
     }
   }
 </style>
