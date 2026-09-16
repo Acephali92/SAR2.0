@@ -224,7 +224,7 @@ const currentStatus = statusStyles[status];
                 <button
                   type="button"
                   class="rounded-md border border-surface-700 px-4 py-2 text-sm font-medium text-content-secondary transition-colors hover:bg-surface-800 hover:text-content-primary"
-                  onclick="navigator.clipboard.writeText(window.location.href)"
+                  data-copy-link
                 >
                   Link kopieren
                 </button>
@@ -268,6 +268,8 @@ const currentStatus = statusStyles[status];
     <Footer />
   </div>
 </BaseLayout>
+
+<script type="module" src="/scripts/copy-link.js"></script>
 
 <style>
   /* Prose styling for event content */

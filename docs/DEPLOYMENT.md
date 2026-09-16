@@ -109,4 +109,4 @@ Weder eine `Caddyfile` noch eine nginx-Config liegt aktuell im Repository — di
 
 ## CSP-Hinweis
 
-`npm run check-csp` prüft `dist/` nach dem Build auf Inline-`<script>`-Tags und Inline-Event-Handler, die gegen `script-src 'self'` verstoßen würden. Der Check ist aktuell **nicht** Teil von `npm run verify`, weil er bestehende, aus dem Astro-Build-Prozess resultierende Inline-Scripts meldet (Astro bündelt kleine, seitenspezifische Scripts standardmäßig inline statt als externe Datei). Details und Empfehlung: [REDAKTION-TODO.md](./REDAKTION-TODO.md).
+`npm run check-csp` prüft `dist/` nach dem Build auf Inline-`<script>`-Tags und Inline-Event-Handler, die gegen `script-src 'self'` verstoßen würden. Ist Teil von `npm run verify`. Alle Page-Scripts liegen als externe Dateien unter `public/scripts/` und werden per `<script type="module" src="...">` eingebunden (Astro bündelt/inlined sie dadurch nicht, siehe [ARCHITEKTUR.md](./ARCHITEKTUR.md)). Neue interaktive Features müssen diesem Muster folgen — kein `<script>` ohne `src` und keine `onclick="..."`-Attribute.
