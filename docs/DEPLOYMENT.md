@@ -9,6 +9,17 @@
 | TLS | Let's Encrypt (automatisiert) |
 | Domain | stoppramstein.de |
 
+## Team-Vorschau (statichost.eu)
+
+Für Reviews durch das Team läuft eine passwortgeschützte Vorschau auf statichost.eu (EU-Hosting):
+
+- **URL:** https://stoppramstein.statichost.page
+- **Branch:** `master`
+- **Konfiguration:** `statichost.yml` (Build-Befehl, Publish-Verzeichnis)
+- **Header:** `scripts/write-preview-headers.mjs` schreibt `dist/_headers` (CSP, Security-Header, `X-Robots-Tag: noindex, nofollow`) — ausschließlich für die Vorschau, nie für die Produktion.
+
+Die Vorschau ist unabhängig von der unten beschriebenen Produktionsinfrastruktur und wird bei jedem Push auf `master` automatisch neu gebaut.
+
 ## Build & Deploy
 
 ```bash
@@ -50,6 +61,8 @@ dist/
 **Aktuell gibt es keinen automatisierten Rebuild.** Da Astro rein statisch baut (kein SSR, kein API-Backend), muss nach jeder Content- oder Code-Änderung manuell `npm run build` + `rsync` ausgeführt werden (oder über die in `.github/workflows/ci.yml` laufende CI, die nur validiert, nicht deployt).
 
 Empfehlung (noch nicht eingerichtet, keine bestehende Automatisierung): ein Cron-Job oder ein CI-Deploy-Step, der z. B. täglich oder bei jedem Push auf `main` automatisch baut und synced. Das ist eine sinnvolle Erweiterung, aber bewusst nicht Teil dieses Dokuments als bestehende Tatsache dargestellt.
+
+(Die Team-Vorschau auf statichost.eu ist davon ausgenommen und baut automatisch bei jedem Push auf `master`, siehe oben.)
 
 ## Server-Konfiguration (Caddy)
 
