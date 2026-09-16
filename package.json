@@ -11,6 +11,7 @@
     "postbuild": "pagefind --site dist",
     "typecheck": "astro check",
     "check-links": "node scripts/check-links.mjs",
+    "check-csp": "node scripts/check-csp.mjs",
     "verify": "npm run typecheck && npm run build && npm run check-links"
   },
   "dependencies": {
