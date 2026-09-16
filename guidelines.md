@@ -40,9 +40,9 @@ This website serves as the official digital presence for the "Stopp Air Base Ram
 |-------|------------|---------|-----------|
 | **Framework** | Astro | 5.x | Static-first, native Markdown support, minimal JS |
 | **Content** | Markdown + Astro Content Collections | — | Type-safe content, file-based routing |
-| **Styling** | Tailwind CSS | 4.x | Utility-first, no runtime CSS-in-JS |
+| **Styling** | Tailwind CSS | 3.x | Utility-first, no runtime CSS-in-JS |
 | **Typography** | IBM Plex (Sans, Serif, Mono) | Self-hosted | No Google Fonts; excellent German language support |
-| **Icons** | Phosphor Icons | Via `@phosphor-icons/web` | MIT license, consistent design language |
+| **Icons** | Inline SVG | — | No icon library dependency |
 | **Search** | Pagefind | Latest | Static search index, zero runtime cost |
 | **Build** | Vite (via Astro) | — | Fast builds, ES modules |
 
@@ -280,9 +280,7 @@ Global design tokens are defined as CSS custom properties in `src/styles/global.
 
 ### 7.3 Dark Mode
 
-- **Default:** Dark mode (matches documentary aesthetic)
-- **Light Mode:** Available via `prefers-color-scheme` media query
-- **No Toggle:** No manual dark/light toggle (respects system preference)
+Not implemented. The site is light-only; design tokens in `tailwind.config.mjs` reference the light CSS custom properties in `src/styles/global.css`. There is no `.dark` class, no toggle, and no `prefers-color-scheme` handling. Do not add `dark:` utilities without first re-introducing the underlying token infrastructure.
 
 ### 7.4 Forbidden Styling Patterns
 
@@ -357,7 +355,6 @@ Run Lighthouse CI on every build. Fail the build if any score drops below target
 | `@astrojs/sitemap` | Sitemap generation | Required |
 | `tailwindcss` | CSS framework | Required |
 | `@tailwindcss/typography` | Prose styling | Required |
-| `@phosphor-icons/web` | Icons | Required |
 | `pagefind` | Static search | Required |
 | `sharp` | Image optimization | Optional |
 
@@ -435,7 +432,9 @@ npm run verify
     "preview": "astro preview",
     "postbuild": "pagefind --site dist",
     "typecheck": "astro check",
-    "verify": "npm run typecheck && npm run build"
+    "check-links": "node scripts/check-links.mjs",
+    "check-csp": "node scripts/check-csp.mjs",
+    "verify": "npm run typecheck && npm run build && npm run check-links"
   }
 }
 ```

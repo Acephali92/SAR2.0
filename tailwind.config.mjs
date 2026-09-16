@@ -2,37 +2,43 @@
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
 
-  darkMode: 'class',
-
   theme: {
     extend: {
-      // Custom color palette
+      // Custom color palette — values come from the CSS custom properties
+      // defined in src/styles/global.css (single source of truth).
       colors: {
-        // Primary backgrounds
+        // Backgrounds / borders
         surface: {
-          900: '#0a0f14',
-          800: '#111827',
-          700: '#1f2937',
-          600: '#374151',
+          800: 'rgb(var(--color-bg-secondary) / <alpha-value>)',
+          700: 'rgb(var(--color-border) / <alpha-value>)',
+          600: 'rgb(var(--color-border-strong) / <alpha-value>)',
         },
         // Text colors
         content: {
-          primary: '#f1f5f9',
-          secondary: '#94a3b8',
-          muted: '#64748b',
+          primary: 'rgb(var(--color-text-primary) / <alpha-value>)',
+          secondary: 'rgb(var(--color-text-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--color-text-tertiary) / <alpha-value>)',
+          muted: 'rgb(var(--color-text-muted) / <alpha-value>)',
         },
         // Accent colors
         accent: {
-          amber: '#f59e0b',
-          red: '#dc2626',
-          emerald: '#059669',
-          sky: '#0ea5e9',
+          amber: 'rgb(var(--color-accent-warning) / <alpha-value>)',
+          red: 'rgb(var(--color-accent-danger) / <alpha-value>)',
+          emerald: 'rgb(var(--color-accent-success) / <alpha-value>)',
+          sky: 'rgb(var(--color-accent-info) / <alpha-value>)',
         },
-        // Semantic colors
-        warning: '#f59e0b',
-        danger: '#dc2626',
-        success: '#059669',
-        info: '#0ea5e9',
+        // Brand colors (CTA red / cyan-blue, with hover/active variants)
+        brand: {
+          red: {
+            DEFAULT: 'rgb(var(--color-brand-red) / <alpha-value>)',
+            hover: 'rgb(var(--color-brand-red-hover) / <alpha-value>)',
+            active: 'rgb(var(--color-brand-red-active) / <alpha-value>)',
+          },
+          cyan: {
+            DEFAULT: 'rgb(var(--color-brand-cyan) / <alpha-value>)',
+            hover: 'rgb(var(--color-brand-cyan-hover) / <alpha-value>)',
+          },
+        },
       },
 
       // IBM Plex font stack

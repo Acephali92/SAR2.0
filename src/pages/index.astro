@@ -99,7 +99,7 @@ const heroSlides = [
               </h2>
 
               <!-- Red underline accent -->
-              <div class="mx-auto mb-8 h-2 w-36 rounded-full bg-[#dc2626] shadow-[0_0_30px_rgba(220,38,38,0.4)] md:w-48 lg:w-56" aria-hidden="true" />
+              <div class="mx-auto mb-8 h-2 w-36 rounded-full bg-brand-red shadow-[0_0_30px_rgb(var(--color-brand-red)/0.4)] md:w-48 lg:w-56" aria-hidden="true" />
 
               <!-- Subline -->
               <p class="mx-auto mb-4 max-w-2xl text-lg text-white/90 md:text-xl lg:text-2xl">
@@ -117,8 +117,8 @@ const heroSlides = [
                     class:list={[
                       'hero-cta inline-flex items-center gap-3 rounded-full px-10 py-5 text-lg font-bold text-white no-underline shadow-2xl transition-all duration-300 hover:scale-110 md:px-12 md:py-6 md:text-xl',
                       slide.ctaColor === 'cyan'
-                        ? 'bg-[#0284c7] hover:bg-[#0ea5e9] hover:shadow-[0_20px_50px_-12px_rgba(2,132,199,0.5)]'
-                        : 'bg-[#dc2626] hover:bg-[#ef4444] hover:shadow-[0_20px_50px_-12px_rgba(220,38,38,0.5)]'
+                        ? 'bg-brand-cyan hover:bg-brand-cyan-hover hover:shadow-[0_20px_50px_-12px_rgb(var(--color-brand-cyan)/0.5)]'
+                        : 'bg-brand-red hover:bg-brand-red-hover hover:shadow-[0_20px_50px_-12px_rgb(var(--color-brand-red)/0.5)]'
                     ]}
                   >
                     {slide.ctaText}
@@ -144,7 +144,7 @@ const heroSlides = [
                     />
                     <button
                       type="submit"
-                      class="rounded-full bg-[#dc2626] px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:bg-[#ef4444] hover:scale-105 hover:shadow-xl md:text-lg"
+                      class="rounded-full bg-brand-red px-8 py-4 text-base font-bold text-white shadow-lg transition-all duration-300 hover:bg-brand-red-hover hover:scale-105 hover:shadow-xl md:text-lg"
                     >
                       Eintragen
                     </button>
@@ -194,7 +194,7 @@ const heroSlides = [
           class:list={[
             'slide-dot h-3 w-3 rounded-full transition-all duration-300 hover:scale-125',
             index === 0
-              ? 'bg-[#dc2626] w-8 shadow-[0_0_10px_rgba(220,38,38,0.5)]'
+              ? 'bg-brand-red w-8 shadow-[0_0_10px_rgb(var(--color-brand-red)/0.5)]'
               : 'bg-white/50 hover:bg-white/80'
           ]}
           data-dot={index}
@@ -207,7 +207,7 @@ const heroSlides = [
 
     <!-- Progress Bar (optional visual timer) -->
     <div class="absolute bottom-0 left-0 z-20 h-1 w-full bg-black/20">
-      <div id="progress-bar" class="h-full w-0 bg-[#dc2626] transition-all ease-linear" />
+      <div id="progress-bar" class="h-full w-0 bg-brand-red transition-all ease-linear" />
     </div>
   </section>
 
@@ -230,7 +230,7 @@ const heroSlides = [
           </p>
           <a
             href="/warum-ramstein/drohnenkrieg/"
-            class="inline-flex items-center gap-1 font-semibold text-[#dc2626] no-underline transition-colors hover:text-[#b91c1c]"
+            class="inline-flex items-center gap-1 font-semibold text-brand-red no-underline transition-colors hover:text-brand-red-active"
           >
             Mehr erfahren
             <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,7 +253,7 @@ const heroSlides = [
           </p>
           <a
             href="/warum-ramstein/umwelt/"
-            class="inline-flex items-center gap-1 font-semibold text-[#dc2626] no-underline transition-colors hover:text-[#b91c1c]"
+            class="inline-flex items-center gap-1 font-semibold text-brand-red no-underline transition-colors hover:text-brand-red-active"
           >
             Mehr erfahren
             <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -276,7 +276,7 @@ const heroSlides = [
           </p>
           <a
             href="/warum-ramstein/voelkerrecht/"
-            class="inline-flex items-center gap-1 font-semibold text-[#dc2626] no-underline transition-colors hover:text-[#b91c1c]"
+            class="inline-flex items-center gap-1 font-semibold text-brand-red no-underline transition-colors hover:text-brand-red-active"
           >
             Mehr erfahren
             <svg class="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,19 +322,19 @@ const heroSlides = [
       <div class="flex flex-wrap justify-center gap-4">
         <a
           href="/mitmachen/aufruf/"
-          class="rounded-full border-2 border-slate-300 bg-white px-8 py-3 font-bold text-slate-700 no-underline transition-all duration-200 hover:border-[#0284c7] hover:text-[#0284c7]"
+          class="rounded-full border-2 border-slate-300 bg-white px-8 py-3 font-bold text-slate-700 no-underline transition-all duration-200 hover:border-brand-cyan hover:text-brand-cyan"
         >
           Aufruf unterzeichnen
         </a>
         <a
           href="/mitmachen/mitglied-werden/"
-          class="rounded-full border-2 border-slate-300 bg-white px-8 py-3 font-bold text-slate-700 no-underline transition-all duration-200 hover:border-[#0284c7] hover:text-[#0284c7]"
+          class="rounded-full border-2 border-slate-300 bg-white px-8 py-3 font-bold text-slate-700 no-underline transition-all duration-200 hover:border-brand-cyan hover:text-brand-cyan"
         >
           Mitglied werden
         </a>
         <a
           href="/mitmachen/spenden/"
-          class="rounded-full bg-[#dc2626] px-8 py-3 font-bold text-white no-underline shadow-lg transition-all duration-200 hover:bg-[#ef4444] hover:shadow-xl hover:scale-105"
+          class="rounded-full bg-brand-red px-8 py-3 font-bold text-white no-underline shadow-lg transition-all duration-200 hover:bg-brand-red-hover hover:shadow-xl hover:scale-105"
         >
           Spenden
         </a>
@@ -371,7 +371,7 @@ const heroSlides = [
 
   /* Active dot indicator style */
   .slide-dot[aria-selected="true"] {
-    @apply w-8 bg-[#dc2626] shadow-[0_0_10px_rgba(220,38,38,0.5)];
+    @apply w-8 bg-brand-red shadow-[0_0_10px_rgb(var(--color-brand-red)/0.5)];
   }
 
   .slide-dot[aria-selected="false"] {
@@ -556,7 +556,7 @@ const heroSlides = [
       // Success feedback
       if (submitBtn) {
         submitBtn.textContent = 'Eingetragen!';
-        submitBtn.classList.remove('bg-[#dc2626]', 'hover:bg-[#ef4444]');
+        submitBtn.classList.remove('bg-brand-red', 'hover:bg-brand-red-hover');
         submitBtn.classList.add('bg-emerald-500');
       }
       form.reset();
@@ -566,7 +566,7 @@ const heroSlides = [
         if (submitBtn) {
           submitBtn.textContent = 'Eintragen';
           (submitBtn as HTMLButtonElement).disabled = false;
-          submitBtn.classList.add('bg-[#dc2626]', 'hover:bg-[#ef4444]');
+          submitBtn.classList.add('bg-brand-red', 'hover:bg-brand-red-hover');
           submitBtn.classList.remove('bg-emerald-500');
         }
       }, 3000);
