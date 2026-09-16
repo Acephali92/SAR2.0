@@ -142,7 +142,7 @@ const readingTime = '5 Min. Lesezeit';
                 <section class="mt-12 border-t border-surface-700 pt-8">
                   <h2 class="mb-4 font-sans text-lg font-semibold">Quellen</h2>
                   <ol class="list-decimal space-y-2 pl-4 text-sm">
-                    {sources.map((source, index) => (
+                    {sources.map((source) => (
                       <li>
                         <a
                           href={source.url}
@@ -200,12 +200,9 @@ const readingTime = '5 Min. Lesezeit';
               <div class="flex flex-wrap items-center gap-2">
                 <span class="text-sm text-content-muted">Themen:</span>
                 {tags.map((tag) => (
-                  <a
-                    href={`/themen/${tag.toLowerCase()}/`}
-                    class="rounded-full border border-surface-700 px-3 py-1 text-xs font-medium text-content-secondary no-underline transition-colors hover:bg-surface-800"
-                  >
+                  <span class="rounded-full border border-surface-700 px-3 py-1 text-xs font-medium text-content-secondary">
                     {tag}
-                  </a>
+                  </span>
                 ))}
               </div>
             </footer>

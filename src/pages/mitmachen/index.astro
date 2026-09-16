@@ -104,9 +104,6 @@ const icons = {
   arrow: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />`,
   mail: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />`,
 } as const;
-
-// Helper to get icon path
-const getIcon = (name: keyof typeof icons) => icons[name];
 ---
 
 <BaseLayout

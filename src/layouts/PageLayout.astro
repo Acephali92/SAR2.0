@@ -21,6 +21,8 @@ interface Props {
   ogImage?: string;
   /** Wide layout removes max-width constraint */
   wide?: boolean;
+  /** Hero overlaps under fixed header (hides header spacer) */
+  heroOverlap?: boolean;
   /** Show breadcrumbs (future feature) */
   showBreadcrumbs?: boolean;
 }
@@ -31,6 +33,7 @@ const {
   canonicalUrl,
   ogImage,
   wide = false,
+  heroOverlap = false,
   showBreadcrumbs = false,
 } = Astro.props;
 ---
@@ -41,14 +44,14 @@ const {
   canonicalUrl={canonicalUrl}
   ogImage={ogImage}
 >
-  <div class="flex min-h-screen flex-col">
+  <div class:list={['flex min-h-screen flex-col', heroOverlap && 'hero-overlap']}>
     <Header />
 
     <main
       id="main-content"
       class:list={[
-        'flex-1 py-8 md:py-12 lg:py-16',
-        wide ? 'w-full' : 'container mx-auto px-4 md:px-6',
+        'flex-1',
+        wide ? 'w-full' : 'container mx-auto px-4 py-8 md:px-6 md:py-12 lg:py-16',
       ]}
     >
       <slot />

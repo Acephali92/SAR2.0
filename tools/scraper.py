@@ -1,3 +1,15 @@
+"""
+Web Scraper für stoppramstein.de
+
+Einmaliges Migrationswerkzeug zum Extrahieren von WordPress-Inhalten.
+Nicht Teil des Build-Prozesses.
+
+Verwendung:
+    cd tools
+    pip install -r requirements.txt
+    python scraper.py
+"""
+
 import requests
 from bs4 import BeautifulSoup
 import os
@@ -8,7 +20,8 @@ import re
 
 # Konfiguration
 BASE_URL = "https://www.stoppramstein.de"
-OUTPUT_DIR = "stoppramstein_content"
+# Ausgabe relativ zum Projektroot (Skript liegt in tools/)
+OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "stoppramstein_content")
 USER_AGENT = "Mozilla/5.0 (compatible; ITSystemBot/1.0; +http://example.com/bot)"
 
 # Erstellen des Ausgabeordners, falls nicht vorhanden
@@ -46,7 +59,7 @@ def extract_content(soup):
 
     # Versuch 1: Spezifische Klasse (oft bei WordPress verwendet)
     content = soup.find(class_="entry-content")
-    
+
     # Versuch 2: Article Tag
     if not content:
         content = soup.find("article")
@@ -63,7 +76,7 @@ def extract_content(soup):
 
 def main():
     print(f"Starte Scraper für {BASE_URL}...")
-    
+
     # 1. Hauptseite abrufen
     soup = get_soup(BASE_URL)
     if not soup:
@@ -74,11 +87,11 @@ def main():
     for a_tag in soup.find_all("a", href=True):
         href = a_tag['href']
         full_url = urljoin(BASE_URL, href)
-        
+
         # Nur Links auf derselben Domain und keine Dateien (PDF, JPG etc.)
         parsed_base = urlparse(BASE_URL)
         parsed_url = urlparse(full_url)
-        
+
         if parsed_base.netloc == parsed_url.netloc:
             # Einfacher Filter gegen Bilder/PDFs
             if not any(full_url.lower().endswith(ext) for ext in ['.pdf', '.jpg', '.png', '.zip']):
@@ -89,28 +102,28 @@ def main():
     # 3. Jede Seite scrapen
     for index, url in enumerate(links_to_scrape):
         print(f"[{index+1}/{len(links_to_scrape)}] Bearbeite: {url}")
-        
+
         page_soup = get_soup(url)
         if not page_soup:
             continue
 
         # Inhalt extrahieren
         content_element = extract_content(page_soup)
-        
+
         if content_element:
             # Titel extrahieren (für den Header der Markdown-Datei)
             title = page_soup.title.string if page_soup.title else "Ohne Titel"
-            
+
             # HTML zu Markdown konvertieren
             markdown_text = md(str(content_element), heading_style="ATX")
-            
+
             # Metadaten oben hinzufügen
             final_content = f"# {title}\n\nOriginal URL: {url}\n\n---\n\n{markdown_text}"
-            
+
             # Speichern
             filename = clean_filename(url)
             file_path = os.path.join(OUTPUT_DIR, filename)
-            
+
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(final_content)
         else:
