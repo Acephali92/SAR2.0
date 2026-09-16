@@ -44,7 +44,7 @@ Astro 5.x (statische Ausgabe) · Tailwind CSS 3.x · Astro Content Collections m
 | [`CLAUDE.md`](CLAUDE.md) | Verbindliche Kurzregeln für Code-Änderungen (Stack, Verbote, CSP) |
 | [`guidelines.md`](guidelines.md) | Ausführliche Projektregeln |
 | [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md) | Datenfluss, Komponenten, Content-Schema, Verzeichnisstruktur (mit Diagrammen) |
-| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Server-Konfiguration (Caddy/nginx), CSP-Header, Rebuild-Prozess |
+| [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Server-Konfiguration (Caddy/nginx), CSP-Header, Rebuild-Prozess, Team-Vorschau |
 | [`docs/INHALTE-PFLEGEN.md`](docs/INHALTE-PFLEGEN.md) | Anleitung für Redakteur:innen zum Bearbeiten von Inhalten |
 | [`docs/REDAKTION-TODO.md`](docs/REDAKTION-TODO.md) | Unbelegte Aussagen, bekannte offene Probleme |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Setup und Ablauf für Ehrenamtliche |
