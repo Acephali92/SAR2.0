@@ -216,7 +216,8 @@ SAR2.0/
 │   └── styles/
 │       └── global.css              # Tailwind-Direktiven + CSS Custom Properties (Design-Tokens)
 │
-├── public/                         # Statische Assets (unverändert kopiert)
+├── public/
+│   └── scripts/                    # Page-Scripts als externe Dateien (CSP: script-src 'self', keine Inline-Scripts)
 ├── scripts/                        # check-links.mjs, check-csp.mjs, generate-assets.mjs
 ├── tools/                          # scraper.py (einmaliges Migrationswerkzeug, siehe unten)
 ├── stoppramstein_content/          # Migrierte WordPress-Inhalte — nur lesen, nicht verändern
