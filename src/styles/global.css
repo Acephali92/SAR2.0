@@ -329,6 +329,11 @@ html.dark {
     text-wrap: balance;
   }
 
+  /* Hide header spacer when hero overlaps */
+  .hero-overlap .header-spacer {
+    display: none;
+  }
+
   /* Visually hidden (for screen readers) */
   .sr-only {
     position: absolute;

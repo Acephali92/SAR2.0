@@ -1,13 +1,13 @@
 ---
 /**
  * @component Header
- * @description Site header with logo, navigation, and mobile menu.
- *              Sticky on scroll with blur backdrop.
+ * @description Refined navbar with semi-transparent background, centered pill navigation,
+ *              and strong brand integration (red accents for urgency, cyan-blue for CTA).
  */
 
 // Navigation items - centralized for consistency
 const navItems = [
-  { href: '/warum-ramstein/', label: 'Warum Ramstein' },
+  { href: '/warum-ramstein/', label: 'Warum' },
   { href: '/fakten/', label: 'Fakten' },
   { href: '/analysen/', label: 'Analysen' },
   { href: '/aktionen/', label: 'Aktionen' },
@@ -19,53 +19,61 @@ const currentPath = Astro.url.pathname;
 ---
 
 <header
-  class="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-sm"
+  id="site-header"
+  class="fixed top-0 z-50 w-full bg-white/80 backdrop-blur-md transition-all duration-300"
 >
-  <div class="container mx-auto px-4 md:px-6">
-    <nav class="flex h-16 items-center justify-between" aria-label="Hauptnavigation">
-      <!-- Logo / Site Name -->
+  <div class="mx-auto max-w-7xl px-4 md:px-6">
+    <nav class="flex h-20 items-center justify-between" aria-label="Hauptnavigation">
+      <!-- Logo (enlarged 1.2-1.5x) -->
       <a
         href="/"
-        class="flex items-center gap-3 text-lg font-semibold text-slate-900 no-underline transition-colors hover:text-sky-600"
+        class="relative z-10 flex shrink-0 items-center no-underline transition-transform hover:scale-105"
       >
         <img
           src="/images/Logo_Header.png"
-          alt="Stopp Air Base Ramstein Logo"
-          class="h-10 w-auto"
+          alt="Stopp Air Base Ramstein"
+          class="h-14 w-auto md:h-16 lg:h-[4.5rem]"
         />
-        <span class="hidden lg:inline">Stopp Air Base Ramstein</span>
       </a>
 
-      <!-- Desktop Navigation -->
-      <ul class="hidden items-center gap-1 md:flex" role="list">
-        {
-          navItems.map((item) => {
-            const isActive = currentPath.startsWith(item.href);
-            return (
-              <li>
-                <a
-                  href={item.href}
-                  class:list={[
-                    'px-3 py-2 text-sm font-medium no-underline rounded-md transition-colors',
-                    isActive
-                      ? 'text-sky-600 bg-sky-50'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
-                  ]}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  {item.label}
-                </a>
-              </li>
-            );
-          })
-        }
-      </ul>
+      <!-- Desktop Navigation: Centered Pill Style -->
+      <div class="absolute left-1/2 hidden -translate-x-1/2 lg:block">
+        <ul
+          class="nav-pill flex items-center rounded-full bg-white/90 px-3 py-2 shadow-md backdrop-blur-sm"
+          role="list"
+        >
+          {
+            navItems.map((item, index) => {
+              const isActive = currentPath.startsWith(item.href);
+              return (
+                <li class="flex items-center">
+                  <a
+                    href={item.href}
+                    class:list={[
+                      'nav-link px-4 py-1.5 text-sm font-bold no-underline transition-all duration-200',
+                      isActive
+                        ? 'text-[#dc2626]'
+                        : 'text-slate-800 hover:text-[#dc2626]',
+                    ]}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {item.label}
+                  </a>
+                  {index < navItems.length - 1 && (
+                    <span class="text-slate-200" aria-hidden="true">|</span>
+                  )}
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
 
-      <!-- CTA Button (Desktop) -->
-      <div class="hidden md:block">
+      <!-- CTA Button (Desktop): Red pill with pulse hover -->
+      <div class="relative z-10 hidden lg:block">
         <a
           href="/mitmachen/spenden/"
-          class="btn-primary inline-flex items-center gap-2 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white no-underline transition-colors hover:bg-emerald-700"
+          class="spenden-btn inline-flex items-center gap-2 rounded-full bg-[#dc2626] px-7 py-3 text-sm font-bold text-white no-underline shadow-lg transition-all duration-200 hover:bg-[#ef4444] hover:shadow-xl hover:scale-105"
         >
           Spenden
         </a>
@@ -74,15 +82,14 @@ const currentPath = Astro.url.pathname;
       <!-- Mobile Menu Button -->
       <button
         type="button"
-        class="inline-flex items-center justify-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden"
+        class="relative z-10 inline-flex items-center justify-center rounded-full bg-white p-2.5 text-slate-900 shadow-md transition-all hover:shadow-lg lg:hidden"
         aria-expanded="false"
         aria-controls="mobile-menu"
         id="mobile-menu-button"
       >
         <span class="sr-only">Menü öffnen</span>
-        <!-- Hamburger Icon -->
         <svg
-          class="h-6 w-6"
+          class="hamburger-icon h-6 w-6"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -92,19 +99,34 @@ const currentPath = Astro.url.pathname;
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M4 6h16M4 12h16M4 18h16"></path>
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+        </svg>
+        <svg
+          class="close-icon hidden h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </button>
     </nav>
   </div>
 
-  <!-- Mobile Menu (Hidden by default) -->
+  <!-- Mobile Menu -->
   <div
     id="mobile-menu"
-    class="hidden border-t border-slate-200 bg-white md:hidden"
+    class="hidden border-t border-slate-100 bg-white/95 backdrop-blur-md lg:hidden"
     aria-labelledby="mobile-menu-button"
   >
-    <div class="container mx-auto px-4 py-4">
+    <div class="mx-auto max-w-7xl px-4 py-6">
       <ul class="space-y-1" role="list">
         {
           navItems.map((item) => {
@@ -114,10 +136,10 @@ const currentPath = Astro.url.pathname;
                 <a
                   href={item.href}
                   class:list={[
-                    'block px-3 py-2 text-base font-medium no-underline rounded-md transition-colors',
+                    'block px-4 py-3 text-lg font-bold no-underline rounded-xl transition-all',
                     isActive
-                      ? 'text-sky-600 bg-sky-50'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
+                      ? 'text-[#dc2626] bg-red-50'
+                      : 'text-slate-900 hover:text-[#dc2626] hover:bg-red-50/50',
                   ]}
                   aria-current={isActive ? 'page' : undefined}
                 >
@@ -127,10 +149,10 @@ const currentPath = Astro.url.pathname;
             );
           })
         }
-        <li class="pt-2">
+        <li class="pt-4">
           <a
             href="/mitmachen/spenden/"
-            class="block rounded-md bg-emerald-600 px-3 py-2 text-center text-base font-medium text-white no-underline transition-colors hover:bg-emerald-700"
+            class="block rounded-full bg-[#dc2626] px-4 py-3.5 text-center text-lg font-bold text-white no-underline transition-all hover:bg-[#ef4444]"
           >
             Spenden
           </a>
@@ -140,16 +162,88 @@ const currentPath = Astro.url.pathname;
   </div>
 </header>
 
+<!-- Spacer for fixed header (hidden when hero-overlap class is on wrapper) -->
+<div class="header-spacer h-20" aria-hidden="true"></div>
+
+<style>
+  /* Header scroll state - slightly more opaque when scrolled */
+  #site-header.scrolled {
+    @apply bg-white/95 shadow-md;
+  }
+
+  /* Nav pill subtle hover lift */
+  .nav-pill {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .nav-pill:hover {
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Nav link hover underline effect */
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: #dc2626;
+    transition: width 0.2s ease, left 0.2s ease;
+  }
+
+  .nav-link:hover::after {
+    width: 60%;
+    left: 20%;
+  }
+
+  /* Spenden button subtle pulse on hover */
+  .spenden-btn:hover {
+    animation: subtle-pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes subtle-pulse {
+    0%, 100% {
+      box-shadow: 0 10px 25px -5px rgba(220, 38, 38, 0.4);
+    }
+    50% {
+      box-shadow: 0 10px 30px -5px rgba(220, 38, 38, 0.6);
+    }
+  }
+</style>
+
 <script>
-  // Mobile menu toggle (minimal JS)
+  // Mobile menu toggle
   const menuButton = document.getElementById('mobile-menu-button');
   const mobileMenu = document.getElementById('mobile-menu');
+  const hamburgerIcon = menuButton?.querySelector('.hamburger-icon');
+  const closeIcon = menuButton?.querySelector('.close-icon');
 
-  if (menuButton && mobileMenu) {
+  if (menuButton && mobileMenu && hamburgerIcon && closeIcon) {
     menuButton.addEventListener('click', () => {
       const isExpanded = menuButton.getAttribute('aria-expanded') === 'true';
       menuButton.setAttribute('aria-expanded', String(!isExpanded));
       mobileMenu.classList.toggle('hidden');
+      hamburgerIcon.classList.toggle('hidden');
+      closeIcon.classList.toggle('hidden');
     });
+  }
+
+  // Header scroll behavior - add stronger background when scrolled
+  const header = document.getElementById('site-header');
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
   }
 </script>

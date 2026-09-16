@@ -38,6 +38,11 @@ const {
 const siteTitle = 'Stopp Air Base Ramstein';
 const fullTitle = title === siteTitle ? title : `${title} — ${siteTitle}`;
 const canonical = canonicalUrl || Astro.url.href;
+
+// Make OG image URL absolute
+const absoluteOgImage = ogImage.startsWith('http')
+  ? ogImage
+  : new URL(ogImage, Astro.site).href;
 ---
 
 <!doctype html>
@@ -57,8 +62,10 @@ const canonical = canonicalUrl || Astro.url.href;
     <!-- Canonical URL -->
     <link rel="canonical" href={canonical} />
 
-    <!-- Favicon -->
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 
     <!-- Preload Critical Fonts -->
     <link
@@ -88,7 +95,7 @@ const canonical = canonicalUrl || Astro.url.href;
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={absoluteOgImage} />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:site_name" content={siteTitle} />
 
@@ -96,7 +103,7 @@ const canonical = canonicalUrl || Astro.url.href;
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image" content={absoluteOgImage} />
 
     <!-- Theme Color -->
     <meta name="theme-color" content="#ffffff" />

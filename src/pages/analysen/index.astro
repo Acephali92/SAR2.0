@@ -1,0 +1,73 @@
+---
+/**
+ * Analysen (Analysis Articles) Index Page
+ * Lists all geopolitical analysis articles
+ */
+
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PageLayout from '@layouts/PageLayout.astro';
+
+type AnalyseEntry = CollectionEntry<'analysen'>;
+
+// Get all non-draft analysen, sorted by date (newest first)
+const analysen = await getCollection('analysen', ({ data }: AnalyseEntry) => !data.draft);
+const sortedAnalysen = analysen.sort(
+  (a: AnalyseEntry, b: AnalyseEntry) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+);
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+---
+
+<PageLayout
+  title="Analysen"
+  description="Geopolitische Analysen und Hintergrundartikel zur Air Base Ramstein und internationaler Friedenspolitik."
+>
+  <div class="container mx-auto px-4 py-8 md:px-6 lg:py-12">
+    <header class="mb-12 max-w-2xl">
+      <h1 class="mb-4 text-3xl font-bold md:text-4xl">Analysen</h1>
+      <p class="text-lg text-content-secondary">
+        Geopolitische Hintergründe und aktuelle Entwicklungen rund um die Air Base Ramstein,
+        US-Militärpolitik und internationale Friedensbewegung.
+      </p>
+    </header>
+
+    {sortedAnalysen.length > 0 ? (
+      <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {sortedAnalysen.map((artikel: AnalyseEntry) => (
+          <article class="group rounded-lg border border-surface-700 bg-surface-800 p-6 transition-colors hover:border-surface-600">
+            <a href={`/analysen/${artikel.slug}/`} class="block">
+              {artikel.data.tags && artikel.data.tags.length > 0 && (
+                <div class="mb-3 flex flex-wrap gap-2">
+                  {artikel.data.tags.slice(0, 2).map((tag: string) => (
+                    <span class="rounded-full bg-surface-700 px-2 py-0.5 text-xs text-content-muted">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <h2 class="mb-2 text-xl font-semibold text-content-primary group-hover:text-accent-sky transition-colors">
+                {artikel.data.title}
+              </h2>
+              <p class="mb-4 text-sm text-content-secondary line-clamp-3">
+                {artikel.data.description}
+              </p>
+              <time class="text-xs text-content-muted" datetime={artikel.data.publishedAt.toISOString()}>
+                {formatDate(artikel.data.publishedAt)}
+              </time>
+            </a>
+          </article>
+        ))}
+      </div>
+    ) : (
+      <p class="text-content-secondary">
+        Noch keine Analysen veröffentlicht.
+      </p>
+    )}
+  </div>
+</PageLayout>

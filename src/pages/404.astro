@@ -1,0 +1,41 @@
+---
+/**
+ * 404 Error Page
+ * Custom error page for missing routes
+ */
+
+import PageLayout from '@layouts/PageLayout.astro';
+import Button from '@components/ui/Button.astro';
+---
+
+<PageLayout
+  title="Seite nicht gefunden"
+  description="Die angeforderte Seite konnte nicht gefunden werden."
+>
+  <div class="mx-auto max-w-2xl py-16 text-center">
+    <p class="mb-4 text-6xl font-bold text-content-tertiary">404</p>
+    <h1 class="mb-4 text-2xl font-bold">Seite nicht gefunden</h1>
+    <p class="mb-8 text-content-secondary">
+      Die angeforderte Seite existiert nicht oder wurde verschoben.
+    </p>
+
+    <div class="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+      <Button href="/" variant="primary">
+        Zur Startseite
+      </Button>
+      <Button href="/kontakt/" variant="secondary">
+        Kontakt
+      </Button>
+    </div>
+
+    <div class="mt-12 text-sm text-content-tertiary">
+      <p>Vielleicht finden Sie, was Sie suchen:</p>
+      <nav class="mt-4 flex flex-wrap justify-center gap-4">
+        <a href="/warum-ramstein/" class="hover:text-accent-sky">Warum Ramstein</a>
+        <a href="/fakten/" class="hover:text-accent-sky">Fakten</a>
+        <a href="/aktionen/" class="hover:text-accent-sky">Aktionen</a>
+        <a href="/mitmachen/" class="hover:text-accent-sky">Mitmachen</a>
+      </nav>
+    </div>
+  </div>
+</PageLayout>

@@ -1,0 +1,52 @@
+---
+/**
+ * Datenschutz (Privacy Policy) page
+ */
+
+import { getEntry } from 'astro:content';
+import PageLayout from '@layouts/PageLayout.astro';
+
+const entry = await getEntry('seiten', 'datenschutz');
+if (!entry) throw new Error('Datenschutz page not found');
+
+const { Content } = await entry.render();
+---
+
+<PageLayout title={entry.data.title} description={entry.data.description}>
+  <article class="mx-auto max-w-2xl">
+    <h1 class="mb-8 text-3xl font-bold">{entry.data.title}</h1>
+    <div class="prose-custom font-serif">
+      <Content />
+    </div>
+  </article>
+</PageLayout>
+
+<style>
+  .prose-custom :global(h2) {
+    @apply mt-8 mb-4 text-xl font-semibold font-sans;
+  }
+
+  .prose-custom :global(p) {
+    @apply mb-4 text-content-secondary;
+  }
+
+  .prose-custom :global(a) {
+    @apply text-accent-sky hover:text-content-primary;
+  }
+
+  .prose-custom :global(ul) {
+    @apply mb-4 ml-6 list-disc text-content-secondary;
+  }
+
+  .prose-custom :global(li) {
+    @apply mb-1;
+  }
+
+  .prose-custom :global(blockquote) {
+    @apply my-4 border-l-4 border-amber-400 bg-amber-50 p-4 text-amber-800;
+  }
+
+  .prose-custom :global(blockquote strong) {
+    @apply text-amber-900;
+  }
+</style>
