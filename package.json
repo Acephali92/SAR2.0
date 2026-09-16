@@ -10,7 +10,8 @@
     "preview": "astro preview",
     "postbuild": "pagefind --site dist",
     "typecheck": "astro check",
-    "verify": "npm run typecheck && npm run build"
+    "check-links": "node scripts/check-links.mjs",
+    "verify": "npm run typecheck && npm run build && npm run check-links"
   },
   "dependencies": {
     "@astrojs/check": "0.9.4",
