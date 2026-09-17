@@ -2,7 +2,7 @@ import type { TaskConfig } from 'payload';
 
 /**
  * M5 (zeitgesteuerte Veroeffentlichung): laeuft per Payload Jobs Queue alle ~5 Minuten (siehe
- * payload.config.ts jobs.autoRun), sucht in beiden Collections Dokumente mit status=zur_freigabe
+ * payload.config.ts jobs.autoRun), sucht in beiden Collections Dokumente mit freigabeStatus=zur_freigabe
  * und einem publishAt in der Vergangenheit, und setzt sie auf veroeffentlicht. Das loest ueber den
  * afterChange-Hook (triggerRebuild) automatisch den Rebuild-Webhook aus (M9).
  *
@@ -14,7 +14,7 @@ async function runForCollection(payload: any, collection: 'beitraege' | 'termine
   const due = await payload.find({
     collection,
     where: {
-      and: [{ status: { equals: 'zur_freigabe' } }, { publishAt: { less_than_equal: now } }],
+      and: [{ freigabeStatus: { equals: 'zur_freigabe' } }, { publishAt: { less_than_equal: now } }],
     },
     limit: 100,
   });
@@ -23,7 +23,7 @@ async function runForCollection(payload: any, collection: 'beitraege' | 'termine
     await payload.update({
       collection,
       id: doc.id,
-      data: { status: 'veroeffentlicht' },
+      data: { freigabeStatus: 'veroeffentlicht' },
     });
   }
 
@@ -33,6 +33,10 @@ async function runForCollection(payload: any, collection: 'beitraege' | 'termine
 export const schedulePublishTask: TaskConfig<'schedulePublish'> = {
   slug: 'schedulePublish',
   retries: 2,
+  // "schedule" queues eine Job-Instanz alle 5 Minuten; "jobs.autoRun" (payload.config.ts, gleiche
+  // queue) fuehrt die Warteschlange tatsaechlich aus. Beides zusammen ist noetig - schedule allein
+  // wuerde Jobs nur anhaeufen, autoRun allein haette ohne schedule nichts zum Ausfuehren.
+  schedule: [{ cron: '*/5 * * * *', queue: 'default' }],
   handler: async ({ req }) => {
     const beitraegeCount = await runForCollection(req.payload, 'beitraege');
     const termineCount = await runForCollection(req.payload, 'termine');

@@ -12,6 +12,10 @@ export const Users: CollectionConfig = {
     tokenExpiration: 60 * 60 * 8, // 8h
     maxLoginAttempts: 10,
     lockTime: 10 * 60 * 1000,
+    // Erlaubt API-Key-Auth zusaetzlich zu Login-Sessions - wird nur fuer den dedizierten
+    // Service-Nutzer aktiviert, mit dem der Astro-Build lesend zugreift (siehe cms/README.md).
+    // Menschliche Redaktions-Accounts lassen das Feld einfach deaktiviert.
+    useAPIKey: true,
     forgotPassword: {
       generateEmailSubject: () => 'Passwort zurücksetzen – Redaktion stoppramstein.de',
     },

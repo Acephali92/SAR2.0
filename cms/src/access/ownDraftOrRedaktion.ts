@@ -1,4 +1,4 @@
-import type { Access } from 'payload';
+import type { Access, Where } from 'payload';
 
 /**
  * Fuer Beitraege/Termine: mit der Rolle Autor sieht/bearbeitet man nur eigene Dokumente,
@@ -15,5 +15,6 @@ export const ownDraftOrRedaktion: Access = ({ req }) => {
 export const ownDraftOnlyDelete: Access = ({ req }) => {
   if (!req.user) return false;
   if (req.user.role === 'redaktion' || req.user.role === 'admin') return true;
-  return { and: [{ createdBy: { equals: req.user.id } }, { status: { equals: 'entwurf' } }] };
+  const where: Where = { and: [{ createdBy: { equals: req.user.id } }, { freigabeStatus: { equals: 'entwurf' } }] };
+  return where;
 };

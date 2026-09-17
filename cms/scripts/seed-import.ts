@@ -41,7 +41,7 @@ async function upsertBeitrag(payload: Awaited<ReturnType<typeof getPayload>>, fi
       kategorie: 'analyse',
       body: markdownToLexical(content),
       tags: (data.tags ?? []).map((tag: string) => ({ tag })),
-      status: 'veroeffentlicht',
+      freigabeStatus: 'veroeffentlicht',
       publishedAt: new Date(data.publishedAt).toISOString(),
     },
   });
@@ -72,7 +72,7 @@ async function upsertTermin(payload: Awaited<ReturnType<typeof getPayload>>, fil
       location: data.location,
       registrationUrl: data.registrationUrl,
       eventStatus: data.status ?? 'upcoming',
-      status: 'veroeffentlicht',
+      freigabeStatus: 'veroeffentlicht',
       publishedAt: new Date(data.publishedAt).toISOString(),
     },
   });

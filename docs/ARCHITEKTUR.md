@@ -183,7 +183,7 @@ erDiagram
     BEITRAEGE ||--o{ TERMINE : "verknuepfterTermin / verknuepfteBeitraege"
 ```
 
-`beitraege` und `termine` erweitern nicht `baseSchema` (sie haben kein `draft`-Feld — Sichtbarkeit läuft über den redaktionellen `status` in Payload, siehe CMS-Integration).
+`beitraege` und `termine` erweitern nicht `baseSchema` (sie haben kein `draft`-Feld — Sichtbarkeit läuft über den redaktionellen `freigabeStatus` in Payload, siehe CMS-Integration).
 
 ## Datenverarbeitung (Art. 13 DSGVO)
 
@@ -281,7 +281,7 @@ Vollständige Entwickler-Referenz (Setup, Umgebungsvariablen, Datenmodell im Det
 
 **Bilder (M4, CSP):** Die Produktions-CSP ist `img-src 'self' data:` — Bilder dürfen also nicht direkt von der CMS-Domain eingebunden werden. `payload-loader.ts` lädt referenzierte Medien deshalb **während des Builds** herunter nach `public/media/cms/` und verweist im Content-Layer-Datensatz auf den lokalen Pfad. Bilder funktionieren dadurch auch, wenn das CMS nach dem Build offline ist.
 
-**Astro-Anbindung:** `src/lib/payload-loader.ts` fetcht bei gesetztem `PAYLOAD_URL` live von Payloads REST-API (nur `status: veroeffentlicht`, `publishedAt <= jetzt`) — Nichterreichbarkeit lässt den Build laut fehlschlagen. Ohne `PAYLOAD_URL` (lokal ohne laufendes `cms/`, und in CI) wird stattdessen `src/content/_fixtures/{beitraege,termine}.json` gelesen, damit `npm run verify` auch ohne Docker/Postgres lauffähig bleibt.
+**Astro-Anbindung:** `src/lib/payload-loader.ts` fetcht bei gesetztem `PAYLOAD_URL` live von Payloads REST-API (nur `freigabeStatus: veroeffentlicht`, `publishedAt <= jetzt`) — Nichterreichbarkeit lässt den Build laut fehlschlagen. Ohne `PAYLOAD_URL` (lokal ohne laufendes `cms/`, und in CI) wird stattdessen `src/content/_fixtures/{beitraege,termine}.json` gelesen, damit `npm run verify` auch ohne Docker/Postgres lauffähig bleibt.
 
 **Automatischer Rebuild (M9) und Backups (M10):** siehe [DEPLOYMENT.md](./DEPLOYMENT.md).
 

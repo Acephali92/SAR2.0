@@ -11,7 +11,9 @@ import { ownDraftOrRedaktion, ownDraftOnlyDelete } from '../access/ownDraftOrRed
 /**
  * Termine (Veranstaltungen) - ersetzt die bisherige Astro-Collection `aktionen`.
  * eventStatus (Veranstaltungslebenszyklus: demnaechst/laeuft/beendet/abgesagt) ist bewusst NICHT
- * `status` genannt, um Verwechslung mit dem redaktionellen Freigabe-status zu vermeiden.
+ * `freigabeStatus` genannt, um Verwechslung mit dem redaktionellen Freigabeprozess zu vermeiden -
+ * und statusField.ts' Feld heisst wiederum bewusst NICHT "status", weil das mit Payloads intern
+ * generiertem Postgres-Enum fuer die eigene "_status"-Spalte (Drafts/Versions) kollidiert.
  * verknuepfteBeitraege ist ein reines "join"-Feld - Spiegel von Beitraege.verknuepfterTermin,
  * hier nicht direkt editierbar (Pflege passiert im Beitrag).
  */
@@ -20,7 +22,7 @@ export const Termine: CollectionConfig = {
   labels: { singular: 'Termin', plural: 'Termine' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'startDate', 'eventStatus', 'status'],
+    defaultColumns: ['title', 'startDate', 'eventStatus', 'freigabeStatus'],
   },
   versions: {
     drafts: { autosave: { interval: 2000 } },
@@ -29,7 +31,7 @@ export const Termine: CollectionConfig = {
   access: {
     read: ({ req }) => {
       if (req.user) return true;
-      return { status: { equals: 'veroeffentlicht' } };
+      return { freigabeStatus: { equals: 'veroeffentlicht' } };
     },
     create: ({ req }) => !!req.user,
     update: ownDraftOrRedaktion,

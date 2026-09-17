@@ -19,6 +19,7 @@ cp .env.example .env
 # PAYLOAD_SECRET mit `openssl rand -base64 48` erzeugen; SMTP/Webhook-Werte können
 # für lokale Entwicklung Platzhalter bleiben (Passwort-Reset/Rebuild-Mail laufen dann nicht).
 
+cp docker-compose.override.yml.example docker-compose.override.yml   # legt u. a. den postgres-Port offen
 docker compose up -d postgres   # nur die Datenbank lokal starten
 npm install
 npm run dev                      # Payload-Admin unter http://localhost:3000/admin
@@ -29,6 +30,23 @@ Beim ersten Aufruf von `/admin` fragt Payload nach einem ersten Admin-Nutzer —
 Nach Änderungen an Collections/Feldern: `npm run generate:types` erzeugt `src/payload-types.ts` (generiert, nicht committen — siehe `.gitignore`).
 
 Um den kompletten Stack lokal zu testen (inkl. Rebuild-Webhook, Backup-Cron), siehe [`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md#cms-infrastruktur-docker) — `docker compose up -d` ohne den `postgres`-Filter startet alles.
+
+## Lokal vollständig testen (Docker + Admin-UI + Astro-Build)
+
+Dieser Ablauf ist einmal vollständig durchgespielt und verifiziert worden — er ist der zuverlässigste Weg, eine Änderung an `cms/` end-to-end zu prüfen, bevor sie live geht. Alle Schritte bauen auf dem Schnellstart oben auf.
+
+1. **Postgres + Payload starten** (siehe Schnellstart oben). Der **allererste** Aufruf von `/admin` bzw. jeder anderen Route kompiliert sie erst (Next.js Dev-Modus) — das kann für die Admin-Route **60–90 Sekunden** dauern, wirkt aber wie ein Hänger. Einfach warten, nicht abbrechen; jeder folgende Aufruf derselben Route ist dann Millisekunden schnell.
+2. **Ersten Admin-Nutzer anlegen**: `/admin` aufrufen, Formular „Erstes Benutzerkonto erstellen" ausfüllen, Rolle auf **Admin** setzen (nur Admin darf später weitere Rollen vergeben).
+3. **Redaktions-Workflow durchspielen**: einen Test-Beitrag anlegen, Inhalt im Rich-Text-Editor schreiben, Status schrittweise auf „Zur Freigabe" und „Veröffentlicht" setzen, zusätzlich oben auf **„Änderungen veröffentlichen"** klicken (das ist Payloads eigener Draft/Publish-Schalter, getrennt vom eigenen `freigabeStatus`-Feld — beides muss für einen öffentlich sichtbaren Beitrag passen, siehe [Redaktioneller Workflow](#redaktioneller-workflow-m5) unten).
+4. **API-Key für den Astro-Build anlegen**: unter `/admin/account` „API-Schlüssel aktivieren" ankreuzen, speichern, den generierten Schlüssel kopieren (nur bei der Erstellung im Klartext sichtbar).
+5. **Astro-Build gegen die laufende Instanz testen** (im Repo-Wurzelverzeichnis, nicht in `cms/`):
+   ```bash
+   PAYLOAD_URL=http://localhost:3000 PAYLOAD_API_TOKEN=<kopierter-key> npm run build
+   ```
+   Die Build-Ausgabe sollte `"beitraege": 1 Dokument(e) geladen` (o. ä.) zeigen statt der Fixture-Warnung. `npm run preview` bzw. ein Blick in `dist/analysen/<slug>/index.html` zeigt den fertigen, statischen Beitrag.
+6. **Verify-Gates laufen lassen**: `npm run check-links && npm run check-csp` (Root) — müssen weiterhin fehlerfrei durchlaufen, das ist der harte Beweis, dass CMS-Inhalte CSP-sauber und linkgültig sind.
+
+**Wichtig bei Config-Änderungen:** `payload.config.ts`, alles unter `src/app/(payload)/`, sowie neue/geänderte Environment-Variablen werden vom Next.js-Dev-Server **nicht** zuverlässig per Fast Refresh übernommen. Nach solchen Änderungen den Dev-Server neu starten (`Strg+C`, dann `npm run dev` erneut) — sonst können alte Route-Handler oder ein veralteter DB-Schema-Stand aktiv bleiben und zu schwer nachvollziehbaren Fehlern führen.
 
 ## Projektstruktur
 
@@ -96,7 +114,11 @@ Umgesetzt in `src/collections/Users.ts` (Feld `role`) und den Access-Funktionen 
 
 ### Redaktioneller Workflow (M5)
 
-Eigenes `status`-Feld (`src/fields/statusField.ts`), **zusätzlich** zu Payloads nativem `versions.drafts` (das sichert Revisionshistorie, ersetzt aber nicht den 3-stufigen Freigabeprozess):
+Eigenes `freigabeStatus`-Feld (`src/fields/statusField.ts`), **zusätzlich** zu Payloads nativem `versions.drafts` (das sichert Revisionshistorie, ersetzt aber nicht den 3-stufigen Freigabeprozess).
+
+> ⚠️ **Fallstrick, beim lokalen Test tatsächlich aufgetreten:** Ein eigenes `select`-Feld auf einer Collection mit `versions.drafts` darf **nicht** `status` heißen. Payload legt für seinen internen Draft/Publish-Mechanismus selbst eine `_status`-Spalte an und generiert dafür in Postgres einen Enum-Typ nach dem Muster `enum_<collection>_status` — exakt der gleiche Name, den ein eigenes Feld `status` ebenfalls bekäme. Die Folge ist kein Typfehler beim Schreiben des Codes, sondern ein kaputtes DB-Schema erst beim ersten Start gegen eine echte Datenbank (`CREATE TABLE` schlägt fehl mit „invalid input value for enum"). Deshalb heißt das Feld bewusst `freigabeStatus`. Diese Falle gilt für **jede** Collection mit `versions.drafts` — bei künftigen eigenen Status-artigen Feldern immer einen anderen Namen als `status` wählen (siehe auch `eventStatus` in `Termine.ts`).
+
+Die Stufen im Detail:
 
 | Von → Nach | Autor | Redaktion/Admin |
 |---|---|---|
@@ -142,7 +164,11 @@ Kurzreferenz — vollständige Beschreibung inkl. Docker-Compose-Setup, Reverse-
 | Problem | Ursache / Lösung |
 |---------|-------------------|
 | `docker compose up` schlägt fehl oder hängt | Prüfen, ob Docker Desktop (bzw. der Docker-Daemon) überhaupt läuft (`docker ps` sollte eine — auch leere — Liste zeigen, keinen Verbindungsfehler). Danach `docker compose logs` prüfen, welcher Service genau nicht hochkommt. |
+| Image-Pull bricht mit `unexpected EOF` / `httpReadSeeker` ab | Reines Netzwerk-Flattern beim Herunterladen großer Layer, kein Fehler in diesem Projekt. `docker compose up -d postgres` (bzw. `docker pull postgres:16-alpine`) einfach erneut ausführen — bereits geladene Layer werden zwischengespeichert, nach 2–3 Versuchen klappt es i. d. R. |
 | `npm run dev` bricht mit einem Fehler zu `DATABASE_URI`/`PAYLOAD_SECRET` ab | `.env` fehlt oder ist unvollständig — `.env.example` nach `.env` kopieren (siehe Schnellstart oben) und die Pflichtwerte ausfüllen, mindestens `DATABASE_URI` und `PAYLOAD_SECRET`. |
+| `CREATE TABLE ... invalid input value for enum` beim ersten Start | Eine Collection hat ein eigenes Feld `status` neben aktiviertem `versions.drafts` — Namenskollision mit Payloads intern generiertem Enum, siehe Warnkasten bei [Redaktioneller Workflow](#redaktioneller-workflow-m5). Feld umbenennen, dann `docker compose down -v` (Postgres-Volume mit dem kaputten Teil-Schema verwerfen) und neu starten. |
+| Beim Neustart: `Error: listen EADDRINUSE: address already in use :::3000` | Ein vorheriger `npm run dev`-Prozess läuft noch (z. B. nach einem nicht sauber beendeten Terminal). Prozess auf Port 3000 beenden (Windows: `Get-NetTCPConnection -LocalPort 3000 \| Select-Object -ExpandProperty OwningProcess \| Stop-Process -Force`; macOS/Linux: `lsof -ti:3000 \| xargs kill`) und `npm run dev` erneut starten. |
+| Seite lädt "ewig" (60–90 s) und wirkt eingefroren | Normal bei der jeweils ersten Anfrage an eine Route nach einem (Neu-)Start des Dev-Servers — Next.js kompiliert sie erst on-demand. Terminal-Log beobachten (`✓ Compiled ... in Xs`), nicht abbrechen. Danach ist dieselbe Route dauerhaft schnell, bis der Server neu startet. |
 | Astro-Build bricht mit "Payload-API nicht erreichbar" ab | `PAYLOAD_URL` ist gesetzt, aber die Instanz läuft nicht/ist nicht erreichbar. Für reine Frontend-Arbeit `PAYLOAD_URL` weglassen — der Astro-Loader nutzt dann automatisch die committete Fixture (`src/content/_fixtures/`). |
 | Neue Beiträge erscheinen nicht auf der Website | Prüfen: Status ist `veroeffentlicht`? `publishedAt` liegt nicht in der Zukunft? Rebuild-Webhook-Log auf dem Produktionsserver prüfen (`/var/log/stoppramstein-rebuild.log`). |
 | Admin-UI zeigt "Access Denied" | Rolle des angemeldeten Nutzers prüfen — mit der Rolle Autor sind nur die eigenen Dokumente sichtbar, keine fremden. |

@@ -8,8 +8,10 @@ import type { CollectionAfterChangeHook } from 'payload';
  */
 export const triggerRebuild: CollectionAfterChangeHook = async ({ doc, previousDoc, operation, req }) => {
   const becamePublished =
-    doc.status === 'veroeffentlicht' && (operation === 'create' || previousDoc?.status !== 'veroeffentlicht');
-  const wasUnpublished = previousDoc?.status === 'veroeffentlicht' && doc.status !== 'veroeffentlicht';
+    doc.freigabeStatus === 'veroeffentlicht' &&
+    (operation === 'create' || previousDoc?.freigabeStatus !== 'veroeffentlicht');
+  const wasUnpublished =
+    previousDoc?.freigabeStatus === 'veroeffentlicht' && doc.freigabeStatus !== 'veroeffentlicht';
 
   if (!becamePublished && !wasUnpublished) {
     return doc;
@@ -27,7 +29,7 @@ export const triggerRebuild: CollectionAfterChangeHook = async ({ doc, previousD
     await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-webhook-secret': secret },
-      body: JSON.stringify({ reason: `${doc.id}:${doc.status}` }),
+      body: JSON.stringify({ reason: `${doc.id}:${doc.freigabeStatus}` }),
     });
   } catch (err) {
     req.payload.logger.error(`Rebuild-Webhook fehlgeschlagen: ${(err as Error).message}`);
