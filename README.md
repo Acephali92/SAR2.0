@@ -31,7 +31,7 @@ Dev-Server: `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.
 | `npm run typecheck` | TypeScript-/Schema-Prüfung |
 | `npm run check-links` | Interne Links im Build-Output prüfen |
 | `npm run check-csp` | Build-Output auf Inline-Scripts/CSP-Verstöße prüfen |
-| `npm run verify` | typecheck + build + check-links — **vor jedem Commit ausführen** |
+| `npm run verify` | typecheck + build + check-links + check-csp — **vor jedem Commit ausführen** |
 
 ## Stack
 

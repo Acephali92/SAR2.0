@@ -53,7 +53,7 @@ chore: update dependencies
 npm run verify
 ```
 
-Muss fehlerfrei durchlaufen (Typecheck + Build + Link-Check). Optional zusätzlich `npm run check-csp` gegen den Build-Output prüfen (aktuell nicht Teil von `verify`, siehe [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md)).
+Muss fehlerfrei durchlaufen (Typecheck + Build + Link-Check + CSP-Check, siehe [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) für Details zum CSP-Check).
 
 ## Pull Requests
 

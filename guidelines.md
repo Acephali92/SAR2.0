@@ -340,7 +340,7 @@ Not implemented. The site is light-only; design tokens in `tailwind.config.mjs` 
 
 ### 9.3 Build Verification
 
-Run Lighthouse CI on every build. Fail the build if any score drops below targets.
+Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor größeren Releases oder Layout-Änderungen) — sie sind **nicht** Teil der automatisierten CI. Die automatisierten Gates sind ausschließlich `npm run verify` (Typecheck, Build, Link-Check, CSP-Check), siehe 11.3 und `.github/workflows/ci.yml`.
 
 ---
 
@@ -415,10 +415,7 @@ npm run postbuild
 # Type checking
 npm run typecheck
 
-# Lint (if configured)
-npm run lint
-
-# Full verification (types + build + lighthouse)
+# Full verification (types + build + link-check + CSP-check)
 npm run verify
 ```
 
@@ -434,7 +431,7 @@ npm run verify
     "typecheck": "astro check",
     "check-links": "node scripts/check-links.mjs",
     "check-csp": "node scripts/check-csp.mjs",
-    "verify": "npm run typecheck && npm run build && npm run check-links"
+    "verify": "npm run typecheck && npm run build && npm run check-links && npm run check-csp"
   }
 }
 ```
