@@ -11,10 +11,12 @@
 ## Wichtige Befehle
 
 ```bash
-npm run dev        # Entwicklungsserver (http://localhost:4321)
-npm run build      # Produktion (nach dist/)
-npm run verify     # typecheck + build (CI-Validation)
-npm run typecheck  # Nur TypeScript-Prüfung
+npm run dev         # Entwicklungsserver (http://localhost:4321)
+npm run build       # Produktion (nach dist/)
+npm run typecheck   # Nur TypeScript-Prüfung
+npm run check-links # Interne Links im Build-Output prüfen
+npm run check-csp   # Build-Output auf Inline-Scripts/CSP-Verstöße prüfen
+npm run verify      # typecheck + build + check-links + check-csp (CI-Validation)
 ```
 
 ## Verbindliche Regeln
