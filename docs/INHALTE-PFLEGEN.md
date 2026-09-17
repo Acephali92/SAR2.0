@@ -64,6 +64,10 @@ sources:
 
 Ist eine Aussage (noch) nicht belegbar, trage sie in [`REDAKTION-TODO.md`](./REDAKTION-TODO.md) ein, statt sie unbelegt zu veröffentlichen oder zu erfinden. Das gilt genauso für Beiträge/Termine im CMS (Teil B).
 
+### Sprachstil: keine Gendersprache
+
+Verbindlich laut `CLAUDE.md`: Keine Doppelpunkt-/Sternchen-/Unterstrich-Formen wie „Autor:in" oder „Leser*innen". Stattdessen ein passendes neutrales Kollektivum nutzen (z. B. „Redaktion" statt „Redakteur:innen") oder die generische Form (z. B. „Autor", „Nutzer"). Gilt für alle Texte — Markdown-Inhalte wie Beiträge im CMS.
+
 ### Neuen Inhalt anlegen
 
 1. Neue `.md`-Datei im passenden Collection-Ordner anlegen, z. B. `src/content/warum-ramstein/neues-argument.md`.
