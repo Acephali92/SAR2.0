@@ -5,9 +5,15 @@ import { canTransitionStatus } from '../access/canTransitionStatus';
  * Redaktioneller Status (M5: Entwurf -> Freigabe -> Veroeffentlichung).
  * Bewusst getrennt von Payloads nativem drafts/versions-Mechanismus (siehe Beitraege.ts/Termine.ts):
  * versions.drafts sichert Revisionen, dieses Feld bildet den 3-stufigen Freigabeprozess ab.
+ *
+ * WICHTIG: heisst bewusst "freigabeStatus", NICHT "status" - Payload legt fuer den internen
+ * drafts/versions-Mechanismus selbst eine Spalte "_status" an und generiert daraus in Postgres
+ * einen Enum-Typ nach dem Muster enum_<collection>_status. Ein eigenes Feld exakt "status" zu
+ * nennen kollidiert mit genau diesem generierten Enum-Namen (enum_beitraege_status etc.) und
+ * fuehrt zu einem kaputten DB-Schema (CREATE TABLE schlaegt fehl: "invalid input value for enum").
  */
 export const statusField: Field = {
-  name: 'status',
+  name: 'freigabeStatus',
   type: 'select',
   required: true,
   defaultValue: 'entwurf',

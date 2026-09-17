@@ -2,7 +2,18 @@
 # ueber die generische *.override.yml-Konvention von Docker Compose, kein Secret-Inhalt hier).
 #
 # Nutzung: cp docker-compose.override.yml.example docker-compose.override.yml
+#
+# Empfohlener, getesteter Dev-Workflow (schnellster Iterationszyklus, kein Image-Rebuild bei
+# Code-Aenderungen): NUR postgres per Docker starten (`docker compose up -d postgres`), Payload
+# selbst nativ auf dem Host mit `npm run dev` (siehe cms/README.md, Abschnitt "Lokal vollstaendig
+# testen"). Dafuer reicht der postgres-Port unten. Die payload/rebuild-webhook-Overrides sind nur
+# fuer den Fall gedacht, dass auch Payload selbst in Docker laufen soll (z.B. um den Produktions-
+# Container-Build zu testen) - dann braucht es auch deren Ports.
 services:
+  postgres:
+    ports:
+      - '5432:5432'
+
   payload:
     build:
       target: builder # dev braucht kein optimiertes Runtime-Image

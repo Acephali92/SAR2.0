@@ -10,13 +10,13 @@ type Status = 'entwurf' | 'zur_freigabe' | 'veroeffentlicht';
  * dieses Feld regelt zusaetzlich, WELCHER Statuswert erlaubt ist).
  * Redaktion/Admin duerfen jeden Uebergang, inklusive Veroeffentlichung und Zurueckziehen.
  */
-export const canTransitionStatus: FieldAccess = ({ req, data, siblingData, originalDoc }) => {
+export const canTransitionStatus: FieldAccess = ({ req, data, siblingData, doc }) => {
   const role = req.user?.role as Role | undefined;
   if (!role) return false;
   if (role === 'redaktion' || role === 'admin') return true;
 
-  const nextStatus = (siblingData?.status ?? data?.status) as Status | undefined;
-  const currentStatus = (originalDoc?.status as Status | undefined) ?? 'entwurf';
+  const nextStatus = (siblingData?.freigabeStatus ?? data?.freigabeStatus) as Status | undefined;
+  const currentStatus = (doc?.freigabeStatus as Status | undefined) ?? 'entwurf';
 
   if (!nextStatus) return true; // Feld nicht Teil dieses Requests
 

@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url';
 import { buildConfig } from 'payload';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { de } from '@payloadcms/translations/languages/de';
+import sharp from 'sharp';
 
 import { Users } from './collections/Users';
 import { Media } from './collections/Media';
@@ -21,15 +23,20 @@ export default buildConfig({
     meta: {
       titleSuffix: '- Redaktion Stopp Air Base Ramstein',
     },
+    importMap: {
+      baseDir: path.resolve(dirname),
+    },
   },
-  // Deutschsprachige Oberflaeche (M3)
+  // Deutschsprachige Oberflaeche (M3) - nur "de" als unterstuetzte Sprache macht die Admin-UI
+  // ausschliesslich deutsch (keine Sprachumschaltung moeglich, kein ungenutzter i18n-Ballast im Bundle).
   i18n: {
     fallbackLanguage: 'de',
-    supportedLanguages: { de: {} } as never,
+    supportedLanguages: { de },
   },
-  localization: undefined,
   collections: [Users, Media, Beitraege, Termine],
   editor: lexicalEditor(),
+  // Noetig fuer die automatischen Bildgroessen-Varianten (imageSizes) in collections/Media.ts (M4).
+  sharp,
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI },
   }),

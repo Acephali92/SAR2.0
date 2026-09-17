@@ -6,7 +6,7 @@ import { lexicalToHtml } from '../lib/lexicalToHtml';
  * nur einen fertigen HTML-String konsumiert und die Payload-Rich-Text-Abhaengigkeit vollstaendig
  * in cms/ bleibt (kein @payloadcms/richtext-lexical im Astro-Root-package.json).
  */
-export const addRenderedHtml: CollectionAfterReadHook = async ({ doc }) => {
-  doc.renderedHtml = await lexicalToHtml(doc.body);
+export const addRenderedHtml: CollectionAfterReadHook = async ({ doc, req }) => {
+  doc.renderedHtml = await lexicalToHtml(doc.body, req.payload);
   return doc;
 };

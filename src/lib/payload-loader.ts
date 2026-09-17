@@ -68,7 +68,7 @@ function loadFixture(collection: string): unknown[] {
 async function fetchLive(collection: string, payloadUrl: string, apiToken: string): Promise<unknown[]> {
   const now = new Date().toISOString();
   const query = new URLSearchParams({
-    'where[status][equals]': 'veroeffentlicht',
+    'where[freigabeStatus][equals]': 'veroeffentlicht',
     'where[publishedAt][less_than_equal]': now,
     depth: '2',
     limit: '1000',
