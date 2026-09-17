@@ -2,7 +2,9 @@
 
 Selbst gehostete Redaktionsoberfläche für [stoppramstein.de](https://stoppramstein.de). Ehrenamtliche legen hier Beiträge (Nachrichten/Analysen) und Termine an, ohne Git- oder GitHub-Kenntnisse. Die öffentliche Website (Astro, im Repo-Wurzelverzeichnis) bleibt vollständig statisch — sie liest veröffentlichte Inhalte nur **zur Build-Zeit** von hier, nie zur Laufzeit. Fällt dieser Dienst aus, läuft die bereits gebaute Website unverändert weiter.
 
-Dieses Verzeichnis ist ein **eigenständiges npm-Projekt** (eigene `package.json`/`package-lock.json`, bewusst **kein** npm-Workspace mit dem Astro-Root) — Payload- und Astro-Abhängigkeiten werden unabhängig voneinander aktualisiert.
+Dieses Verzeichnis ist ein **eigenständiges npm-Projekt** (eigene `package.json`/`package-lock.json`, bewusst **kein** npm-Workspace mit dem Astro-Root).
+
+**Warum eigenständig statt ein gemeinsames Projekt?** Payload und Astro sind zwei völlig unabhängige Software-Ökosysteme mit eigenem Update-Rhythmus. In einem gemeinsamen Workspace würde eine Aktualisierung von Payload/Next.js/React potenziell auch Abhängigkeiten der öffentlichen Astro-Seite anfassen (und umgekehrt) — mit dem Risiko, dass ein Update am CMS versehentlich die öffentliche, statische Seite verändert oder ein Astro-Update das CMS zerbricht. Die Trennung in zwei npm-Projekte macht dieses Risiko strukturell unmöglich: Ein `npm install` in `cms/` kann `package.json` im Repo-Wurzelverzeichnis gar nicht berühren.
 
 Für den großen Zusammenhang (Architektur, Datenfluss, warum diese Trennung) siehe [`../docs/ARCHITEKTUR.md`](../docs/ARCHITEKTUR.md). Für Betrieb/Deployment auf dem Produktionsserver siehe [`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md). Für die redaktionelle Bedienungsanleitung siehe [`../docs/INHALTE-PFLEGEN.md`](../docs/INHALTE-PFLEGEN.md), Teil B. Dieses README richtet sich an **Entwicklung/technische Betreuung**, die lokal an `cms/` arbeiten.
 
@@ -88,7 +90,7 @@ Vollständige Liste mit Kommentaren: [`.env.example`](./.env.example). Kurzrefer
 |-------|------|
 | `autor` | Eigene Beiträge/Termine anlegen, bearbeiten, zur Freigabe einreichen |
 | `redaktion` | Zusätzlich: alle Inhalte einsehen, freigeben, veröffentlichen, zurückziehen |
-| `admin` | Zusätzlich: Nutzer:innen und Rollen verwalten |
+| `admin` | Zusätzlich: Nutzer anlegen und Rollen verwalten |
 
 Umgesetzt in `src/collections/Users.ts` (Feld `role`) und den Access-Funktionen in `src/access/`.
 
@@ -96,7 +98,7 @@ Umgesetzt in `src/collections/Users.ts` (Feld `role`) und den Access-Funktionen 
 
 Eigenes `status`-Feld (`src/fields/statusField.ts`), **zusätzlich** zu Payloads nativem `versions.drafts` (das sichert Revisionshistorie, ersetzt aber nicht den 3-stufigen Freigabeprozess):
 
-| Von → Nach | Autor:in | Redaktion/Admin |
+| Von → Nach | Autor | Redaktion/Admin |
 |---|---|---|
 | — → `entwurf` | ✅ (eigene) | ✅ |
 | `entwurf` → `zur_freigabe` | ✅ (eigene) | ✅ |
@@ -112,7 +114,7 @@ Durchgesetzt über `src/access/canTransitionStatus.ts` (Feld-Access) und `src/ac
 
 ### Rich Text und Sicherheit (M3, M7)
 
-`src/lib/editorConfig.ts` definiert eine **bewusste Feature-Allowlist** für den Lexical-Editor (Überschriften h2/h3, Listen, Links, Zitate, Bold/Italic, Bilder) — **kein** HTML-Block- oder Embed-Feature. Das ist die eigentliche Sicherheitsgrenze: Redakteur:innen können strukturell kein `<script>` oder rohes HTML einschleusen, unabhängig davon, wie sorgfältig die HTML-Konvertierung (`lexicalToHtml.ts`) ist. Neue Editor-Features nur nach Rücksprache aktivieren — die öffentliche Seite verlässt sich auf diese Grenze, um `script-src 'self'` einzuhalten (`scripts/check-csp.mjs` im Astro-Root scannt das Build-Ergebnis).
+`src/lib/editorConfig.ts` definiert eine **bewusste Feature-Allowlist** für den Lexical-Editor (Überschriften h2/h3, Listen, Links, Zitate, Bold/Italic, Bilder) — **kein** HTML-Block- oder Embed-Feature. Das ist die eigentliche Sicherheitsgrenze: In der Redaktionsoberfläche lässt sich strukturell kein `<script>` oder rohes HTML einschleusen, unabhängig davon, wie sorgfältig die HTML-Konvertierung (`lexicalToHtml.ts`) ist. Neue Editor-Features nur nach Rücksprache aktivieren — die öffentliche Seite verlässt sich auf diese Grenze, um `script-src 'self'` einzuhalten (`scripts/check-csp.mjs` im Astro-Root scannt das Build-Ergebnis).
 
 ### Medien (M4)
 
@@ -139,7 +141,10 @@ Kurzreferenz — vollständige Beschreibung inkl. Docker-Compose-Setup, Reverse-
 
 | Problem | Ursache / Lösung |
 |---------|-------------------|
+| `docker compose up` schlägt fehl oder hängt | Prüfen, ob Docker Desktop (bzw. der Docker-Daemon) überhaupt läuft (`docker ps` sollte eine — auch leere — Liste zeigen, keinen Verbindungsfehler). Danach `docker compose logs` prüfen, welcher Service genau nicht hochkommt. |
+| `npm run dev` bricht mit einem Fehler zu `DATABASE_URI`/`PAYLOAD_SECRET` ab | `.env` fehlt oder ist unvollständig — `.env.example` nach `.env` kopieren (siehe Schnellstart oben) und die Pflichtwerte ausfüllen, mindestens `DATABASE_URI` und `PAYLOAD_SECRET`. |
 | Astro-Build bricht mit "Payload-API nicht erreichbar" ab | `PAYLOAD_URL` ist gesetzt, aber die Instanz läuft nicht/ist nicht erreichbar. Für reine Frontend-Arbeit `PAYLOAD_URL` weglassen — der Astro-Loader nutzt dann automatisch die committete Fixture (`src/content/_fixtures/`). |
 | Neue Beiträge erscheinen nicht auf der Website | Prüfen: Status ist `veroeffentlicht`? `publishedAt` liegt nicht in der Zukunft? Rebuild-Webhook-Log auf dem Produktionsserver prüfen (`/var/log/stoppramstein-rebuild.log`). |
-| Admin-UI zeigt "Access Denied" | Rolle des angemeldeten Nutzers prüfen — Autor:innen sehen nur eigene Dokumente. |
+| Admin-UI zeigt "Access Denied" | Rolle des angemeldeten Nutzers prüfen — mit der Rolle Autor sind nur die eigenen Dokumente sichtbar, keine fremden. |
 | Bild wird nicht angezeigt | Alt-Text ist Pflichtfeld auf der Media-Collection — ohne Alt-Text lässt sich das Bild nicht speichern. |
+| Login-Seite unter `redaktion.stoppramstein.de` nicht erreichbar (Produktion) | Reverse-Proxy-Konfiguration prüfen (siehe `docs/DEPLOYMENT.md`, Abschnitt "Reverse-Proxy für die Redaktionsoberfläche") sowie ob der `payload`-Container überhaupt läuft (`docker compose ps`). |

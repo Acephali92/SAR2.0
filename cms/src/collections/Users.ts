@@ -40,7 +40,7 @@ export const Users: CollectionConfig = {
       defaultValue: 'autor',
       label: 'Rolle',
       options: [
-        { label: 'Autor:in', value: 'autor' },
+        { label: 'Autor', value: 'autor' },
         { label: 'Redaktion', value: 'redaktion' },
         { label: 'Admin', value: 'admin' },
       ],

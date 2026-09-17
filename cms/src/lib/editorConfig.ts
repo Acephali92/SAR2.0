@@ -14,7 +14,7 @@ import {
 
 /**
  * Bewusste Feature-Allowlist statt defaultFeatures: keine HTML-Block-/Embed-Features, damit
- * Redakteur:innen strukturell keine <script>-Tags oder rohes HTML einschleusen koennen. Das ist
+ * sich strukturell keine <script>-Tags oder rohes HTML einschleusen lassen. Das ist
  * die eigentliche Sicherheitsgrenze fuer die CSP-Konformitaet des oeffentlichen Builds (M7), nicht
  * erst die HTML-Konvertierung in lexicalToHtml.ts.
  */

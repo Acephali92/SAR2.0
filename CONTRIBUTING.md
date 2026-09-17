@@ -1,6 +1,14 @@
 # Mitwirken
 
-Danke für dein Interesse, an der Website von „Stopp Air Base Ramstein“ mitzuarbeiten. Dieses Dokument richtet sich an Ehrenamtliche mit und ohne Vorerfahrung in Astro/Tailwind.
+Schön, dass du bei der Website von „Stopp Air Base Ramstein“ mithelfen möchtest! Dieses Dokument richtet sich an alle Ehrenamtlichen — ganz gleich, ob du schon mit Astro/Tailwind gearbeitet hast oder zum ersten Mal hier bist. Es gibt für praktisch jede Art von Mitarbeit einen passenden, einfachen Einstieg, auch ganz ohne Programmierkenntnisse.
+
+## Welcher Weg passt zu mir?
+
+- Du möchtest **eine Nachricht, Analyse oder einen Termin veröffentlichen** (z. B. eine Ankündigung zur nächsten Aktion)? → Redaktionsoberfläche nutzen, siehe „Beiträge/Termine pflegen" unten. Kein Git, kein Code, keine technischen Vorkenntnisse nötig.
+- Du möchtest **einen bestehenden Text ändern**, der nicht über die Redaktionsoberfläche läuft (z. B. eine Argumentseite unter „Warum Ramstein" oder eine Mitmachen-Seite)? → „Andere Inhalte ändern" unten. Braucht einen GitHub-Account, aber keine Programmierkenntnisse.
+- Du möchtest **am Code der Website arbeiten** (Layout, Design, neue Funktionen)? → „Code ändern" unten. Setzt Grundkenntnisse in Astro/Tailwind bzw. TypeScript voraus.
+
+Im Zweifel: einfach fragen, wir helfen gerne beim Einordnen.
 
 ## Setup
 
