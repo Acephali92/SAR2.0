@@ -3,7 +3,7 @@
  * scripts/seed-import.ts gedacht (siehe docs/ARCHITEKTUR.md, Abschnitt Content-Migration).
  * Deckt genau das ab, was die drei zu migrierenden Bestandsartikel nutzen: Ueberschriften
  * (##/###), Absaetze, "- "-Listen und **fett**. Fuer die redaktionelle Alltagsarbeit ist das
- * NICHT relevant - Redakteur:innen schreiben direkt im Rich-Text-Editor, nicht in Markdown.
+ * NICHT relevant - die Redaktion schreibt direkt im Rich-Text-Editor, nicht in Markdown.
  */
 
 type LexicalNode = Record<string, unknown>;

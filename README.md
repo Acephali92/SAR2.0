@@ -47,7 +47,7 @@ Beiträge (Nachrichten/Analysen) und Termine werden über eine selbst gehostete 
 | [`guidelines.md`](guidelines.md) | Ausführliche Projektregeln |
 | [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md) | Datenfluss, Komponenten, Content-Schema, Verzeichnisstruktur (mit Diagrammen) |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Server-Konfiguration (Caddy/nginx), CSP-Header, Rebuild-Prozess, Team-Vorschau |
-| [`docs/INHALTE-PFLEGEN.md`](docs/INHALTE-PFLEGEN.md) | Anleitung für Redakteur:innen zum Bearbeiten von Inhalten |
+| [`docs/INHALTE-PFLEGEN.md`](docs/INHALTE-PFLEGEN.md) | Anleitung für die Redaktion zum Bearbeiten von Inhalten |
 | [`docs/REDAKTION-TODO.md`](docs/REDAKTION-TODO.md) | Unbelegte Aussagen, bekannte offene Probleme |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Setup und Ablauf für Ehrenamtliche |
 | [`cms/README.md`](cms/README.md) | Redaktionsoberfläche (Payload CMS 3): lokales Setup, Datenmodell, Scripts, Troubleshooting |

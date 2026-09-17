@@ -64,7 +64,7 @@ export const Beitraege: CollectionConfig = {
       name: 'author',
       type: 'relationship',
       relationTo: 'users',
-      label: 'Autor:in (Anzeige)',
+      label: 'Autor (Anzeige)',
       admin: { description: 'Optional - wenn leer, wird kein Autor angezeigt.' },
     },
     {

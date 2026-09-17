@@ -7,7 +7,7 @@ Es gibt zwei Wege, Inhalte zu pflegen, je nach Content-Typ:
 
 ## Teil A: Markdown-Collections (warum-ramstein, mitmachen, seiten)
 
-Anleitung für Redakteur:innen, die Content über die Astro Content Collections pflegen (kein Code-Wissen nötig, nur Markdown + Frontmatter).
+Anleitung für die Redaktion, um Inhalte über die Astro Content Collections zu pflegen. Es ist kein Code-Wissen nötig — nur Markdown (eine sehr einfache Textauszeichnung) und ein kurzer Frontmatter-Block am Anfang jeder Datei.
 
 ### Grundprinzip
 
@@ -104,40 +104,64 @@ Nachrichten, Analysen und Termine werden **nicht** mehr als Markdown-Datei gepfl
 
 ### Rollen
 
+Jede angemeldete Person hat genau eine Rolle. Die Rolle bestimmt, was sie in der Redaktionsoberfläche sehen und tun darf:
+
 | Rolle | Darf |
 |-------|------|
-| **Autor:in** | Eigene Beiträge/Termine anlegen, bearbeiten und zur Freigabe einreichen |
-| **Redaktion** | Zusätzlich: alle Beiträge/Termine einsehen, freigeben, veröffentlichen, zurückziehen |
-| **Admin** | Zusätzlich: Nutzer:innen und Rollen verwalten |
+| **Autor** | Eigene Beiträge/Termine anlegen, bearbeiten und zur Freigabe einreichen. Sieht nur die eigenen Entwürfe, keine fremden. |
+| **Redaktion** | Alles, was Autor darf, plus: alle Beiträge/Termine aller Personen einsehen, freigeben, veröffentlichen und wieder zurückziehen. |
+| **Admin** | Alles, was Redaktion darf, plus: Nutzer anlegen, Rollen vergeben und ändern. |
+
+Wer welche Rolle bekommt, entscheidet Admin bei der Einrichtung des Zugangs — bei Fragen dazu einfach melden.
 
 ### Einen Beitrag anlegen
 
 1. In der Admin-UI: **Beiträge → Erstellen**.
-2. Titel, Beschreibung (max. 160 Zeichen), Kategorie (Nachricht/Analyse) ausfüllen.
-3. Inhalt im Rich-Text-Editor schreiben: Überschriften, Listen, Links, Zitate und Bilder stehen über die Werkzeugleiste zur Verfügung.
-4. **Quellen** für alle Fakten und Zahlen im "Quellen"-Feld eintragen (siehe Beleg-Pflicht oben — gilt hier genauso).
-5. Optional: **Verknüpfter Termin** setzen, wenn sich der Beitrag auf eine Veranstaltung bezieht — der Termin zeigt dann automatisch einen Rückverweis auf diesen Beitrag.
-6. Bild hochladen: Alt-Text ist Pflichtfeld (Barrierefreiheit) — kurz beschreiben, was auf dem Bild zu sehen ist.
-7. Speichern → Status steht auf **Entwurf**.
+2. Titel, Beschreibung (max. 160 Zeichen — das ist der kurze Anreißertext, der z. B. in der Google-Suche oder beim Teilen in sozialen Medien angezeigt wird) und Kategorie (Nachricht oder Analyse) ausfüllen.
+3. Inhalt im Rich-Text-Editor schreiben. Über die Werkzeugleiste stehen Überschriften, Listen, Links, Zitate und Bilder zur Verfügung — ähnlich wie in einem gewöhnlichen Textverarbeitungsprogramm, kein Markdown oder Code nötig.
+4. **Quellen** für alle Fakten und Zahlen im Feld „Quellen" eintragen (siehe Beleg-Pflicht oben — gilt hier genauso). Zum Beispiel:
+
+   | Bezeichnung | URL |
+   |---|---|
+   | Statistisches Bundesamt, Bevölkerungsbericht 2026 | `https://www.destatis.de/beispiel-quelle` |
+
+   Eine gute Quellenangabe nennt die Institution/den Urheber und führt direkt zur Originalquelle — nicht nur zu einem Zeitungsartikel, der die Zahl nur zitiert.
+5. Optional: **Verknüpfter Termin** setzen, wenn sich der Beitrag auf eine konkrete Veranstaltung bezieht (z. B. eine Ankündigung zur Friedenswoche). Der Termin zeigt dann automatisch einen Rückverweis auf diesen Beitrag — das musst du beim Termin nicht zusätzlich eintragen.
+6. Bild hochladen: Der **Alt-Text ist Pflicht**. Er beschreibt kurz, was auf dem Bild zu sehen ist, wird von Screenreadern vorgelesen (damit blinde und sehbehinderte Menschen die Website nutzen können) und angezeigt, falls das Bild nicht lädt. Beispiel: „Demonstrierende mit Transparenten vor dem Haupttor der Air Base Ramstein."
+7. Speichern. Der Status steht danach auf **Entwurf** — noch nichts davon ist öffentlich sichtbar, du kannst in Ruhe weiterschreiben oder später zurückkommen.
 
 ### Einen Termin anlegen
 
-Analog unter **Termine → Erstellen**: Titel, Beschreibung, Art der Veranstaltung, Beginn/Ende, Ort, ggf. Anmeldelink. Der Abschnitt "Zugehörige Beiträge" füllt sich automatisch, sobald ein Beitrag auf diesen Termin verweist.
+Läuft genauso ab, unter **Termine → Erstellen**: Titel, Beschreibung, Art der Veranstaltung, Beginn/Ende, Ort und optional ein Anmeldelink. Der Abschnitt „Zugehörige Beiträge" füllt sich von selbst, sobald ein Beitrag auf diesen Termin verweist (siehe Schritt 5 oben) — hier ist nichts weiter zu tun.
 
 ### Freigabe und Veröffentlichung
 
-Jeder Beitrag/Termin durchläuft drei Stufen:
+Jeder Beitrag und jeder Termin durchläuft drei Stufen. Dieses Vier-Augen-Prinzip stellt sicher, dass niemand versehentlich einen unfertigen oder fehlerhaften Text live schaltet:
 
-1. **Entwurf** — Autor:in schreibt und bearbeitet.
-2. **Zur Freigabe** — Autor:in reicht den fertigen Entwurf ein (Status im Seitenmenü umstellen). Ab hier kann nur noch Redaktion/Admin etwas ändern.
-3. **Veröffentlicht** — Redaktion oder Admin schaltet frei. Ab hier ist der Inhalt öffentlich sichtbar.
+1. **Entwurf** — Autor schreibt und bearbeitet in Ruhe, jederzeit änderbar, nur für die eigene Person sichtbar.
+2. **Zur Freigabe** — Autor reicht den fertigen Entwurf ein (Status im rechten Seitenmenü auf „Zur Freigabe" umstellen). Ab diesem Punkt kann nur noch Redaktion oder Admin etwas ändern — so wird verhindert, dass sich Text und Freigabe-Entscheidung auseinanderentwickeln.
+3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung) und schaltet frei. Ab jetzt ist der Beitrag öffentlich auf der Website sichtbar.
 
-Redaktion kann einen eingereichten Entwurf auch zurück auf "Entwurf" setzen (z. B. mit Korrekturwunsch) oder einen veröffentlichten Beitrag wieder zurückziehen.
+Redaktion kann einen eingereichten Entwurf jederzeit zurück auf „Entwurf" setzen, zum Beispiel mit einem Korrekturwunsch, oder einen bereits veröffentlichten Beitrag wieder zurückziehen (z. B. wenn sich nachträglich ein Fehler zeigt).
 
 ### Zeitgesteuerte Veröffentlichung
 
-Im Feld **Geplante Veröffentlichung** (rechte Seitenleiste) ein Datum/Uhrzeit setzen, während der Status auf "Zur Freigabe" steht. Das System prüft alle paar Minuten automatisch, ob der Zeitpunkt erreicht ist, und veröffentlicht dann selbstständig — eine Freigabe durch Redaktion ist weiterhin Voraussetzung, ein Entwurf wird nicht allein durch Zeitablauf live.
+Manchmal soll ein Beitrag erst zu einem bestimmten Zeitpunkt live gehen, z. B. am Morgen einer Aktion. Dafür im Feld **Geplante Veröffentlichung** (rechte Seitenleiste) ein Datum und eine Uhrzeit eintragen, während der Status auf „Zur Freigabe" steht. Das System prüft danach alle paar Minuten automatisch, ob der Zeitpunkt erreicht ist, und veröffentlicht den Beitrag dann von selbst — eine vorherige Freigabe durch Redaktion bleibt trotzdem Voraussetzung. Ein Entwurf, der nie freigegeben wurde, geht also auch dann nicht automatisch live, wenn die geplante Zeit verstreicht.
 
 ### Was passiert nach dem Veröffentlichen?
 
-Nichts weiter zu tun — die Website baut sich **automatisch neu** und ist binnen weniger Minuten aktuell. Kein manueller Build, kein Deploy, kein Git nötig.
+Nichts, was du selbst noch tun musst — die Website baut sich **automatisch neu** und zeigt die Änderung binnen weniger Minuten. Kein manueller Build, kein Deploy, kein Git nötig. Ein Blick auf die Live-Seite nach ein paar Minuten genügt, um zu prüfen, dass alles wie gewünscht aussieht.
+
+### Häufige Fragen
+
+**Wie lange dauert es, bis meine Änderung online ist?**
+In der Regel wenige Minuten nach der Veröffentlichung. Bei einer zeitgesteuerten Veröffentlichung kann es zusätzlich bis zu rund fünf bis zehn Minuten nach dem geplanten Zeitpunkt dauern, da das System nur in diesem Abstand nachschaut.
+
+**Ich habe nach der Veröffentlichung einen Fehler gefunden — was jetzt?**
+Beitrag öffnen, korrigieren und erneut speichern. Läuft der Beitrag bereits, wird die Korrektur beim nächsten automatischen Rebuild live übernommen. Bei gravierenden Fehlern kann Redaktion den Beitrag jederzeit kurzzeitig auf „Entwurf" zurücksetzen, bis die Korrektur fertig ist.
+
+**Warum sehe ich nicht die Entwürfe von anderen im Team?**
+Das ist Absicht (siehe Rollen-Tabelle oben): Autor sieht nur eigene Entwürfe, damit niemand versehentlich fremde, noch unfertige Texte bearbeitet. Redaktion und Admin sehen alles.
+
+**Ich kann den Status nicht auf „Veröffentlicht" stellen — woran liegt das?**
+Nur Redaktion und Admin dürfen diesen Schritt ausführen (siehe Rollen-Tabelle). Mit der Rolle Autor lässt sich ein Beitrag nur bis „Zur Freigabe" bringen.

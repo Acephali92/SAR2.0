@@ -5,7 +5,7 @@ type Status = 'entwurf' | 'zur_freigabe' | 'veroeffentlicht';
 
 /**
  * Regelt, wer das Status-Feld auf welchen Wert setzen darf (Entwurf -> Freigabe -> Veroeffentlichung, M5).
- * Autor:innen duerfen nur zwischen entwurf und zur_freigabe wechseln, und nur bei eigenen Dokumenten
+ * Mit der Rolle Autor darf nur zwischen entwurf und zur_freigabe gewechselt werden, und nur bei eigenen Dokumenten
  * (die Eigentuemer-Pruefung selbst passiert in der Collection ueber access.update/ownDraftOrRedaktion;
  * dieses Feld regelt zusaetzlich, WELCHER Statuswert erlaubt ist).
  * Redaktion/Admin duerfen jeden Uebergang, inklusive Veroeffentlichung und Zurueckziehen.
