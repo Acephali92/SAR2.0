@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payload
+      POSTGRES_USER: payload
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    secrets: [postgres_password]
+
+  payload:
+    build: .
+    restart: unless-stopped
+    depends_on: [postgres]
+    env_file: .env
+    volumes:
+      - uploads:/data/uploads
+    ports:
+      - '127.0.0.1:3000:3000'
+
+  rebuild-webhook:
+    build: ./webhook
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      SITE_DIR: /site
+      RELEASES_DIR: /releases
+      CURRENT_LINK: /releases/current
+    volumes:
+      - ../:/site
+      - releases:/releases
+    ports:
+      - '127.0.0.1:8090:8090'
+
+  backup:
+    build: ./backup
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data:ro
+      - uploads:/data/uploads:ro
+      - backups:/backups
+
+volumes:
+  pgdata:
+  uploads:
+  releases:
+  backups:
+
+secrets:
+  postgres_password:
+    file: ./secrets/postgres_password.txt

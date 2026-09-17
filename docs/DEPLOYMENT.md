@@ -58,11 +58,99 @@ dist/
 
 ## Rebuild-Rhythmus
 
-**Aktuell gibt es keinen automatisierten Rebuild.** Da Astro rein statisch baut (kein SSR, kein API-Backend), muss nach jeder Content- oder Code-Änderung manuell `npm run build` + `rsync` ausgeführt werden (oder über die in `.github/workflows/ci.yml` laufende CI, die nur validiert, nicht deployt).
+**Code-Änderungen** (Git-Push) laufen weiterhin manuell: `npm run build` + `rsync` (oder ein CI-Deploy-Step, falls das später eingerichtet wird — aktuell validiert `.github/workflows/ci.yml` nur, deployt nicht).
 
-Empfehlung (noch nicht eingerichtet, keine bestehende Automatisierung): ein Cron-Job oder ein CI-Deploy-Step, der z. B. täglich oder bei jedem Push auf `main` automatisch baut und synced. Das ist eine sinnvolle Erweiterung, aber bewusst nicht Teil dieses Dokuments als bestehende Tatsache dargestellt.
+**Redaktionelle Änderungen** (Beiträge/Termine über die Payload-Oberfläche) lösen dagegen **automatisch** einen Rebuild aus: siehe "Automatischer Rebuild bei Veröffentlichung (M9)" unten. Sobald Redaktion einen Beitrag oder Termin veröffentlicht, baut der `rebuild-webhook`-Dienst die Seite neu und tauscht `dist/` binnen weniger Minuten aus — ohne dass jemand manuell `npm run build` ausführen muss.
 
-(Die Team-Vorschau auf statichost.eu ist davon ausgenommen und baut automatisch bei jedem Push auf `master`, siehe oben.)
+(Die Team-Vorschau auf statichost.eu ist davon unabhängig und baut automatisch bei jedem Push auf `master`, siehe oben.)
+
+## CMS-Infrastruktur (Docker)
+
+Payload CMS 3 + PostgreSQL laufen per Docker Compose **auf demselben Server** wie die statische Seite (ein VPS, Caddy/nginx davor). Alles CMS-Bezogene liegt in `cms/` und wird unabhängig vom Astro-Build betrieben.
+
+```bash
+cd cms
+cp .env.example .env               # Werte ausfüllen (DB-Passwort, Secrets, SMTP, ...)
+mkdir -p secrets
+echo "CHANGEME" > secrets/postgres_password.txt
+docker compose up -d
+```
+
+Services (`cms/docker-compose.yml`):
+
+| Service | Zweck |
+|---------|-------|
+| `postgres` | Datenbank, Volume `pgdata` |
+| `payload` | Redaktionsoberfläche (Next.js), nur auf `127.0.0.1:3000` gebunden, nie direkt aus dem Internet erreichbar |
+| `rebuild-webhook` | M9: nimmt den Publish-Webhook entgegen, baut die Astro-Seite, tauscht `dist/` atomar aus |
+| `backup` | M10: nächtlicher `pg_dump` + Uploads-Backup |
+
+Erstes Setup: einen Admin-Nutzer in Payload anlegen (Payload fragt beim ersten Aufruf von `/admin` danach), danach weitere Nutzer mit passender Rolle (`autor`/`redaktion`/`admin`) über die Admin-UI anlegen. Für den Astro-Build (Content-Layer-Loader) einen Service-Nutzer mit API-Key anlegen und den Key als `PAYLOAD_API_TOKEN` im Build-Environment hinterlegen.
+
+Lokale Entwicklung: `cp docker-compose.override.yml.example docker-compose.override.yml` (startet Payload im Dev-Modus mit offenen Ports).
+
+## Reverse-Proxy für die Redaktionsoberfläche
+
+Eigene Subdomain (`redaktion.stoppramstein.de`) statt Pfad-Präfix auf der Hauptdomain — sauberere Cookie-/CSP-Trennung: Payloads Next.js-Admin-UI braucht eigene, lockerere Header, die die strikte CSP der öffentlichen Seite nicht berühren.
+
+```caddyfile
+redaktion.stoppramstein.de {
+    reverse_proxy 127.0.0.1:3000
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+}
+```
+
+Empfehlung: Rate-Limiting oder IP-Allowlisting vor dem Login-Endpunkt (z. B. via Caddy oder fail2ban), da die Redaktionsoberfläche jetzt aus dem Internet erreichbar ist. Payloads eigener Login-Schutz (`maxLoginAttempts`/`lockTime`, siehe `cms/src/collections/Users.ts`) greift zusätzlich.
+
+## Automatischer Rebuild bei Veröffentlichung (M9)
+
+Wenn Redaktion einen Beitrag/Termin veröffentlicht (oder ein zeitgesteuerter Beitrag automatisch veröffentlicht wird), ruft Payload den `rebuild-webhook`-Dienst auf (`cms/src/hooks/triggerRebuild.ts` → `cms/webhook/rebuild-server.mjs`):
+
+1. Prüft ein Shared Secret (`REBUILD_WEBHOOK_SECRET`, muss in `cms/.env` gesetzt sein).
+2. Baut die Astro-Seite: `npm ci && npm run build && npm run check-links && npm run check-csp` — schlägt einer der Schritte fehl, wird **nicht** getauscht, die zuletzt erfolgreich gebaute Seite bleibt live.
+3. Bei Erfolg: atomarer Symlink-Swap auf ein neues Release-Verzeichnis (kein Moment mit halb geschriebenem Output).
+4. Bei Fehlschlag: vollständiges Log unter `/var/log/stoppramstein-rebuild.log`, E-Mail-Benachrichtigung an `REDAKTION_NOTIFY_EMAIL` (dieselben SMTP-Zugangsdaten wie für Payloads Passwort-Reset).
+
+Mehrere Publish-Ereignisse kurz hintereinander werden nicht parallel gebaut — ein laufender Build wird zu Ende geführt, danach folgt bei Bedarf ein weiterer.
+
+## Backups & Wiederherstellung (M10)
+
+**Nächtliches Backup** (03:00 Uhr, `cms/backup/backup.sh`): `pg_dump` (gzip) der Datenbank + `tar` des Uploads-Volumes, 14 Tage lokale Aufbewahrung. Liegt unter dem `backups`-Volume im `backup`-Container.
+
+> Offsite-Kopie noch offen: siehe [REDAKTION-TODO.md](./REDAKTION-TODO.md) — lokale Backups allein schützen nicht vor Totalausfall des Servers.
+
+**Wiederherstellung:**
+
+```bash
+cd cms
+
+# 1. Payload-Container stoppen (Postgres bleibt laufen)
+docker compose stop payload
+
+# 2. Datenbank aus Backup einspielen
+gunzip -c /pfad/zu/backups/db-<TIMESTAMP>.sql.gz | docker compose exec -T postgres psql -U payload -d payload
+
+# 3. Uploads wiederherstellen
+docker compose stop
+tar xzf /pfad/zu/backups/uploads-<TIMESTAMP>.tar.gz -C ./restore-tmp/
+docker run --rm -v cms_uploads:/data -v $(pwd)/restore-tmp:/restore alpine \
+  sh -c "rm -rf /data/* && cp -a /restore/uploads/. /data/"
+
+# 4. Neu starten
+docker compose up -d
+```
+
+**Content-Export als Markdown/JSON** (Portabilität, unabhängig von Payload):
+
+```bash
+cd cms
+npm run export   # schreibt nach cms/exports/{beitraege,termine}/
+```
 
 ## Server-Konfiguration (Caddy)
 

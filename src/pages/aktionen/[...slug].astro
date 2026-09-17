@@ -1,25 +1,30 @@
 ---
 /**
- * Dynamic route for event pages
+ * Dynamic route for individual Termine, Payload-CMS-backed.
  */
 
 import { getCollection, type CollectionEntry } from 'astro:content';
 import EventLayout from '@layouts/EventLayout.astro';
 
 export async function getStaticPaths() {
-  const entries = await getCollection('aktionen');
-  return entries.map((entry: CollectionEntry<'aktionen'>) => ({
-    params: { slug: entry.slug },
+  const entries = await getCollection('termine');
+  return entries.map((entry: CollectionEntry<'termine'>) => ({
+    params: { slug: entry.id },
     props: { entry },
   }));
 }
 
 interface Props {
-  entry: CollectionEntry<'aktionen'>;
+  entry: CollectionEntry<'termine'>;
 }
 
 const { entry } = Astro.props as Props;
-const { Content } = await entry.render();
+
+// Beiträge, die auf diesen Termin verweisen (M6) - für den "Zugehöriger Beitrag"-Block.
+const allBeitraege = await getCollection('beitraege');
+const relatedBeitraege = allBeitraege
+  .filter((b: CollectionEntry<'beitraege'>) => entry.data.beitragSlugs.includes(b.id))
+  .map((b: CollectionEntry<'beitraege'>) => ({ slug: b.id, title: b.data.title }));
 ---
 
 <EventLayout
@@ -29,9 +34,10 @@ const { Content } = await entry.render();
   startDate={entry.data.startDate}
   endDate={entry.data.endDate}
   location={entry.data.location}
-  registrationUrl={entry.data.registrationUrl}
-  status={entry.data.status}
-  image={entry.data.image}
+  registrationUrl={entry.data.registrationUrl ?? undefined}
+  eventStatus={entry.data.eventStatus}
+  image={entry.data.image ?? undefined}
+  relatedBeitraege={relatedBeitraege}
 >
-  <Content />
+  <Fragment set:html={entry.rendered?.html} />
 </EventLayout>

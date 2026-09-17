@@ -17,6 +17,6 @@
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*", "src/content/config.ts"],
+  "include": [".astro/types.d.ts", "src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

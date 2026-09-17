@@ -27,8 +27,9 @@ interface Props {
   location: string;
   /** Event type */
   eventType: 'friedenswoche' | 'demonstration' | 'konferenz' | 'workshop' | 'sonstiges';
-  /** Event status */
-  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  /** Event status - bewusst nicht "status" genannt, um Verwechslung mit dem redaktionellen
+   *  Freigabe-Status im CMS zu vermeiden */
+  eventStatus?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   /** Short description */
   description?: string;
   /** Featured image */
@@ -44,7 +45,7 @@ const {
   endDate,
   location,
   eventType,
-  status = 'upcoming',
+  eventStatus = 'upcoming',
   description,
   image,
   class: className = '',
@@ -83,7 +84,7 @@ const statusConfig = {
 };
 
 const typeInfo = eventTypeConfig[eventType];
-const statusInfo = statusConfig[status];
+const statusInfo = statusConfig[eventStatus];
 ---
 
 <a
@@ -111,10 +112,10 @@ const statusInfo = statusConfig[status];
       <span class={`rounded-full px-2.5 py-1 text-xs font-medium ${typeInfo.color}`}>
         {typeInfo.label}
       </span>
-      {statusInfo.show && status !== 'completed' && (
+      {statusInfo.show && eventStatus !== 'completed' && (
         <span class:list={[
           'rounded-full px-2.5 py-1 text-xs font-medium',
-          status === 'cancelled' ? 'bg-accent-red/20 text-accent-red' : 'bg-surface-700 text-content-muted',
+          eventStatus === 'cancelled' ? 'bg-accent-red/20 text-accent-red' : 'bg-surface-700 text-content-muted',
         ]}>
           {statusInfo.label}
         </span>

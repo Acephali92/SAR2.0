@@ -15,7 +15,7 @@ const sortedTopics = allTopics
   .sort((a: TopicEntry, b: TopicEntry) => (a.data.order || 0) - (b.data.order || 0));
 
 // Get topic pages (excluding index)
-const topics = sortedTopics.filter((topic: TopicEntry) => topic.slug !== 'index');
+const topics = sortedTopics.filter((topic: TopicEntry) => topic.id !== 'index');
 
 // Category config with images
 const categoryConfig: Record<string, { label: string; color: string; bgColor: string; image: string }> = {
@@ -83,7 +83,7 @@ const categoryConfig: Record<string, { label: string; color: string; bgColor: st
         };
         return (
           <a
-            href={`/warum-ramstein/${topic.slug}/`}
+            href={`/warum-ramstein/${topic.id}/`}
             class="group block rounded-lg border border-slate-200 bg-white shadow-sm overflow-hidden transition-all hover:shadow-md hover:border-slate-300 no-underline"
           >
             <div class="aspect-video overflow-hidden">

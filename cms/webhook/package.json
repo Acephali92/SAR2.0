@@ -1,0 +1,12 @@
+{
+  "name": "sar2-rebuild-webhook",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "M9: nimmt den Payload-Publish-Webhook entgegen, baut die Astro-Seite neu und tauscht dist/ atomar aus.",
+  "main": "rebuild-server.mjs",
+  "scripts": {
+    "start": "node rebuild-server.mjs"
+  },
+  "engines": { "node": ">=22.0.0" }
+}

@@ -1,25 +1,30 @@
 ---
 /**
- * Dynamic route for individual analysis articles
+ * Dynamic route for individual Beiträge (Nachrichten/Analysen), Payload-CMS-backed.
  */
 
 import { getCollection, type CollectionEntry } from 'astro:content';
 import ArticleLayout from '@layouts/ArticleLayout.astro';
 
 export async function getStaticPaths() {
-  const analysen = await getCollection('analysen');
-  return analysen.map((entry: CollectionEntry<'analysen'>) => ({
-    params: { slug: entry.slug },
+  const beitraege = await getCollection('beitraege');
+  return beitraege.map((entry: CollectionEntry<'beitraege'>) => ({
+    params: { slug: entry.id },
     props: { entry },
   }));
 }
 
 interface Props {
-  entry: CollectionEntry<'analysen'>;
+  entry: CollectionEntry<'beitraege'>;
 }
 
 const { entry } = Astro.props;
-const { Content } = await entry.render();
+
+// Termine, mit denen dieser Beitrag verknüpft ist (M6) - für den "Verknüpfter Termin"-Block.
+const allTermine = await getCollection('termine');
+const relatedTermine = allTermine
+  .filter((t: CollectionEntry<'termine'>) => entry.data.terminSlugs.includes(t.id))
+  .map((t: CollectionEntry<'termine'>) => ({ slug: t.id, title: t.data.title }));
 ---
 
 <ArticleLayout
@@ -27,9 +32,11 @@ const { Content } = await entry.render();
   description={entry.data.description}
   publishedAt={entry.data.publishedAt}
   updatedAt={entry.data.updatedAt}
-  author={entry.data.author}
+  author={entry.data.author ?? undefined}
   tags={entry.data.tags}
   relatedSlugs={entry.data.relatedSlugs}
+  sources={entry.data.sources}
+  relatedTermine={relatedTermine}
 >
-  <Content />
+  <Fragment set:html={entry.rendered?.html} />
 </ArticleLayout>

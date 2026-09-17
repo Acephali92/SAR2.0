@@ -4,15 +4,15 @@
  * Uses the editorial ArgumentLayout with category-based styling
  */
 
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import ArgumentLayout from '@layouts/ArgumentLayout.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('warum-ramstein');
   return entries
-    .filter((entry: CollectionEntry<'warum-ramstein'>) => entry.slug !== 'index')
+    .filter((entry: CollectionEntry<'warum-ramstein'>) => entry.id !== 'index')
     .map((entry: CollectionEntry<'warum-ramstein'>) => ({
-      params: { slug: entry.slug },
+      params: { slug: entry.id },
       props: { entry },
     }));
 }
@@ -22,7 +22,7 @@ interface Props {
 }
 
 const { entry } = Astro.props as Props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 ---
 
 <ArgumentLayout

@@ -1,0 +1,11 @@
+node_modules/
+.next/
+.env
+.env.*
+!.env.example
+payload-types.ts
+uploads/
+exports/
+*.log
+secrets/*.txt
+docker-compose.override.yml
