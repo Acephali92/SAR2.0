@@ -40,6 +40,7 @@ Gilt für die öffentliche Astro-Seite (`src/`, `dist/`). Ausnahme: `cms/` ist e
 - Alle Fakten müssen belegt sein (Quellen angeben)
 - **Keine Fakten, Zahlen, Quellen oder Personen erfinden!**
 - Unbelegte Aussagen in `docs/REDAKTION-TODO.md` notieren
+- **Keine Gendersprache:** Keine Doppelpunkt-/Sternchen-/Unterstrich-Formen (`Autor:in`, `Nutzer*innen`, `Leser_innen` etc.) — weder in Inhalten noch in Dokumentation oder UI-Texten. Stattdessen ein passendes neutrales Kollektivum nutzen (z. B. „Redaktion" statt „Redakteur:innen") oder die generische Form (z. B. „Autor", „Nutzer").
 
 ### Content Security Policy
 

@@ -174,6 +174,7 @@ Astro Content Collections provide build-time validation. If a content file fails
 - **Citations:** All factual claims must include source links
 - **No Placeholders:** Never use Lorem Ipsum or placeholder text
 - **No AI Hallucinations:** Do not fabricate quotes, statistics, or sources
+- **No Gender-Inclusive Notation:** Do not use colon/asterisk/underscore forms in German text (`Autor:in`, `Nutzer*innen`, `Leser_innen`, etc.) — in content, documentation, and UI copy alike. Prefer a neutral collective noun where one naturally fits (e.g. "Redaktion" instead of "Redakteur:innen"); otherwise use the standard generic form (e.g. "Autor", "Nutzer"). Applies to German text only — irrelevant for English.
 
 ---
 
