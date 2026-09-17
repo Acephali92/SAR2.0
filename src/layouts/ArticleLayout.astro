@@ -29,6 +29,8 @@ interface Props {
   relatedSlugs?: string[];
   /** Source citations */
   sources?: Array<{ label: string; url: string }>;
+  /** Verknüpfte Termine (M6), gerendert als "Verknüpfter Termin"-Block */
+  relatedTermine?: Array<{ slug: string; title: string }>;
   canonicalUrl?: string;
   ogImage?: string;
 }
@@ -42,6 +44,7 @@ const {
   tags = [],
   relatedSlugs = [],
   sources = [],
+  relatedTermine = [],
   canonicalUrl,
   ogImage,
 } = Astro.props;
@@ -159,6 +162,24 @@ const readingTime = '5 Min. Lesezeit';
                     ))}
                   </ol>
                 </section>
+              )
+            }
+
+            <!-- Verknüpfter Termin (M6) -->
+            {
+              relatedTermine.length > 0 && (
+                <aside class="mt-12 rounded-lg border border-surface-700 bg-surface-800 p-6">
+                  <h2 class="mb-3 font-sans text-lg font-semibold">Verknüpfter Termin</h2>
+                  <ul class="space-y-2">
+                    {relatedTermine.map((termin) => (
+                      <li>
+                        <a href={`/aktionen/${termin.slug}/`} class="text-accent-sky hover:text-content-primary">
+                          {termin.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </aside>
               )
             }
           </div>

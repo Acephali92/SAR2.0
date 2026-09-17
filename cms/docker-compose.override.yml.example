@@ -1,0 +1,15 @@
+# Lokale Entwicklung: kopieren nach docker-compose.override.yml (bereits in .gitignore-Wirkung
+# ueber die generische *.override.yml-Konvention von Docker Compose, kein Secret-Inhalt hier).
+#
+# Nutzung: cp docker-compose.override.yml.example docker-compose.override.yml
+services:
+  payload:
+    build:
+      target: builder # dev braucht kein optimiertes Runtime-Image
+    ports:
+      - '3000:3000'
+    command: npm run dev
+
+  rebuild-webhook:
+    ports:
+      - '8090:8090'

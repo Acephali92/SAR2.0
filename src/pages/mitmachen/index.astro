@@ -208,7 +208,7 @@ const icons = {
           <div class="grid gap-6 md:gap-8 md:grid-cols-2 max-w-5xl mx-auto">
             {sortedEntries.map((entry: CollectionEntry<'mitmachen'>, index: number) => (
                 <a
-                  href={`/mitmachen/${entry.slug}/`}
+                  href={`/mitmachen/${entry.id}/`}
                   class={`group relative flex flex-col rounded-2xl border-2 bg-white overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-slate-200/60 hover:-translate-y-1 no-underline focus:outline-none focus:ring-4 focus:ring-sky-500/20 ${ctaConfig[entry.data.ctaType].borderColor} hover:border-slate-300`}
                 >
                   <!-- Image with gradient overlay -->

@@ -4,13 +4,13 @@
  * Uses MitmachenLayout for proper visual hierarchy and CTAs
  */
 
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import MitmachenLayout from '@layouts/MitmachenLayout.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('mitmachen');
   return entries.map((entry: CollectionEntry<'mitmachen'>) => ({
-    params: { slug: entry.slug },
+    params: { slug: entry.id },
     props: { entry },
   }));
 }
@@ -20,7 +20,7 @@ interface Props {
 }
 
 const { entry } = Astro.props as Props;
-const { Content } = await entry.render();
+const { Content } = await render(entry);
 ---
 
 <MitmachenLayout

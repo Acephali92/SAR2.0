@@ -1,26 +1,26 @@
 ---
 /**
- * Aktionen - Events listing page
+ * Aktionen - Events listing page, Payload-CMS-backed (Termine)
  */
 
 import { getCollection, type CollectionEntry } from 'astro:content';
 import PageLayout from '@layouts/PageLayout.astro';
 import EventCard from '@components/content/EventCard.astro';
 
-type EventEntry = CollectionEntry<'aktionen'>;
+type TerminEntry = CollectionEntry<'termine'>;
 
-const allEvents = await getCollection('aktionen');
-const events = allEvents
-  .filter((event: EventEntry) => !event.data.draft)
-  .sort((a: EventEntry, b: EventEntry) => b.data.startDate.getTime() - a.data.startDate.getTime());
+const allEvents = await getCollection('termine');
+const events = allEvents.sort(
+  (a: TerminEntry, b: TerminEntry) => b.data.startDate.getTime() - a.data.startDate.getTime()
+);
 
 // Separate upcoming and past events
 const now = new Date();
 const upcomingEvents = events.filter(
-  (e: EventEntry) => e.data.startDate >= now || e.data.status === 'upcoming' || e.data.status === 'ongoing'
+  (e: TerminEntry) => e.data.startDate >= now || e.data.eventStatus === 'upcoming' || e.data.eventStatus === 'ongoing'
 );
 const pastEvents = events.filter(
-  (e: EventEntry) => e.data.startDate < now && e.data.status !== 'upcoming' && e.data.status !== 'ongoing'
+  (e: TerminEntry) => e.data.startDate < now && e.data.eventStatus !== 'upcoming' && e.data.eventStatus !== 'ongoing'
 );
 ---
 
@@ -43,15 +43,15 @@ const pastEvents = events.filter(
       <section class="mb-16">
         <h2 class="mb-6 text-2xl font-semibold">Kommende Veranstaltungen</h2>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {upcomingEvents.map((event: EventEntry) => (
+          {upcomingEvents.map((event: TerminEntry) => (
             <EventCard
               title={event.data.title}
-              href={`/aktionen/${event.slug}/`}
+              href={`/aktionen/${event.id}/`}
               startDate={event.data.startDate}
               endDate={event.data.endDate}
               location={event.data.location.name}
               eventType={event.data.eventType}
-              status={event.data.status}
+              eventStatus={event.data.eventStatus}
               description={event.data.description}
             />
           ))}
@@ -65,15 +65,15 @@ const pastEvents = events.filter(
       <section>
         <h2 class="mb-6 text-2xl font-semibold">Vergangene Veranstaltungen</h2>
         <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {pastEvents.map((event: EventEntry) => (
+          {pastEvents.map((event: TerminEntry) => (
             <EventCard
               title={event.data.title}
-              href={`/aktionen/${event.slug}/`}
+              href={`/aktionen/${event.id}/`}
               startDate={event.data.startDate}
               endDate={event.data.endDate}
               location={event.data.location.name}
               eventType={event.data.eventType}
-              status="completed"
+              eventStatus="completed"
               description={event.data.description}
             />
           ))}

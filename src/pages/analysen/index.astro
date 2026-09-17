@@ -1,18 +1,17 @@
 ---
 /**
  * Analysen (Analysis Articles) Index Page
- * Lists all geopolitical analysis articles
+ * Lists all Beiträge from the CMS (Content Layer, Payload-backed)
  */
 
 import { getCollection, type CollectionEntry } from 'astro:content';
 import PageLayout from '@layouts/PageLayout.astro';
 
-type AnalyseEntry = CollectionEntry<'analysen'>;
+type BeitragEntry = CollectionEntry<'beitraege'>;
 
-// Get all non-draft analysen, sorted by date (newest first)
-const analysen = await getCollection('analysen', ({ data }: AnalyseEntry) => !data.draft);
-const sortedAnalysen = analysen.sort(
-  (a: AnalyseEntry, b: AnalyseEntry) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
+const beitraege = await getCollection('beitraege');
+const sortedBeitraege = beitraege.sort(
+  (a: BeitragEntry, b: BeitragEntry) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime()
 );
 
 const formatDate = (date: Date) => {
@@ -37,11 +36,11 @@ const formatDate = (date: Date) => {
       </p>
     </header>
 
-    {sortedAnalysen.length > 0 ? (
+    {sortedBeitraege.length > 0 ? (
       <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-        {sortedAnalysen.map((artikel: AnalyseEntry) => (
+        {sortedBeitraege.map((artikel: BeitragEntry) => (
           <article class="group rounded-lg border border-surface-700 bg-surface-800 p-6 transition-colors hover:border-surface-600">
-            <a href={`/analysen/${artikel.slug}/`} class="block">
+            <a href={`/analysen/${artikel.id}/`} class="block">
               {artikel.data.tags && artikel.data.tags.length > 0 && (
                 <div class="mb-3 flex flex-wrap gap-2">
                   {artikel.data.tags.slice(0, 2).map((tag: string) => (

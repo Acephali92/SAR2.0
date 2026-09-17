@@ -33,11 +33,15 @@ interface Props {
     city?: string;
   };
   registrationUrl?: string;
-  status?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  /** Veranstaltungslebenszyklus - bewusst nicht "status" genannt, um Verwechslung mit dem
+   *  redaktionellen Freigabe-Status im CMS zu vermeiden. */
+  eventStatus?: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
   image?: {
     src: string;
     alt: string;
   };
+  /** Zugehörige Beiträge (M6), gerendert als "Zugehöriger Beitrag"-Block */
+  relatedBeitraege?: Array<{ slug: string; title: string }>;
   canonicalUrl?: string;
   ogImage?: string;
 }
@@ -50,8 +54,9 @@ const {
   endDate,
   location,
   registrationUrl,
-  status = 'upcoming',
+  eventStatus = 'upcoming',
   image,
+  relatedBeitraege = [],
   canonicalUrl,
   ogImage,
 } = Astro.props;
@@ -96,7 +101,7 @@ const statusStyles = {
   cancelled: { label: 'Abgesagt', class: 'bg-accent-red text-white' },
 };
 
-const currentStatus = statusStyles[status];
+const currentStatus = statusStyles[eventStatus];
 ---
 
 <BaseLayout
@@ -157,7 +162,7 @@ const currentStatus = statusStyles[status];
 
             <!-- CTA Buttons -->
             {
-              status === 'upcoming' && (
+              eventStatus === 'upcoming' && (
                 <div class="mt-8 flex flex-wrap justify-center gap-4">
                   {registrationUrl && (
                     <a
@@ -212,6 +217,24 @@ const currentStatus = statusStyles[status];
                     {location.city && <p class="text-content-secondary">{location.city}</p>}
                   </div>
                 </div>
+              </section>
+            )
+          }
+
+          <!-- Zugehöriger Beitrag (M6) -->
+          {
+            relatedBeitraege.length > 0 && (
+              <section class="mt-12 rounded-lg border border-surface-700 bg-surface-800 p-6">
+                <h2 class="mb-4 font-sans text-lg font-semibold">Zugehöriger Beitrag</h2>
+                <ul class="space-y-2">
+                  {relatedBeitraege.map((beitrag) => (
+                    <li>
+                      <a href={`/analysen/${beitrag.slug}/`} class="text-accent-sky hover:text-content-primary">
+                        {beitrag.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </section>
             )
           }

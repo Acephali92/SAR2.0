@@ -4,9 +4,10 @@
 
 - **Framework:** Astro 5.x (statische Ausgabe)
 - **Styling:** Tailwind CSS 3.x
-- **Content:** Astro Content Collections mit Zod-Validierung
+- **Content:** Astro Content Collections mit Zod-Validierung (`src/content.config.ts`) — teils Markdown (git), teils aus dem CMS (Build-Zeit-Fetch)
 - **Suche:** Pagefind
 - **Sprache:** TypeScript (strict mode)
+- **Redaktion:** Payload CMS 3 + PostgreSQL in `cms/` (eigenständiges npm-Projekt, kein Workspace)
 
 ## Wichtige Befehle
 
@@ -24,6 +25,8 @@ npm run verify      # typecheck + build + check-links + check-csp (CI-Validation
 Siehe `guidelines.md` für alle Details. Hier die wichtigsten:
 
 ### Verboten
+
+Gilt für die öffentliche Astro-Seite (`src/`, `dist/`). Ausnahme: `cms/` ist ein eigenständiges, intern gehostetes Payload-CMS-Projekt (Next.js/React) für die Redaktion — läuft nie im öffentlichen Build mit, siehe `docs/ARCHITEKTUR.md`.
 
 - **Keine JS-Frameworks:** React, Vue, Preact etc.
 - **Keine UI-Libraries:** shadcn, radix, headless-ui
