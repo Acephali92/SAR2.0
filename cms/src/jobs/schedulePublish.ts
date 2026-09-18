@@ -20,10 +20,13 @@ async function runForCollection(payload: any, collection: 'beitraege' | 'termine
   });
 
   for (const doc of due.docs) {
+    // _status mitsetzen: oeffentlich lesbar ist nur freigabeStatus=veroeffentlicht UND
+    // _status=published (access/readPublishedOrSession.ts). Payloads update() uebernimmt sonst den
+    // _status der neuesten Version - meist "draft" - und der Beitrag bliebe trotz Freigabe unsichtbar.
     await payload.update({
       collection,
       id: doc.id,
-      data: { freigabeStatus: 'veroeffentlicht' },
+      data: { freigabeStatus: 'veroeffentlicht', _status: 'published' },
     });
   }
 

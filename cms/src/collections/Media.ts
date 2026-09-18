@@ -17,7 +17,12 @@ export const Media: CollectionConfig = {
     formatOptions: { format: 'webp', options: { quality: 80 } },
   },
   access: {
-    read: () => true,
+    // Kein anonymer Zugriff - weder auf die JSON-Liste noch auf die Datei-Bytes unter
+    // /api/media/file/... (Payload prueft dort dieselbe read-Regel). Die oeffentliche Seite braucht
+    // das nicht: payload-loader.ts laedt Bilder zur Build-Zeit mit dem API-Key und liefert sie
+    // selbst gehostet aus (CSP img-src 'self'). Ohne diese Sperre war die komplette Mediathek
+    // einschliesslich nur in Entwuerfen verwendeter Bilder anonym abrufbar.
+    read: isLoggedIn,
     create: isLoggedIn,
     update: isRedaktionOrAdmin,
     delete: isRedaktionOrAdmin,

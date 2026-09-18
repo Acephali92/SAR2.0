@@ -67,7 +67,8 @@ cms/
 │   │   ├── statusField.ts       # Redaktioneller Status + zugehörige Sidebar-Felder (M5)
 │   │   └── slugField.ts         # Auto-Slug aus Titel, editierbar
 │   ├── access/                  # Zugriffsregeln (Rollen × Status-Übergänge)
-│   │   └── canReadVersions.ts   # Wer die Versionsgeschichte sehen darf (access.readVersions)
+│   │   ├── canReadVersions.ts   # Wer die Versionsgeschichte sehen darf (access.readVersions)
+│   │   └── readPublishedOrSession.ts # Öffentlicher Lesezugriff: freigabeStatus UND _status
 │   ├── hooks/
 │   │   ├── setCreatedBy.ts      # Stempelt den Ersteller (für "nur eigene Entwürfe")
 │   │   ├── setPublishedAt.ts    # Stempelt das erste Veröffentlichungsdatum
@@ -104,7 +105,7 @@ Vollständige Liste mit Kommentaren: [`.env.example`](./.env.example). Kurzrefer
 | `REBUILD_WEBHOOK_URL` / `REBUILD_WEBHOOK_SECRET` | M9: Trigger für den Astro-Rebuild |
 | `PAYLOAD_API_TOKEN` | API-Key eines Service-Nutzers, mit dem der Astro-Build lesend zugreift (siehe unten) |
 
-**Service-Nutzer für den Astro-Build:** In der Admin-UI einen Nutzer anlegen (z. B. `build@stoppramstein.de`, Rolle **`autor`** — der Astro-Loader liest nur veröffentlichte Daten, und mit `autor` bleibt ihm die Versionsgeschichte verschlossen, siehe [Versionen und Wiederherstellen](#versionen-und-wiederherstellen)), API-Key aktivieren, Key kopieren und im Astro-Build-Environment als `PAYLOAD_API_TOKEN` hinterlegen (nicht in diesem `.env`, sondern dort, wo `npm run build` für die Astro-Seite läuft).
+**Service-Nutzer für den Astro-Build:** In der Admin-UI einen Nutzer anlegen (z. B. `build@stoppramstein.de`, Rolle **`autor`** als geringstes Recht), API-Key aktivieren, Key kopieren und im Astro-Build-Environment als `PAYLOAD_API_TOKEN` hinterlegen (nicht in diesem `.env`, sondern dort, wo `npm run build` für die Astro-Seite läuft).
 
 ## Datenmodell
 
@@ -145,7 +146,22 @@ Durchgesetzt über `src/access/canTransitionStatus.ts` (Feld-Access) und `src/ac
 
 `Media` hat derzeit keine `versions` aktiviert; würde das eingeschaltet, muss `access.readVersions` dort ebenfalls gesetzt werden.
 
-**Service-Nutzer-Hinweis:** Der Build-Nutzer mit API-Key (siehe [Umgebungsvariablen](#umgebungsvariablen)) sollte die Rolle **`autor`** behalten. Mit `redaktion` oder `admin` bekäme der Astro-Build über die REST-API Zugriff auf die komplette Versionsgeschichte, die er nicht braucht.
+API-Key-Zugriffe (der Build-Nutzer, siehe [Umgebungsvariablen](#umgebungsvariablen)) bekommen **unabhängig von der Rolle** keine Versionen — `canReadVersions` sperrt `_strategy === 'api-key'`.
+
+### Öffentlicher Lesezugriff: zwei Status-Felder
+
+`access.read` von `Beitraege`/`Termine` → `src/access/readPublishedOrSession.ts`:
+
+| Wer | Sieht |
+|-----|-------|
+| Session-Login (Admin-UI) | alles (Rollenlogik über `update`/`delete`) |
+| anonym **oder** API-Key (Astro-Build) | nur `freigabeStatus = veroeffentlicht` **UND** `_status = published` |
+
+Beide Felder sind nötig: `freigabeStatus` bleibt `veroeffentlicht`, wenn nach der Veröffentlichung ein Entwurf gespeichert wird, und Payload liefert mit `?draft=true` (REST) bzw. `draft: true` (GraphQL) die neueste Version — ohne `_status`-Prüfung also den unveröffentlichten Entwurf. Das war bis 2026-09-18 anonym ausnutzbar (siehe `docs/REDAKTION-TODO.md`). Unterschieden wird über `req.user._strategy`, das Payload zur Laufzeit setzt (`'api-key'` bzw. `'local-jwt'`), das aber im generierten `User`-Typ fehlt — daher der Helper `istApiKeyZugriff()`.
+
+Folgen: Ein Dokument ist erst öffentlich, wenn in der Admin-UI zusätzlich „Änderungen veröffentlichen" geklickt wurde. `src/jobs/schedulePublish.ts` setzt deshalb neben `freigabeStatus` auch `_status: 'published'` — `payload.update()` übernähme sonst den `_status` der neuesten Version (meist `draft`).
+
+`Media` ist nur für Angemeldete lesbar (Session oder API-Key), das gilt auch für die Datei-Bytes unter `/api/media/file/…`. Der Astro-Loader schickt beim Bild-Download deshalb denselben `Authorization: users API-Key …`-Header wie beim Daten-Abruf.
 
 ### Vorschau (Admin-Route)
 

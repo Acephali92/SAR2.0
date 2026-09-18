@@ -1,4 +1,5 @@
 import type { Access, Where } from 'payload';
+import { istApiKeyZugriff } from './readPublishedOrSession';
 
 /**
  * Wer die Versionsgeschichte von Beitraege/Termine lesen darf: Redaktion/Admin alles,
@@ -14,6 +15,8 @@ import type { Access, Where } from 'payload';
  */
 export const canReadVersions: Access = ({ req }) => {
   if (!req.user) return false;
+  // Versionen sind Entwurfsstaende - der Build-Nutzer (API-Key) braucht sie nie.
+  if (istApiKeyZugriff(req.user)) return false;
   if (req.user.role === 'redaktion' || req.user.role === 'admin') return true;
 
   const where: Where = { 'version.createdBy': { equals: req.user.id } };

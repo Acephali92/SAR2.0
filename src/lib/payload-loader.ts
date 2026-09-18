@@ -31,7 +31,9 @@ function toPlainDate(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-async function downloadMedia(url: string, payloadBaseUrl: string): Promise<string> {
+// Die Datei-Bytes unter /api/media/file/... liegen hinter derselben read-Regel wie die Media-Collection
+// (anonym gesperrt) - daher derselbe API-Key-Header wie in fetchLive.
+async function downloadMedia(url: string, payloadBaseUrl: string, apiToken: string): Promise<string> {
   const absoluteUrl = url.startsWith('http') ? url : `${payloadBaseUrl}${url}`;
   const hash = crypto.createHash('sha1').update(absoluteUrl).digest('hex').slice(0, 12);
   const ext = path.extname(new URL(absoluteUrl).pathname) || '.webp';
@@ -40,7 +42,7 @@ async function downloadMedia(url: string, payloadBaseUrl: string): Promise<strin
 
   if (!fs.existsSync(outPath)) {
     fs.mkdirSync(MEDIA_OUT_DIR, { recursive: true });
-    const res = await fetch(absoluteUrl);
+    const res = await fetch(absoluteUrl, { headers: { Authorization: `users API-Key ${apiToken}` } });
     if (!res.ok) throw new Error(`Medien-Download fehlgeschlagen (${res.status}): ${absoluteUrl}`);
     const buffer = Buffer.from(await res.arrayBuffer());
     fs.writeFileSync(outPath, buffer);
@@ -51,11 +53,12 @@ async function downloadMedia(url: string, payloadBaseUrl: string): Promise<strin
 
 async function resolveImage(
   imageGroup: { image?: { url?: string; alt?: string; sizes?: Record<string, { url?: string }> } } | undefined,
-  payloadBaseUrl: string
+  payloadBaseUrl: string,
+  apiToken: string
 ): Promise<{ src: string; alt: string } | undefined> {
   if (!imageGroup?.image?.url) return undefined;
   const cardUrl = imageGroup.image.sizes?.card?.url ?? imageGroup.image.url;
-  const src = await downloadMedia(cardUrl, payloadBaseUrl);
+  const src = await downloadMedia(cardUrl, payloadBaseUrl, apiToken);
   return { src, alt: imageGroup.image.alt ?? '' };
 }
 
@@ -117,7 +120,7 @@ export function payloadLoader({ collection }: PayloadLoaderOptions): Loader {
       store.clear();
 
       for (const doc of rawDocs) {
-        const image = await resolveImage(doc.image, payloadUrl ?? '');
+        const image = await resolveImage(doc.image, payloadUrl ?? '', apiToken ?? '');
 
         const baseData: Record<string, unknown> = {
           title: doc.title,

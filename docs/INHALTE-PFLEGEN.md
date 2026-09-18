@@ -157,7 +157,9 @@ Jeder Beitrag und jeder Termin durchläuft drei Stufen. Dieses Vier-Augen-Prinzi
 
 1. **Entwurf** — Autor schreibt und bearbeitet in Ruhe, jederzeit änderbar, nur für die eigene Person sichtbar.
 2. **Zur Freigabe** — Autor reicht den fertigen Entwurf ein (Status im rechten Seitenmenü auf „Zur Freigabe" umstellen). Ab diesem Punkt kann nur noch Redaktion oder Admin etwas ändern — so wird verhindert, dass sich Text und Freigabe-Entscheidung auseinanderentwickeln.
-3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung) und schaltet frei. Ab jetzt ist der Beitrag öffentlich auf der Website sichtbar.
+3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung), stellt den Status auf „Veröffentlicht" **und klickt oben auf „Änderungen veröffentlichen"**. Erst wenn beides erfolgt ist, ist der Beitrag öffentlich auf der Website sichtbar. Nur „Speichern" bzw. „Entwurf speichern" reicht nicht — dann bleibt der Stand ein Entwurf.
+
+Dasselbe gilt für spätere Korrekturen an einem bereits veröffentlichten Beitrag: Solange nur als Entwurf gespeichert wird, bleibt öffentlich die bisherige Fassung stehen, und der Entwurf ist für niemanden außerhalb der Redaktionsoberfläche sichtbar. Erst „Änderungen veröffentlichen" macht die Korrektur zur öffentlichen Fassung; auf der Website erscheint sie mit dem nächsten automatischen Neuaufbau (siehe „Häufige Fragen" unten).
 
 Redaktion kann einen eingereichten Entwurf jederzeit zurück auf „Entwurf" setzen, zum Beispiel mit einem Korrekturwunsch, oder einen bereits veröffentlichten Beitrag wieder zurückziehen (z. B. wenn sich nachträglich ein Fehler zeigt).
 

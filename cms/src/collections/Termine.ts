@@ -9,6 +9,7 @@ import { addRenderedHtml } from '../hooks/addRenderedHtml';
 import { restrictVersionRestore } from '../hooks/restrictVersionRestore';
 import { ownDraftOrRedaktion, ownDraftOnlyDelete } from '../access/ownDraftOrRedaktion';
 import { canReadVersions } from '../access/canReadVersions';
+import { readPublishedOrSession } from '../access/readPublishedOrSession';
 import { vorschauUrl } from '../lib/vorschauUrl';
 
 /**
@@ -33,10 +34,7 @@ export const Termine: CollectionConfig = {
     maxPerDoc: 50,
   },
   access: {
-    read: ({ req }) => {
-      if (req.user) return true;
-      return { freigabeStatus: { equals: 'veroeffentlicht' } };
-    },
+    read: readPublishedOrSession,
     create: ({ req }) => !!req.user,
     update: ownDraftOrRedaktion,
     delete: ownDraftOnlyDelete,
