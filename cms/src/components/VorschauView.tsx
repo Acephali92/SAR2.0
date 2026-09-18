@@ -1,6 +1,7 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import type { PayloadRequest } from 'payload';
+import { FREIGABE_STATUS_LABEL } from '../lib/freigabeStatusLabel';
 import styles from './VorschauView.module.css';
 
 /**
@@ -18,12 +19,6 @@ import styles from './VorschauView.module.css';
 
 const COLLECTIONS = ['beitraege', 'termine'] as const;
 type Collection = (typeof COLLECTIONS)[number];
-
-const STATUS_LABEL: Record<string, string> = {
-  entwurf: 'Entwurf',
-  veroeffentlicht: 'Veröffentlicht',
-  zur_freigabe: 'Zur Freigabe',
-};
 
 const KATEGORIE_LABEL: Record<string, string> = {
   analyse: 'Analyse',
@@ -45,7 +40,14 @@ const EVENT_STATUS_LABEL: Record<string, string> = {
   upcoming: 'Demnächst',
 };
 
-const datumZeitFormat = new Intl.DateTimeFormat('de-DE', { dateStyle: 'long', timeStyle: 'short' });
+// timeZone explizit setzen: ohne sie greift die Zeitzone des Node-Prozesses (Docker/Alpine
+// steht standardmaessig auf UTC), wodurch z.B. eine fuer 14:00 Europe/Berlin geplante
+// Veroeffentlichung hier faelschlich als 12:00/13:00 angezeigt wuerde.
+const datumZeitFormat = new Intl.DateTimeFormat('de-DE', {
+  dateStyle: 'long',
+  timeStyle: 'short',
+  timeZone: 'Europe/Berlin',
+});
 
 function formatiereDatum(wert: unknown): null | string {
   if (typeof wert !== 'string' && typeof wert !== 'number') return null;
@@ -141,7 +143,7 @@ export async function VorschauView({ initPageResult, params }: Props) {
 
   const adminPfad = payload.config.routes.admin;
   const bearbeitenURL = `${adminPfad}/collections/${collection}/${String(doc.id)}`;
-  const status = STATUS_LABEL[String(doc.freigabeStatus)] ?? String(doc.freigabeStatus);
+  const status = FREIGABE_STATUS_LABEL[String(doc.freigabeStatus)] ?? String(doc.freigabeStatus);
   const bild = leseBild(doc);
   const quellen = leseQuellen(doc);
   const istTermin = collection === 'termine';
