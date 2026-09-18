@@ -159,7 +159,7 @@ Jeder Beitrag und jeder Termin durchläuft drei Stufen. Dieses Vier-Augen-Prinzi
 2. **Zur Freigabe** — Autor reicht den fertigen Entwurf ein (Status im rechten Seitenmenü auf „Zur Freigabe" umstellen). Ab diesem Punkt kann nur noch Redaktion oder Admin etwas ändern — so wird verhindert, dass sich Text und Freigabe-Entscheidung auseinanderentwickeln.
 3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung), stellt den Status auf „Veröffentlicht" **und klickt oben auf „Änderungen veröffentlichen"**. Erst wenn beides erfolgt ist, ist der Beitrag öffentlich auf der Website sichtbar. Nur „Speichern" bzw. „Entwurf speichern" reicht nicht — dann bleibt der Stand ein Entwurf.
 
-Dasselbe gilt für spätere Korrekturen an einem bereits veröffentlichten Beitrag: Solange nur als Entwurf gespeichert wird, bleibt öffentlich die bisherige Fassung stehen, und der Entwurf ist für niemanden außerhalb der Redaktionsoberfläche sichtbar. Erst „Änderungen veröffentlichen" macht die Korrektur zur öffentlichen Fassung; auf der Website erscheint sie mit dem nächsten automatischen Neuaufbau (siehe „Häufige Fragen" unten).
+Dasselbe gilt für spätere Korrekturen an einem bereits veröffentlichten Beitrag: Solange nur als Entwurf gespeichert wird, bleibt öffentlich die bisherige Fassung stehen, und der Entwurf ist für niemanden außerhalb der Redaktionsoberfläche sichtbar. Erst „Änderungen veröffentlichen" macht die Korrektur zur öffentlichen Fassung — die Website baut sich daraufhin automatisch neu, die Korrektur ist nach wenigen Minuten online.
 
 Redaktion kann einen eingereichten Entwurf jederzeit zurück auf „Entwurf" setzen, zum Beispiel mit einem Korrekturwunsch, oder einen bereits veröffentlichten Beitrag wieder zurückziehen (z. B. wenn sich nachträglich ein Fehler zeigt).
 
@@ -201,7 +201,7 @@ Nichts, was du selbst noch tun musst — die Website baut sich **automatisch neu
 In der Regel wenige Minuten nach der Veröffentlichung. Bei einer zeitgesteuerten Veröffentlichung kann es zusätzlich bis zu rund fünf bis zehn Minuten nach dem geplanten Zeitpunkt dauern, da das System nur in diesem Abstand nachschaut.
 
 **Ich habe nach der Veröffentlichung einen Fehler gefunden — was jetzt?**
-Beitrag öffnen, korrigieren und erneut speichern. Läuft der Beitrag bereits, wird die Korrektur beim nächsten automatischen Rebuild live übernommen. Bei gravierenden Fehlern kann Redaktion den Beitrag jederzeit kurzzeitig auf „Entwurf" zurücksetzen, bis die Korrektur fertig ist.
+Beitrag öffnen, korrigieren und oben auf „Änderungen veröffentlichen" klicken. Die Website baut sich daraufhin automatisch neu, die Korrektur ist nach wenigen Minuten online. (Nur „Entwurf speichern" reicht nicht — dann bleibt öffentlich die alte Fassung stehen.) Bei gravierenden Fehlern kann Redaktion den Beitrag jederzeit kurzzeitig auf „Entwurf" zurücksetzen, bis die Korrektur fertig ist.
 
 **Warum sehe ich nicht die Entwürfe von anderen im Team?**
 Das ist Absicht (siehe Rollen-Tabelle oben): Autor sieht nur eigene Entwürfe, damit niemand versehentlich fremde, noch unfertige Texte bearbeitet. Redaktion und Admin sehen alles.

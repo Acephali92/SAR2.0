@@ -19,6 +19,9 @@ FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Fuehrt beim Serverstart ausstehende Migrationen aus (cms/src/migrations/, via prodMigrations in
+# payload.config.ts). Ohne das bekaeme ein frischer Produktionsserver kein Datenbankschema.
+ENV PAYLOAD_AUTO_MIGRATE=true
 RUN addgroup -S payload && adduser -S payload -G payload
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
@@ -27,7 +30,7 @@ COPY --from=builder /app/package.json ./package.json
 RUN mkdir -p /data/uploads && chown -R payload:payload /data/uploads
 USER payload
 EXPOSE 3000
-# Wendet vor dem Start alle ausstehenden Migrationen an (cms/src/migrations/) - sonst bekommt ein
-# frischer Produktionsserver kein Datenbankschema, da NODE_ENV=production Payloads automatisches
-# "Push" deaktiviert (siehe docs/REDAKTION-TODO.md, "LAUNCH-BLOCKER").
-CMD ["sh", "-c", "npx payload migrate && npm run start"]
+# Migrationen laufen beim Start innerhalb des Servers (PAYLOAD_AUTO_MIGRATE oben). Ein vorgeschaltetes
+# "npx payload migrate" funktioniert hier nicht: das Image enthaelt weder src/payload.config.ts noch
+# src/migrations/.
+CMD ["npm", "run", "start"]

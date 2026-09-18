@@ -10,7 +10,7 @@
     "start": "next start --port 3000",
     "generate:types": "payload generate:types",
     "seed": "node --loader ts-node/esm scripts/seed-import.ts",
-    "export": "node scripts/export-content.mjs",
+    "export": "payload run scripts/export-content.mjs",
     "payload": "payload"
   },
   "dependencies": {

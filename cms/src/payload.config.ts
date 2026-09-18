@@ -11,6 +11,7 @@ import { Media } from './collections/Media';
 import { Beitraege } from './collections/Beitraege';
 import { Termine } from './collections/Termine';
 import { schedulePublishTask } from './jobs/schedulePublish';
+import { migrations } from './migrations';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -55,6 +56,14 @@ export default buildConfig({
   sharp,
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URI },
+    // Im Produktionsmodus legt Payload das Schema nicht per "push" an. Die Migrationen werden
+    // deshalb mitgebuendelt und beim Serverstart ausgefuehrt - das Runner-Image enthaelt weder
+    // src/ noch die Payload-CLI-Konfiguration, "npx payload migrate" wuerde dort scheitern.
+    // Nur im Docker-Image aktiv (PAYLOAD_AUTO_MIGRATE, siehe Dockerfile): findet migrate eine per
+    // Dev-Push angelegte Datenbank, stellt es eine interaktive Rueckfrage - ohne Terminal haengt der
+    // Server daran (im Container beobachtet: laeuft, antwortet aber nie). Ein lokaler
+    // "npm run start" gegen die Dev-Datenbank waere sonst unbenutzbar.
+    prodMigrations: process.env.PAYLOAD_AUTO_MIGRATE === 'true' ? migrations : undefined,
   }),
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

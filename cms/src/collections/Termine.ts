@@ -4,7 +4,7 @@ import { slugField } from '../fields/slugField';
 import { statusField, createdByField, publishAtField, publishedAtField } from '../fields/statusField';
 import { setCreatedBy } from '../hooks/setCreatedBy';
 import { setPublishedAt } from '../hooks/setPublishedAt';
-import { triggerRebuild } from '../hooks/triggerRebuild';
+import { merkeOeffentlichenStand, triggerRebuild } from '../hooks/triggerRebuild';
 import { addRenderedHtml } from '../hooks/addRenderedHtml';
 import { restrictVersionRestore } from '../hooks/restrictVersionRestore';
 import { ownDraftOrRedaktion, ownDraftOnlyDelete } from '../access/ownDraftOrRedaktion';
@@ -41,7 +41,7 @@ export const Termine: CollectionConfig = {
     readVersions: canReadVersions,
   },
   hooks: {
-    beforeChange: [restrictVersionRestore, setCreatedBy, setPublishedAt],
+    beforeChange: [restrictVersionRestore, setCreatedBy, setPublishedAt, merkeOeffentlichenStand],
     afterChange: [triggerRebuild],
     afterRead: [addRenderedHtml],
   },

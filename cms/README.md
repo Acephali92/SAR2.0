@@ -191,13 +191,14 @@ Nach Änderungen an `admin.components` muss die Import-Map neu erzeugt werden: `
 | `npm run build` / `npm run start` | Produktions-Build/-Start (läuft normalerweise im Docker-Container, siehe `Dockerfile`) |
 | `npm run generate:types` | Generiert `src/payload-types.ts` aus den Collections |
 | `npm run seed` | Einmalige Migration der 3 bestehenden Markdown-Artikel nach Payload (siehe `scripts/seed-import.ts`) — idempotent, gegen eine laufende Instanz |
-| `npm run export` | M10: Export aller veröffentlichten Beiträge/Termine als Markdown+JSON nach `cms/exports/` |
+| `npm run export` | M10: Export aller öffentlich sichtbaren Beiträge/Termine (`freigabeStatus = veroeffentlicht` UND `_status = published`) als Markdown+JSON nach `cms/exports/`. Läuft über `payload run` (lädt die TypeScript-Config) gegen die Datenbank aus `.env`. Verknüpfte Nutzer erscheinen nur mit Namen — keine E-Mail-Adressen, Session-IDs oder API-Keys im Export. |
 
 ## Automatischer Rebuild und Backups
 
 Kurzreferenz — vollständige Beschreibung inkl. Docker-Compose-Setup, Reverse-Proxy und Restore-Prozedur: [`../docs/DEPLOYMENT.md`](../docs/DEPLOYMENT.md).
 
-- **M9:** `src/hooks/triggerRebuild.ts` ruft bei Ver-/Entveröffentlichung `webhook/rebuild-server.mjs` auf, der die Astro-Seite baut, die Verify-Gates (`check-links`/`check-csp`) laufen lässt und `dist/` nur bei Erfolg atomar austauscht.
+- **M9:** `src/hooks/triggerRebuild.ts` ruft `webhook/rebuild-server.mjs` auf, sobald sich die **öffentliche Fassung** ändert — erste Veröffentlichung, veröffentlichte Korrektur, Zurückziehen, Wiederherstellen, zeitgesteuerte Veröffentlichung —, nie bei Entwurf/Autosave. Erkannt wird das an der Hauptzeile des Dokuments in der Datenbank (Payload schreibt sie nur bei Nicht-Entwurfs-Speicherungen), gemerkt vorher per `merkeOeffentlichenStand` (`beforeChange`). Der Webhook baut die Astro-Seite, lässt die Verify-Gates (`check-links`/`check-csp`) laufen und tauscht `dist/` nur bei Erfolg atomar aus.
+- **Migrationen:** Im Docker-Image (`PAYLOAD_AUTO_MIGRATE=true`) führt der Server beim Start ausstehende Migrationen aus `src/migrations/` selbst aus (`prodMigrations` in `payload.config.ts`) — das Image enthält weder `src/` noch die CLI-Konfiguration, ein vorgeschaltetes `npx payload migrate` scheitert dort. Neue Migration nach Schemaänderungen: `npx payload migrate:create <name>` lokal gegen die Dev-Datenbank. **Achtung:** Eine Datenbank, die je im Dev-Modus per „Push" verändert wurde, enthält die Markierung `dev`/`batch -1`; dagegen bleibt der Container beim Start an einer interaktiven Rückfrage hängen. Produktiv deshalb nur eine frische oder ausschließlich per Migration gepflegte Datenbank verwenden.
 - **M10:** `backup/backup.sh` läuft nächtlich (Cron-Container), sichert Datenbank + Uploads, 14 Tage Aufbewahrung.
 
 ## Troubleshooting
