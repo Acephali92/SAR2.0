@@ -1,0 +1,160 @@
+/* Bildet Typografie und Abstaende der oeffentlichen Seite grob nach (src/styles/global.css,
+   tailwind.config.mjs im Astro-Root). Bewusst keine Pixelkopie und keine Schrift-Dateien:
+   die Schriftfamilien werden nur benannt, nichts wird von einem CDN nachgeladen. */
+
+.seite {
+  --vorschau-text: #0f172a;
+  --vorschau-text-leise: #475569;
+  --vorschau-rand: #e2e8f0;
+  --vorschau-akzent: #0369a1;
+
+  background: #ffffff;
+  color: var(--vorschau-text);
+  font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.7;
+  margin: 0 auto;
+  max-width: 48rem;
+  padding: 1.5rem 1.5rem 6rem;
+}
+
+.banner {
+  background: #fef3c7;
+  border: 1px solid #b45309;
+  border-radius: 0.375rem;
+  color: #78350f;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  padding: 0.75rem 1rem;
+}
+
+.bannerLink {
+  color: #78350f;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.artikel a {
+  color: var(--vorschau-akzent);
+}
+
+.kopf {
+  border-bottom: 1px solid var(--vorschau-rand);
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+}
+
+.rubrik {
+  color: var(--vorschau-text-leise);
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  margin: 0 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.titel {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: clamp(1.875rem, 1.5rem + 1.875vw, 2.5rem);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.anriss {
+  color: var(--vorschau-text-leise);
+  font-size: 1.125rem;
+  margin: 0.75rem 0 0;
+}
+
+.eckdaten {
+  display: grid;
+  gap: 0.25rem 1rem;
+  grid-template-columns: max-content 1fr;
+  margin: 1.5rem 0 0;
+}
+
+.eckdaten dt {
+  color: var(--vorschau-text-leise);
+  font-size: 0.875rem;
+}
+
+.eckdaten dd {
+  margin: 0;
+}
+
+.bild {
+  margin: 0 0 2rem;
+}
+
+.bild img {
+  border-radius: 0.375rem;
+  height: auto;
+  max-width: 100%;
+}
+
+.bild figcaption {
+  color: var(--vorschau-text-leise);
+  display: flex;
+  flex-direction: column;
+  font-size: 0.875rem;
+  gap: 0.15rem;
+  margin-top: 0.5rem;
+}
+
+.altHinweis {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.75rem;
+}
+
+.inhalt {
+  font-size: 1.0625rem;
+  max-width: 65ch;
+}
+
+.inhalt h2,
+.inhalt h3 {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  line-height: 1.3;
+  margin: 2rem 0 0.75rem;
+}
+
+.inhalt p,
+.inhalt ul,
+.inhalt ol {
+  margin: 0 0 1.25rem;
+}
+
+.inhalt blockquote {
+  border-left: 3px solid var(--vorschau-rand);
+  color: var(--vorschau-text-leise);
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+}
+
+.inhalt img {
+  height: auto;
+  max-width: 100%;
+}
+
+.block {
+  border-top: 1px solid var(--vorschau-rand);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+}
+
+.block h2 {
+  font-family: 'IBM Plex Serif', Georgia, serif;
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem;
+}
+
+.quellen,
+.verweise {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.verweise {
+  list-style: none;
+  padding-left: 0;
+}

@@ -106,6 +106,19 @@ Nachrichten, Analysen und Termine werden **nicht** mehr als Markdown-Datei gepfl
 1. `https://redaktion.stoppramstein.de` aufrufen.
 2. Mit E-Mail-Adresse und Passwort anmelden (Zugang von Admin einrichten lassen). Passwort vergessen? "Passwort zurücksetzen" auf der Login-Seite nutzen.
 
+### Die Übersicht nach dem Anmelden
+
+Direkt nach dem Login steht oben auf der Startseite die **Redaktions-Übersicht** mit vier Listen:
+
+| Liste | Zeigt |
+|---|---|
+| Offene Entwürfe | Alles im Status „Entwurf" |
+| Warten auf Freigabe | Alles im Status „Zur Freigabe" |
+| Geplante Veröffentlichungen | Alles mit einem Termin in „Geplante Veröffentlichung", der noch bevorsteht |
+| Anstehende Termine | Veranstaltungen ab heute, ohne abgesagte |
+
+Jede Zeile führt per Klick direkt in das jeweilige Dokument. Mit der Rolle Autor erscheinen nur die eigenen Beiträge und Termine, mit Redaktion und Admin alle. Leere Listen sind normal und kein Fehler.
+
 ### Rollen
 
 Jede angemeldete Person hat genau eine Rolle. Die Rolle bestimmt, was sie in der Redaktionsoberfläche sehen und tun darf:
@@ -147,6 +160,30 @@ Jeder Beitrag und jeder Termin durchläuft drei Stufen. Dieses Vier-Augen-Prinzi
 3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung) und schaltet frei. Ab jetzt ist der Beitrag öffentlich auf der Website sichtbar.
 
 Redaktion kann einen eingereichten Entwurf jederzeit zurück auf „Entwurf" setzen, zum Beispiel mit einem Korrekturwunsch, oder einen bereits veröffentlichten Beitrag wieder zurückziehen (z. B. wenn sich nachträglich ein Fehler zeigt).
+
+### Vorschau vor dem Veröffentlichen
+
+In jedem Beitrag und Termin gibt es oben rechts den Knopf **Vorschau** (Symbol „Link nach außen"). Er öffnet in einem neuen Tab eine Ansicht, die Titel, Anrisstext, Bild mit Alt-Text, Kategorie bzw. Art der Veranstaltung, den fertig gesetzten Text, die Quellen und die verknüpften Beiträge/Termine so zeigt, wie sie auf der Website ungefähr wirken. Oben steht ein gelber Hinweis „Vorschau — nicht öffentlich" samt aktuellem Status.
+
+Wichtig zu wissen:
+
+- Die Vorschau läuft **ausschließlich innerhalb der Redaktionsoberfläche** und verlangt eine Anmeldung. Es gibt keine Vorschau-Adresse, die sich an Außenstehende weitergeben ließe — wer den Link ohne Anmeldung öffnet, bekommt nur eine Fehlerseite.
+- Sie zeigt auch **unveröffentlichte Entwürfe**, inklusive der zuletzt automatisch gespeicherten Änderungen.
+- Sie bildet Schrift und Abstände der Website nach, ist aber **keine pixelgenaue Kopie** — Kopf- und Fußzeile der Website fehlen bewusst.
+- Mit der Rolle Autor lassen sich nur eigene Dokumente vorschauen, mit Redaktion und Admin alle.
+
+### Ältere Fassungen wiederherstellen
+
+Das System speichert automatisch frühere Fassungen (Reiter **Versionen** im Dokument). Wer welche zurückholen darf:
+
+| Rolle | Darf wiederherstellen |
+|-------|----------------------|
+| **Autor** | Nur eigene Dokumente, und nur solange sie **nicht veröffentlicht** sind. Fremde Dokumente sind weder sichtbar noch wiederherstellbar. |
+| **Redaktion / Admin** | Jede Fassung jedes Beitrags und Termins, auch bei veröffentlichten Inhalten. |
+
+„Wiederherstellen" überschreibt den aktuellen Stand mit der gewählten älteren Fassung — der bisherige Stand geht dabei nicht verloren, sondern wird selbst wieder als Version abgelegt. Der Freigabestatus ändert sich nicht heimlich mit: Ein veröffentlichter Beitrag bleibt veröffentlicht, und die Website wird nur dann neu gebaut, wenn sich der Status tatsächlich auf oder von „Veröffentlicht" ändert.
+
+Versucht man als Autor, eine veröffentlichte Fassung zurückzusetzen, erscheint ein deutscher Hinweis mit der Bitte, die Redaktion anzusprechen.
 
 ### Zeitgesteuerte Veröffentlichung
 

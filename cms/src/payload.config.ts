@@ -23,6 +23,20 @@ export default buildConfig({
     meta: {
       titleSuffix: '- Redaktion Stopp Air Base Ramstein',
     },
+    components: {
+      // Lageuebersicht ueber den Standard-Karten der Startseite (Rollenfilter im Component selbst).
+      beforeDashboard: ['/components/RedaktionsUebersicht#RedaktionsUebersicht'],
+      views: {
+        // Redaktionelle Vorschau. ACHTUNG: Payload haengt Custom-Views NICHT hinter den
+        // Login-Redirect (isCustomAdminView in @payloadcms/next) - VorschauView.tsx prueft
+        // req.user deshalb selbst und liefert ohne Session 404.
+        vorschau: {
+          Component: '/components/VorschauView#VorschauView',
+          exact: true,
+          path: '/vorschau/:collection/:id',
+        },
+      },
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },

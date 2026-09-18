@@ -6,7 +6,10 @@ import { setCreatedBy } from '../hooks/setCreatedBy';
 import { setPublishedAt } from '../hooks/setPublishedAt';
 import { triggerRebuild } from '../hooks/triggerRebuild';
 import { addRenderedHtml } from '../hooks/addRenderedHtml';
+import { restrictVersionRestore } from '../hooks/restrictVersionRestore';
 import { ownDraftOrRedaktion, ownDraftOnlyDelete } from '../access/ownDraftOrRedaktion';
+import { canReadVersions } from '../access/canReadVersions';
+import { vorschauUrl } from '../lib/vorschauUrl';
 
 /**
  * Termine (Veranstaltungen) - ersetzt die bisherige Astro-Collection `aktionen`.
@@ -23,6 +26,7 @@ export const Termine: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'startDate', 'eventStatus', 'freigabeStatus'],
+    preview: vorschauUrl('termine'),
   },
   versions: {
     drafts: { autosave: { interval: 2000 } },
@@ -36,9 +40,10 @@ export const Termine: CollectionConfig = {
     create: ({ req }) => !!req.user,
     update: ownDraftOrRedaktion,
     delete: ownDraftOnlyDelete,
+    readVersions: canReadVersions,
   },
   hooks: {
-    beforeChange: [setCreatedBy, setPublishedAt],
+    beforeChange: [restrictVersionRestore, setCreatedBy, setPublishedAt],
     afterChange: [triggerRebuild],
     afterRead: [addRenderedHtml],
   },

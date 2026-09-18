@@ -59,14 +59,20 @@ cms/
 │   │   ├── Media.ts             # Upload, automatische Größenvarianten, Pflicht-Alt-Text (M4)
 │   │   ├── Beitraege.ts         # Nachrichten/Analysen (M6)
 │   │   └── Termine.ts           # Veranstaltungen (M6)
+│   ├── components/
+│   │   ├── RedaktionsUebersicht.tsx  # Lageübersicht über dem Dashboard (beforeDashboard)
+│   │   ├── uebersichtDaten.ts        # Deren Abfragen — getrennt, damit ohne Admin-UI prüfbar
+│   │   └── VorschauView.tsx          # Geschützte Vorschau unter /admin/vorschau/:collection/:id
 │   ├── fields/
 │   │   ├── statusField.ts       # Redaktioneller Status + zugehörige Sidebar-Felder (M5)
 │   │   └── slugField.ts         # Auto-Slug aus Titel, editierbar
 │   ├── access/                  # Zugriffsregeln (Rollen × Status-Übergänge)
+│   │   └── canReadVersions.ts   # Wer die Versionsgeschichte sehen darf (access.readVersions)
 │   ├── hooks/
 │   │   ├── setCreatedBy.ts      # Stempelt den Ersteller (für "nur eigene Entwürfe")
 │   │   ├── setPublishedAt.ts    # Stempelt das erste Veröffentlichungsdatum
 │   │   ├── addRenderedHtml.ts   # Lexical → HTML für den Astro-Loader (afterRead)
+│   │   ├── restrictVersionRestore.ts # Grenzt das Wiederherstellen für die Rolle Autor ein
 │   │   └── triggerRebuild.ts    # M9: ruft den Rebuild-Webhook bei Publish/Unpublish auf
 │   ├── jobs/
 │   │   └── schedulePublish.ts   # M5: zeitgesteuerte Veröffentlichung (Jobs Queue, alle ~5 Min.)
@@ -98,7 +104,7 @@ Vollständige Liste mit Kommentaren: [`.env.example`](./.env.example). Kurzrefer
 | `REBUILD_WEBHOOK_URL` / `REBUILD_WEBHOOK_SECRET` | M9: Trigger für den Astro-Rebuild |
 | `PAYLOAD_API_TOKEN` | API-Key eines Service-Nutzers, mit dem der Astro-Build lesend zugreift (siehe unten) |
 
-**Service-Nutzer für den Astro-Build:** In der Admin-UI einen Nutzer anlegen (z. B. `build@stoppramstein.de`, Rolle egal, da der Astro-Loader nur öffentliche, veröffentlichte Daten liest), API-Key aktivieren, Key kopieren und im Astro-Build-Environment als `PAYLOAD_API_TOKEN` hinterlegen (nicht in diesem `.env`, sondern dort, wo `npm run build` für die Astro-Seite läuft).
+**Service-Nutzer für den Astro-Build:** In der Admin-UI einen Nutzer anlegen (z. B. `build@stoppramstein.de`, Rolle **`autor`** — der Astro-Loader liest nur veröffentlichte Daten, und mit `autor` bleibt ihm die Versionsgeschichte verschlossen, siehe [Versionen und Wiederherstellen](#versionen-und-wiederherstellen)), API-Key aktivieren, Key kopieren und im Astro-Build-Environment als `PAYLOAD_API_TOKEN` hinterlegen (nicht in diesem `.env`, sondern dort, wo `npm run build` für die Astro-Seite läuft).
 
 ## Datenmodell
 
@@ -129,6 +135,25 @@ Die Stufen im Detail:
 | `veroeffentlicht` → `entwurf` | ❌ | ✅ |
 
 Durchgesetzt über `src/access/canTransitionStatus.ts` (Feld-Access) und `src/access/ownDraftOrRedaktion.ts` (Dokument-Access). **Zeitgesteuerte Veröffentlichung:** Feld `publishAt` + Jobs-Queue-Task `src/jobs/schedulePublish.ts` (Cron `*/5 * * * *` in `payload.config.ts`) — prüft alle ~5 Minuten auf fällige, bereits freigegebene (`zur_freigabe`) Dokumente.
+
+### Versionen und Wiederherstellen
+
+`versions.drafts` (mit Autosave, `maxPerDoc: 50`) läuft auf `Beitraege` und `Termine`. Die Rechte darauf hängen an zwei Stellen:
+
+- **Lesen:** `access.readVersions` → `src/access/canReadVersions.ts`. Redaktion/Admin sehen alle Versionen, die Rolle Autor nur die eigenen, ohne Login gar keine. Die Where-Bedingung lautet `version.createdBy`, nicht `createdBy` — Payload fragt die Versions-Collection ab, dort liegen die Dokumentfelder unter `version.*`. **Ohne** diese Funktion greift Payloads Fallback in `executeAccess`: jeder eingeloggte Nutzer dürfte dann die Versionen aller Dokumente lesen, einschließlich des API-Key-Nutzers des Astro-Builds.
+- **Wiederherstellen:** `src/hooks/restrictVersionRestore.ts` (`beforeChange`). Payload kennt **kein** eigenes Zugriffsrecht fürs Wiederherstellen — die `restoreVersion`-Operation prüft ausschließlich `access.update`. Fremde Dokumente sind damit schon abgedeckt (`ownDraftOrRedaktion` liefert eine Where-Bedingung, der Restore endet in „Forbidden"), ein *eigenes, veröffentlichtes* Dokument aber nicht. Genau das fängt der Hook ab und wirft einen deutschen 403-Text. Er erkennt den Restore an `req.context.isRestoringVersion`, das `restoreVersion` vor den `beforeChange`-Hooks setzt — bei normalem Speichern und Autosave ist der Hook wirkungslos.
+
+`Media` hat derzeit keine `versions` aktiviert; würde das eingeschaltet, muss `access.readVersions` dort ebenfalls gesetzt werden.
+
+**Service-Nutzer-Hinweis:** Der Build-Nutzer mit API-Key (siehe [Umgebungsvariablen](#umgebungsvariablen)) sollte die Rolle **`autor`** behalten. Mit `redaktion` oder `admin` bekäme der Astro-Build über die REST-API Zugriff auf die komplette Versionsgeschichte, die er nicht braucht.
+
+### Vorschau (Admin-Route)
+
+`collection.admin.preview` (→ `src/lib/vorschauUrl.ts`) setzt in beiden Collections den eingebauten Vorschau-Knopf der Edit-Ansicht auf `/admin/vorschau/:collection/:id`. Dort rendert `src/components/VorschauView.tsx` das Dokument per Local API mit `draft: true`, nutzt das vorhandene `renderedHtml` aus `addRenderedHtml` und zeigt es in einem Artikel-/Event-Layout mit Status-Banner.
+
+> ⚠️ **Custom-Admin-Views sind bei Payload 3 nicht automatisch hinter dem Login.** `isCustomAdminView` in `@payloadcms/next` nimmt jede unter `admin.components.views` registrierte Route ausdrücklich vom Auth-Redirect aus. `VorschauView.tsx` prüft `req.user` deshalb selbst (404 ohne Session) und setzt zusätzlich „Autor sieht nur Eigenes" durch, weil `access.read` eingeloggten Nutzern bewusst alles freigibt. Jede weitere Custom-View muss diese Prüfungen selbst mitbringen.
+
+Nach Änderungen an `admin.components` muss die Import-Map neu erzeugt werden: `npx payload generate:importmap` (schreibt `src/app/(payload)/admin/importMap.js`, diese Datei ist committet). Fehlt der Eintrag, rendert Payload die Komponente **kommentarlos als nichts** — `RenderServerComponent` gibt ohne Treffer in der Import-Map einfach `null` zurück.
 
 ### Beitrag ↔ Termin (M6)
 
@@ -171,6 +196,8 @@ Kurzreferenz — vollständige Beschreibung inkl. Docker-Compose-Setup, Reverse-
 | Seite lädt "ewig" (60–90 s) und wirkt eingefroren | Normal bei der jeweils ersten Anfrage an eine Route nach einem (Neu-)Start des Dev-Servers — Next.js kompiliert sie erst on-demand. Terminal-Log beobachten (`✓ Compiled ... in Xs`), nicht abbrechen. Danach ist dieselbe Route dauerhaft schnell, bis der Server neu startet. |
 | Astro-Build bricht mit "Payload-API nicht erreichbar" ab | `PAYLOAD_URL` ist gesetzt, aber die Instanz läuft nicht/ist nicht erreichbar. Für reine Frontend-Arbeit `PAYLOAD_URL` weglassen — der Astro-Loader nutzt dann automatisch die committete Fixture (`src/content/_fixtures/`). |
 | Neue Beiträge erscheinen nicht auf der Website | Prüfen: Status ist `veroeffentlicht`? `publishedAt` liegt nicht in der Zukunft? Rebuild-Webhook-Log auf dem Produktionsserver prüfen (`/var/log/stoppramstein-rebuild.log`). |
+| Eigene Dashboard-/View-Komponente erscheint einfach nicht (keine Fehlermeldung) | Eintrag fehlt in `src/app/(payload)/admin/importMap.js`. `RenderServerComponent` gibt ohne Treffer stillschweigend `null` zurück. `npx payload generate:importmap` ausführen und den Dev-Server neu starten. |
+| Test mit `curl`/Skript: trotz erfolgreichem Login landet jeder `/admin`-Aufruf auf der Login-Seite, `/api/users/me` liefert `user: null` | Payloads Cookie-Auth hat einen CSRF-Schutz (`extractJWT`, Methode `cookie`): ohne `Origin`-Header verlangt sie einen passenden `Sec-Fetch-Site`-Header. Browser senden den, `curl` nicht — das Cookie wird deshalb verworfen. Im Browser tritt das nicht auf. Für Tests auf der Kommandozeile entweder `-H "Sec-Fetch-Site: same-origin"` bzw. `-H "Origin: http://localhost:3000"` mitschicken oder den Token direkt als `-H "Authorization: JWT <token>"` setzen. |
 | Admin-UI zeigt "Access Denied" | Rolle des angemeldeten Nutzers prüfen — mit der Rolle Autor sind nur die eigenen Dokumente sichtbar, keine fremden. |
 | Bild wird nicht angezeigt | Alt-Text ist Pflichtfeld auf der Media-Collection — ohne Alt-Text lässt sich das Bild nicht speichern. |
 | Login-Seite unter `redaktion.stoppramstein.de` nicht erreichbar (Produktion) | Reverse-Proxy-Konfiguration prüfen (siehe `docs/DEPLOYMENT.md`, Abschnitt "Reverse-Proxy für die Redaktionsoberfläche") sowie ob der `payload`-Container überhaupt läuft (`docker compose ps`). |
