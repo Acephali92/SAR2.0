@@ -9,15 +9,36 @@ export const Media: CollectionConfig = {
     staticDir: process.env.UPLOAD_DIR ?? 'uploads',
     mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'],
     imageSizes: [
-      { name: 'thumbnail', width: 400, fit: 'inside' },
-      { name: 'card', width: 800, fit: 'inside' },
-      { name: 'og', width: 1200, height: 630, fit: 'cover' },
+      {
+        name: 'thumbnail',
+        width: 400,
+        fit: 'inside',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'card',
+        width: 800,
+        fit: 'inside',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'og',
+        width: 1200,
+        height: 630,
+        fit: 'cover',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
     ],
     adminThumbnail: 'thumbnail',
     formatOptions: { format: 'webp', options: { quality: 80 } },
   },
   access: {
-    read: () => true,
+    // Kein anonymer Zugriff - weder auf die JSON-Liste noch auf die Datei-Bytes unter
+    // /api/media/file/... (Payload prueft dort dieselbe read-Regel). Die oeffentliche Seite braucht
+    // das nicht: payload-loader.ts laedt Bilder zur Build-Zeit mit dem API-Key und liefert sie
+    // selbst gehostet aus (CSP img-src 'self'). Ohne diese Sperre war die komplette Mediathek
+    // einschliesslich nur in Entwuerfen verwendeter Bilder anonym abrufbar.
+    read: isLoggedIn,
     create: isLoggedIn,
     update: isRedaktionOrAdmin,
     delete: isRedaktionOrAdmin,

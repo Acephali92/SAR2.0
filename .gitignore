@@ -31,3 +31,6 @@ audit-*.png
 scraper.txt
 wordpress-theme/
 wordpress-theme.zip
+
+# CMS-Bilder, von src/lib/payload-loader.ts zur Build-Zeit heruntergeladen
+public/media/cms/

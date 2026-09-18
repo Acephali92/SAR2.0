@@ -1,0 +1,98 @@
+/* Nutzt Payloads eigene Theme-Variablen, damit die Uebersicht in hellem und dunklem
+   Admin-Theme automatisch stimmt und keine eigenen Farbwerte gepflegt werden muessen. */
+
+.wrapper {
+  margin-bottom: calc(var(--base) * 2);
+}
+
+.kopf {
+  margin-bottom: calc(var(--base) * 0.75);
+}
+
+.ueberschrift {
+  margin: 0;
+}
+
+.hinweis {
+  color: var(--theme-elevation-600);
+  margin: calc(var(--base) * 0.25) 0 0;
+}
+
+.raster {
+  display: grid;
+  gap: calc(var(--base) * 0.75);
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+}
+
+.karte {
+  background: var(--theme-elevation-50);
+  border: 1px solid var(--theme-elevation-100);
+  border-radius: var(--style-radius-m);
+  padding: calc(var(--base) * 0.75);
+}
+
+.karteTitel {
+  align-items: center;
+  display: flex;
+  gap: calc(var(--base) * 0.4);
+  justify-content: space-between;
+  margin: 0 0 calc(var(--base) * 0.5);
+}
+
+.anzahl {
+  background: var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+  color: var(--theme-elevation-800);
+  font-size: 0.8rem;
+  padding: 0.1rem 0.5rem;
+}
+
+.leer {
+  color: var(--theme-elevation-500);
+  margin: 0;
+}
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base) * 0.5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.zeile {
+  border-top: 1px solid var(--theme-elevation-100);
+  padding-top: calc(var(--base) * 0.5);
+}
+
+.zeile:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.link {
+  display: block;
+  font-weight: 600;
+}
+
+.meta {
+  align-items: center;
+  color: var(--theme-elevation-600);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  gap: 0.35rem 0.6rem;
+  margin-top: 0.2rem;
+}
+
+.badge {
+  background: var(--theme-elevation-150);
+  border-radius: var(--style-radius-s);
+  color: var(--theme-elevation-800);
+  padding: 0.05rem 0.4rem;
+}
+
+.status {
+  font-weight: 600;
+}

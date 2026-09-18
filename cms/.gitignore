@@ -10,3 +10,5 @@ exports/
 *.log
 secrets/*.txt
 docker-compose.override.yml
+# Von next dev/build generiert, Inhalt wechselt je nach Modus
+next-env.d.ts

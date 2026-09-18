@@ -31,7 +31,9 @@ function toPlainDate(value: unknown): string | undefined {
   return typeof value === 'string' ? value : undefined;
 }
 
-async function downloadMedia(url: string, payloadBaseUrl: string): Promise<string> {
+// Die Datei-Bytes unter /api/media/file/... liegen hinter derselben read-Regel wie die Media-Collection
+// (anonym gesperrt) - daher derselbe API-Key-Header wie in fetchLive.
+async function downloadMedia(url: string, payloadBaseUrl: string, apiToken: string): Promise<string> {
   const absoluteUrl = url.startsWith('http') ? url : `${payloadBaseUrl}${url}`;
   const hash = crypto.createHash('sha1').update(absoluteUrl).digest('hex').slice(0, 12);
   const ext = path.extname(new URL(absoluteUrl).pathname) || '.webp';
@@ -40,7 +42,7 @@ async function downloadMedia(url: string, payloadBaseUrl: string): Promise<strin
 
   if (!fs.existsSync(outPath)) {
     fs.mkdirSync(MEDIA_OUT_DIR, { recursive: true });
-    const res = await fetch(absoluteUrl);
+    const res = await fetch(absoluteUrl, { headers: { Authorization: `users API-Key ${apiToken}` } });
     if (!res.ok) throw new Error(`Medien-Download fehlgeschlagen (${res.status}): ${absoluteUrl}`);
     const buffer = Buffer.from(await res.arrayBuffer());
     fs.writeFileSync(outPath, buffer);
@@ -49,13 +51,73 @@ async function downloadMedia(url: string, payloadBaseUrl: string): Promise<strin
   return `/media/cms/${filename}`;
 }
 
+const CMS_MEDIA_PFAD = '/api/media/file/';
+
+/** Pfad einer CMS-Mediendatei, egal ob relativ oder absolut mit beliebiger CMS-Adresse. */
+function cmsMedienPfad(wert: string): string | null {
+  if (wert.startsWith(CMS_MEDIA_PFAD)) return wert;
+  if (!/^https?:\/\//i.test(wert)) return null;
+  const pfad = new URL(wert).pathname;
+  return pfad.startsWith(CMS_MEDIA_PFAD) ? pfad : null;
+}
+
+/**
+ * Spiegelt Medien, die im Rich-Text eingebettet sind, und schreibt ihre URLs auf /media/cms/ um.
+ *
+ * Der Lexical-HTML-Konverter setzt die absolute URL der CMS-Instanz ein (<img src>, <source srcset>
+ * und bei PDFs <a href>). Unveraendert wuerde die statische Seite zur Laufzeit vom CMS abhaengen -
+ * und scheitern: die CSP erlaubt nur img-src 'self', und /api/media ist anonym gesperrt.
+ * Erkannt wird am Pfad /api/media/file/; geladen wird ueber PAYLOAD_URL, weil die im HTML
+ * stehende oeffentliche CMS-Adresse aus dem Build-Server heraus nicht erreichbar sein muss.
+ *
+ * Bilder von anderswo lassen den Build scheitern, statt still eine CSP-Verletzung auszuliefern.
+ */
+const URL_ATTRIBUT = /\b(src|srcset|href)="([^"]*)"/g;
+
+const srcsetKandidaten = (wert: string) => wert.split(',').map((teil) => teil.trim().split(/\s+/)[0] ?? '');
+
+async function spiegleEingebetteteMedien(html: string, payloadUrl: string | undefined, apiToken: string, slug: string): Promise<string> {
+  const lokal = new Map<string, string>();
+
+  for (const [, attribut, wert] of html.matchAll(URL_ATTRIBUT)) {
+    for (const url of attribut === 'srcset' ? srcsetKandidaten(wert) : [wert]) {
+      if (!url || lokal.has(url)) continue;
+      const pfad = cmsMedienPfad(url);
+      if (pfad) {
+        if (!payloadUrl) {
+          throw new Error(`"${slug}": eingebettete CMS-Datei ${url} gefunden, aber PAYLOAD_URL ist nicht gesetzt.`);
+        }
+        lokal.set(url, await downloadMedia(pfad, payloadUrl, apiToken));
+      } else if (attribut !== 'href' && /^(https?:)?\/\//i.test(url)) {
+        throw new Error(
+          `"${slug}": eingebettetes Bild von fremder Herkunft (${url}). Die CSP erlaubt nur eigene Bilder (img-src 'self').`
+        );
+      }
+    }
+  }
+
+  // Nur innerhalb der gefundenen Attribute ersetzen, nicht im Fliesstext.
+  return html.replace(URL_ATTRIBUT, (ganz, attribut: string, wert: string) => {
+    const neu =
+      attribut === 'srcset'
+        ? wert.split(',').map((teil) => {
+            const url = teil.trim().split(/\s+/)[0] ?? '';
+            return lokal.has(url) ? teil.replace(url, lokal.get(url)!) : teil;
+          }).join(',')
+        : (lokal.get(wert) ?? wert);
+    return `${attribut}="${neu}"`;
+  });
+}
+
 async function resolveImage(
   imageGroup: { image?: { url?: string; alt?: string; sizes?: Record<string, { url?: string }> } } | undefined,
-  payloadBaseUrl: string
+  payloadBaseUrl: string,
+  apiToken: string
 ): Promise<{ src: string; alt: string } | undefined> {
   if (!imageGroup?.image?.url) return undefined;
   const cardUrl = imageGroup.image.sizes?.card?.url ?? imageGroup.image.url;
-  const src = await downloadMedia(cardUrl, payloadBaseUrl);
+  // Ueber PAYLOAD_URL laden statt ueber die oeffentliche CMS-Adresse in der URL (siehe cmsMedienPfad).
+  const src = await downloadMedia(cmsMedienPfad(cardUrl) ?? cardUrl, payloadBaseUrl, apiToken);
   return { src, alt: imageGroup.image.alt ?? '' };
 }
 
@@ -117,7 +179,7 @@ export function payloadLoader({ collection }: PayloadLoaderOptions): Loader {
       store.clear();
 
       for (const doc of rawDocs) {
-        const image = await resolveImage(doc.image, payloadUrl ?? '');
+        const image = await resolveImage(doc.image, payloadUrl ?? '', apiToken ?? '');
 
         const baseData: Record<string, unknown> = {
           title: doc.title,
@@ -150,7 +212,8 @@ export function payloadLoader({ collection }: PayloadLoaderOptions): Loader {
               };
 
         const parsed = await parseData({ id: doc.slug, data });
-        store.set({ id: doc.slug, data: parsed, rendered: { html: doc.renderedHtml ?? '' } });
+        const html = await spiegleEingebetteteMedien(doc.renderedHtml ?? '', payloadUrl, apiToken ?? '', doc.slug);
+        store.set({ id: doc.slug, data: parsed, rendered: { html } });
       }
 
       logger.info(`"${collection}": ${rawDocs.length} Dokument(e) geladen.`);

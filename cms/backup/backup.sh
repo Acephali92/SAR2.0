@@ -14,3 +14,13 @@ tar czf "/backups/uploads-$TIMESTAMP.tar.gz" -C /data uploads
 find /backups -name '*.gz' -mtime +14 -delete
 
 echo "[$TIMESTAMP] Backup abgeschlossen: db-$TIMESTAMP.sql.gz, uploads-$TIMESTAMP.tar.gz"
+
+# Optionale Offsite-Kopie (M10): nur aktiv, wenn ein rclone-Ziel UND eine rclone.conf konfiguriert
+# sind. Ohne Konfiguration bleibt das Verhalten wie zuvor (nur lokales Backup).
+if [ -n "${OFFSITE_RCLONE_REMOTE:-}" ] && [ -f /root/.config/rclone/rclone.conf ]; then
+  echo "[$TIMESTAMP] Offsite-Kopie nach $OFFSITE_RCLONE_REMOTE ..."
+  rclone copy /backups "$OFFSITE_RCLONE_REMOTE" --min-age 1m
+  echo "[$TIMESTAMP] Offsite-Kopie abgeschlossen."
+else
+  echo "[$TIMESTAMP] Keine Offsite-Kopie konfiguriert (OFFSITE_RCLONE_REMOTE/rclone.conf fehlen) - nur lokales Backup."
+fi

@@ -37,6 +37,7 @@ const relatedTermine = allTermine
   relatedSlugs={entry.data.relatedSlugs}
   sources={entry.data.sources}
   relatedTermine={relatedTermine}
+  image={entry.data.image ?? undefined}
 >
   <Fragment set:html={entry.rendered?.html} />
 </ArticleLayout>

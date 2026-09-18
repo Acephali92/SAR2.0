@@ -5,8 +5,20 @@
  * (##/###), Absaetze, "- "-Listen und **fett**. Fuer die redaktionelle Alltagsarbeit ist das
  * NICHT relevant - die Redaktion schreibt direkt im Rich-Text-Editor, nicht in Markdown.
  */
+type LexicalNode = { type: string; version: number; [key: string]: unknown };
 
-type LexicalNode = Record<string, unknown>;
+// Bewusst ein type-Alias und kein Interface (wie SerializedEditorState): nur Aliase sind mit der
+// Index-Signatur der generierten Rich-Text-Feldtypen in payload-types.ts kompatibel.
+type LexicalDokument = {
+  root: {
+    type: 'root';
+    children: LexicalNode[];
+    direction: 'ltr' | 'rtl' | null;
+    format: '' | 'left' | 'start' | 'center' | 'right' | 'end' | 'justify';
+    indent: number;
+    version: number;
+  };
+};
 
 function textNode(text: string, bold = false): LexicalNode {
   return {
@@ -69,7 +81,7 @@ function listNode(items: string[]): LexicalNode {
   };
 }
 
-export function markdownToLexical(markdown: string): Record<string, unknown> {
+export function markdownToLexical(markdown: string): LexicalDokument {
   const lines = markdown.split('\n');
   const children: LexicalNode[] = [];
   let listBuffer: string[] = [];

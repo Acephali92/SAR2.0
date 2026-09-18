@@ -106,6 +106,19 @@ Nachrichten, Analysen und Termine werden **nicht** mehr als Markdown-Datei gepfl
 1. `https://redaktion.stoppramstein.de` aufrufen.
 2. Mit E-Mail-Adresse und Passwort anmelden (Zugang von Admin einrichten lassen). Passwort vergessen? "Passwort zurücksetzen" auf der Login-Seite nutzen.
 
+### Die Übersicht nach dem Anmelden
+
+Direkt nach dem Login steht oben auf der Startseite die **Redaktions-Übersicht** mit vier Listen:
+
+| Liste | Zeigt |
+|---|---|
+| Offene Entwürfe | Alles im Status „Entwurf" |
+| Warten auf Freigabe | Alles im Status „Zur Freigabe" |
+| Geplante Veröffentlichungen | Alles mit einem Termin in „Geplante Veröffentlichung", der noch bevorsteht |
+| Anstehende Termine | Veranstaltungen ab heute, ohne abgesagte |
+
+Jede Zeile führt per Klick direkt in das jeweilige Dokument. Mit der Rolle Autor erscheinen nur die eigenen Beiträge und Termine, mit Redaktion und Admin alle. Leere Listen sind normal und kein Fehler.
+
 ### Rollen
 
 Jede angemeldete Person hat genau eine Rolle. Die Rolle bestimmt, was sie in der Redaktionsoberfläche sehen und tun darf:
@@ -144,9 +157,35 @@ Jeder Beitrag und jeder Termin durchläuft drei Stufen. Dieses Vier-Augen-Prinzi
 
 1. **Entwurf** — Autor schreibt und bearbeitet in Ruhe, jederzeit änderbar, nur für die eigene Person sichtbar.
 2. **Zur Freigabe** — Autor reicht den fertigen Entwurf ein (Status im rechten Seitenmenü auf „Zur Freigabe" umstellen). Ab diesem Punkt kann nur noch Redaktion oder Admin etwas ändern — so wird verhindert, dass sich Text und Freigabe-Entscheidung auseinanderentwickeln.
-3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung) und schaltet frei. Ab jetzt ist der Beitrag öffentlich auf der Website sichtbar.
+3. **Veröffentlicht** — Redaktion oder Admin prüft den Inhalt (Fakten, Quellen, Rechtschreibung), stellt den Status auf „Veröffentlicht" **und klickt oben auf „Änderungen veröffentlichen"**. Erst wenn beides erfolgt ist, ist der Beitrag öffentlich auf der Website sichtbar. Nur „Speichern" bzw. „Entwurf speichern" reicht nicht — dann bleibt der Stand ein Entwurf.
+
+Dasselbe gilt für spätere Korrekturen an einem bereits veröffentlichten Beitrag: Solange nur als Entwurf gespeichert wird, bleibt öffentlich die bisherige Fassung stehen, und der Entwurf ist für niemanden außerhalb der Redaktionsoberfläche sichtbar. Erst „Änderungen veröffentlichen" macht die Korrektur zur öffentlichen Fassung — die Website baut sich daraufhin automatisch neu, die Korrektur ist nach wenigen Minuten online.
 
 Redaktion kann einen eingereichten Entwurf jederzeit zurück auf „Entwurf" setzen, zum Beispiel mit einem Korrekturwunsch, oder einen bereits veröffentlichten Beitrag wieder zurückziehen (z. B. wenn sich nachträglich ein Fehler zeigt).
+
+### Vorschau vor dem Veröffentlichen
+
+In jedem Beitrag und Termin gibt es oben rechts den Knopf **Vorschau** (Symbol „Link nach außen"). Er öffnet in einem neuen Tab eine Ansicht, die Titel, Anrisstext, Bild mit Alt-Text, Kategorie bzw. Art der Veranstaltung, den fertig gesetzten Text, die Quellen und die verknüpften Beiträge/Termine so zeigt, wie sie auf der Website ungefähr wirken. Oben steht ein gelber Hinweis „Vorschau — nicht öffentlich" samt aktuellem Status.
+
+Wichtig zu wissen:
+
+- Die Vorschau läuft **ausschließlich innerhalb der Redaktionsoberfläche** und verlangt eine Anmeldung. Es gibt keine Vorschau-Adresse, die sich an Außenstehende weitergeben ließe — wer den Link ohne Anmeldung öffnet, bekommt nur eine Fehlerseite.
+- Sie zeigt auch **unveröffentlichte Entwürfe**, inklusive der zuletzt automatisch gespeicherten Änderungen.
+- Sie bildet Schrift und Abstände der Website nach, ist aber **keine pixelgenaue Kopie** — Kopf- und Fußzeile der Website fehlen bewusst.
+- Mit der Rolle Autor lassen sich nur eigene Dokumente vorschauen, mit Redaktion und Admin alle.
+
+### Ältere Fassungen wiederherstellen
+
+Das System speichert automatisch frühere Fassungen (Reiter **Versionen** im Dokument). Wer welche zurückholen darf:
+
+| Rolle | Darf wiederherstellen |
+|-------|----------------------|
+| **Autor** | Nur eigene Dokumente, und nur solange sie **nicht veröffentlicht** sind. Fremde Dokumente sind weder sichtbar noch wiederherstellbar. |
+| **Redaktion / Admin** | Jede Fassung jedes Beitrags und Termins, auch bei veröffentlichten Inhalten. |
+
+„Wiederherstellen" überschreibt den aktuellen Stand mit der gewählten älteren Fassung — der bisherige Stand geht dabei nicht verloren, sondern wird selbst wieder als Version abgelegt. Der Freigabestatus ändert sich nicht heimlich mit: Ein veröffentlichter Beitrag bleibt veröffentlicht, und die Website wird nur dann neu gebaut, wenn sich der Status tatsächlich auf oder von „Veröffentlicht" ändert.
+
+Versucht man als Autor, eine veröffentlichte Fassung zurückzusetzen, erscheint ein deutscher Hinweis mit der Bitte, die Redaktion anzusprechen.
 
 ### Zeitgesteuerte Veröffentlichung
 
@@ -162,7 +201,7 @@ Nichts, was du selbst noch tun musst — die Website baut sich **automatisch neu
 In der Regel wenige Minuten nach der Veröffentlichung. Bei einer zeitgesteuerten Veröffentlichung kann es zusätzlich bis zu rund fünf bis zehn Minuten nach dem geplanten Zeitpunkt dauern, da das System nur in diesem Abstand nachschaut.
 
 **Ich habe nach der Veröffentlichung einen Fehler gefunden — was jetzt?**
-Beitrag öffnen, korrigieren und erneut speichern. Läuft der Beitrag bereits, wird die Korrektur beim nächsten automatischen Rebuild live übernommen. Bei gravierenden Fehlern kann Redaktion den Beitrag jederzeit kurzzeitig auf „Entwurf" zurücksetzen, bis die Korrektur fertig ist.
+Beitrag öffnen, korrigieren und oben auf „Änderungen veröffentlichen" klicken. Die Website baut sich daraufhin automatisch neu, die Korrektur ist nach wenigen Minuten online. (Nur „Entwurf speichern" reicht nicht — dann bleibt öffentlich die alte Fassung stehen.) Bei gravierenden Fehlern kann Redaktion den Beitrag jederzeit kurzzeitig auf „Entwurf" zurücksetzen, bis die Korrektur fertig ist.
 
 **Warum sehe ich nicht die Entwürfe von anderen im Team?**
 Das ist Absicht (siehe Rollen-Tabelle oben): Autor sieht nur eigene Entwürfe, damit niemand versehentlich fremde, noch unfertige Texte bearbeitet. Redaktion und Admin sehen alles.

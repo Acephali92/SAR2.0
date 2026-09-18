@@ -42,6 +42,9 @@ async function upsertBeitrag(payload: Awaited<ReturnType<typeof getPayload>>, fi
       body: markdownToLexical(content),
       tags: (data.tags ?? []).map((tag: string) => ({ tag })),
       freigabeStatus: 'veroeffentlicht',
+      // Oeffentlich lesbar ist nur freigabeStatus=veroeffentlicht UND _status=published
+      // (src/access/readPublishedOrSession.ts) - ohne _status bliebe der Import unsichtbar.
+      _status: 'published',
       publishedAt: new Date(data.publishedAt).toISOString(),
     },
   });
@@ -73,6 +76,7 @@ async function upsertTermin(payload: Awaited<ReturnType<typeof getPayload>>, fil
       registrationUrl: data.registrationUrl,
       eventStatus: data.status ?? 'upcoming',
       freigabeStatus: 'veroeffentlicht',
+      _status: 'published',
       publishedAt: new Date(data.publishedAt).toISOString(),
     },
   });

@@ -2,10 +2,12 @@
 /*
  * CSP Compliance Checker for Static Site
  *
- * Production uses `script-src 'self'` (see CLAUDE.md). Scans dist/*.html for
- * inline <script> tags (no src attribute) and inline event handler
- * attributes (onclick, onload, ...), both of which are blocked by that
- * policy. Exits with code 1 if any violations are found.
+ * Production uses `script-src 'self'` and `img-src 'self' data:` (see CLAUDE.md,
+ * deploy/). Scans dist/*.html for inline <script> tags (no src attribute),
+ * inline event handler attributes (onclick, onload, ...), cross-origin images
+ * and references to the CMS media endpoint (/api/media/), all of which break
+ * that policy or the "site survives CMS outage" rule. Exits with code 1 if any
+ * violations are found.
  *
  * Usage: node scripts/check-csp.mjs
  */
@@ -79,6 +81,29 @@ function findViolations(html, filePath) {
         });
       }
     }
+  }
+
+  // img-src 'self' data: - Bilder (<img>, <source>) duerfen nur von der eigenen Seite kommen.
+  const imageTagRegex = /<(?:img|source)\b[^>]*>/gi;
+  while ((match = imageTagRegex.exec(html)) !== null) {
+    const tag = match[0];
+    const urls = [];
+    const src = tag.match(/\bsrc\s*=\s*["']([^"']*)["']/i);
+    if (src) urls.push(src[1]);
+    const srcset = tag.match(/\bsrcset\s*=\s*["']([^"']*)["']/i);
+    if (srcset) urls.push(...srcset[1].split(',').map((part) => part.trim().split(/\s+/)[0]));
+    for (const url of urls) {
+      if (/^(https?:)?\/\//i.test(url)) {
+        violations.push({ file: filePath, type: "cross-origin-image (img-src 'self')", excerpt: url.slice(0, 80) });
+      }
+    }
+  }
+
+  // Verweise auf Payloads Medien-Endpunkt: die statische Seite darf das CMS zur Laufzeit nicht
+  // brauchen (und /api/media ist anonym gesperrt). payload-loader.ts spiegelt Medien nach /media/cms/.
+  const cmsMediaRegex = /\b(?:src|srcset|href)\s*=\s*["'][^"']*\/api\/media\/[^"']*["']/gi;
+  while ((match = cmsMediaRegex.exec(html)) !== null) {
+    violations.push({ file: filePath, type: 'cms-runtime-reference (/api/media)', excerpt: match[0].slice(0, 80) });
   }
 
   return violations;

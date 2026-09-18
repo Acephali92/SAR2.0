@@ -42,6 +42,10 @@ services:
       - pgdata:/var/lib/postgresql/data:ro
       - uploads:/data/uploads:ro
       - backups:/backups
+      # Optional (M10): rclone-Konfiguration fuer die Offsite-Kopie. Erst einkommentieren, sobald
+      # ein Anbieter gewaehlt und secrets/rclone.conf per `rclone config` erzeugt wurde - siehe
+      # docs/DEPLOYMENT.md, "Backups & Wiederherstellung".
+      # - ./secrets/rclone.conf:/root/.config/rclone/rclone.conf:ro
 
 volumes:
   pgdata:

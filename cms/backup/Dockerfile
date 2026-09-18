@@ -1,5 +1,5 @@
 FROM postgres:16-alpine
-RUN apk add --no-cache dcron
+RUN apk add --no-cache dcron rclone
 COPY backup.sh /backup.sh
 COPY crontab /etc/crontabs/root
 RUN chmod +x /backup.sh

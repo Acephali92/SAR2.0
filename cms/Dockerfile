@@ -11,12 +11,17 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+# cms/ hat (noch) kein public/-Verzeichnis; ohne es scheitert unten "COPY --from=builder /app/public".
+RUN mkdir -p public
 RUN npm run build
 
 FROM base AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Fuehrt beim Serverstart ausstehende Migrationen aus (cms/src/migrations/, via prodMigrations in
+# payload.config.ts). Ohne das bekaeme ein frischer Produktionsserver kein Datenbankschema.
+ENV PAYLOAD_AUTO_MIGRATE=true
 RUN addgroup -S payload && adduser -S payload -G payload
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
@@ -25,4 +30,7 @@ COPY --from=builder /app/package.json ./package.json
 RUN mkdir -p /data/uploads && chown -R payload:payload /data/uploads
 USER payload
 EXPOSE 3000
+# Migrationen laufen beim Start innerhalb des Servers (PAYLOAD_AUTO_MIGRATE oben). Ein vorgeschaltetes
+# "npx payload migrate" funktioniert hier nicht: das Image enthaelt weder src/payload.config.ts noch
+# src/migrations/.
 CMD ["npm", "run", "start"]

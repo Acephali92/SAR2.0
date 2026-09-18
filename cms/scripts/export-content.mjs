@@ -31,8 +31,15 @@ async function exportCollection(payload, collection, mapFrontmatter) {
 
   const { docs } = await payload.find({
     collection,
-    where: { status: { equals: 'veroeffentlicht' } },
+    // Dieselbe Definition von "oeffentlich" wie src/access/readPublishedOrSession.ts - freigabeStatus
+    // allein wuerde auch Dokumente exportieren, die in Payload nie veroeffentlicht wurden.
+    where: {
+      and: [{ freigabeStatus: { equals: 'veroeffentlicht' } }, { _status: { equals: 'published' } }],
+    },
     depth: 1,
+    // Aus verknuepften Nutzern (createdBy, author) nur den Namen - sonst landen E-Mail-Adressen,
+    // Session-IDs und ggf. entschluesselte API-Keys der Redaktion im Export.
+    populate: { users: { name: true } },
     limit: 1000,
   });
 
@@ -72,7 +79,6 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+// Top-Level-await ist noetig: "payload run" importiert dieses Skript und ruft direkt danach
+// process.exit(0) auf - ohne await wuerde der Export abgebrochen, bevor er etwas schreibt.
+await main();

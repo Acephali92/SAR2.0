@@ -4,9 +4,13 @@ import { slugField } from '../fields/slugField';
 import { statusField, createdByField, publishAtField, publishedAtField } from '../fields/statusField';
 import { setCreatedBy } from '../hooks/setCreatedBy';
 import { setPublishedAt } from '../hooks/setPublishedAt';
-import { triggerRebuild } from '../hooks/triggerRebuild';
+import { merkeOeffentlichenStand, triggerRebuild } from '../hooks/triggerRebuild';
 import { addRenderedHtml } from '../hooks/addRenderedHtml';
+import { restrictVersionRestore } from '../hooks/restrictVersionRestore';
 import { ownDraftOrRedaktion, ownDraftOnlyDelete } from '../access/ownDraftOrRedaktion';
+import { canReadVersions } from '../access/canReadVersions';
+import { readPublishedOrSession } from '../access/readPublishedOrSession';
+import { vorschauUrl } from '../lib/vorschauUrl';
 
 /**
  * Termine (Veranstaltungen) - ersetzt die bisherige Astro-Collection `aktionen`.
@@ -23,22 +27,21 @@ export const Termine: CollectionConfig = {
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'startDate', 'eventStatus', 'freigabeStatus'],
+    preview: vorschauUrl('termine'),
   },
   versions: {
     drafts: { autosave: { interval: 2000 } },
     maxPerDoc: 50,
   },
   access: {
-    read: ({ req }) => {
-      if (req.user) return true;
-      return { freigabeStatus: { equals: 'veroeffentlicht' } };
-    },
+    read: readPublishedOrSession,
     create: ({ req }) => !!req.user,
     update: ownDraftOrRedaktion,
     delete: ownDraftOnlyDelete,
+    readVersions: canReadVersions,
   },
   hooks: {
-    beforeChange: [setCreatedBy, setPublishedAt],
+    beforeChange: [restrictVersionRestore, setCreatedBy, setPublishedAt, merkeOeffentlichenStand],
     afterChange: [triggerRebuild],
     afterRead: [addRenderedHtml],
   },
