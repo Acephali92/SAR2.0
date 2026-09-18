@@ -31,7 +31,7 @@ async function exportCollection(payload, collection, mapFrontmatter) {
 
   const { docs } = await payload.find({
     collection,
-    where: { status: { equals: 'veroeffentlicht' } },
+    where: { freigabeStatus: { equals: 'veroeffentlicht' } },
     depth: 1,
     limit: 1000,
   });

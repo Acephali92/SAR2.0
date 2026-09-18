@@ -31,6 +31,10 @@ interface Props {
   sources?: Array<{ label: string; url: string }>;
   /** Verknüpfte Termine (M6), gerendert als "Verknüpfter Termin"-Block */
   relatedTermine?: Array<{ slug: string; title: string }>;
+  image?: {
+    src: string;
+    alt: string;
+  };
   canonicalUrl?: string;
   ogImage?: string;
 }
@@ -45,6 +49,7 @@ const {
   relatedSlugs = [],
   sources = [],
   relatedTermine = [],
+  image,
   canonicalUrl,
   ogImage,
 } = Astro.props;
@@ -67,7 +72,7 @@ const readingTime = '5 Min. Lesezeit';
   title={title}
   description={description}
   canonicalUrl={canonicalUrl}
-  ogImage={ogImage}
+  ogImage={ogImage || image?.src}
 >
   <div class="flex min-h-screen flex-col">
     <Header />

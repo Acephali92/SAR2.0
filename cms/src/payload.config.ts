@@ -20,6 +20,8 @@ export default buildConfig({
   secret: process.env.PAYLOAD_SECRET ?? '',
   admin: {
     user: Users.slug,
+    // M8: kein Aufruf von gravatar.com (US) beim Laden der Admin-Oberflaeche.
+    avatar: 'default',
     meta: {
       titleSuffix: '- Redaktion Stopp Air Base Ramstein',
     },

@@ -23,11 +23,16 @@ export function istApiKeyZugriff(user: unknown): boolean {
 }
 
 /**
- * Angemeldete Menschen (Session-Login der Admin-UI) sehen alles; die Rollenlogik greift dort ueber
- * update/delete. Anonyme Anfragen UND API-Key-Anfragen (Build-Nutzer des Astro-Loaders) sehen nur
- * Veroeffentlichtes - der Build darf nie Entwuerfe in die statische Seite ziehen.
+ * Redaktion/Admin (Session-Login) sehen alles. Autor sieht nur Veroeffentlichtes oder eigene
+ * Dokumente - nicht die Entwuerfe anderer Autor:innen (analog zu ownDraftOrRedaktion.ts, das
+ * dieselbe Einschraenkung fuer update/delete durchsetzt). Anonyme Anfragen UND API-Key-Anfragen
+ * (Build-Nutzer des Astro-Loaders) sehen nur Veroeffentlichtes - der Build darf nie Entwuerfe in
+ * die statische Seite ziehen.
  */
 export const readPublishedOrSession: Access = ({ req }) => {
-  if (req.user && !istApiKeyZugriff(req.user)) return true;
+  if (req.user && !istApiKeyZugriff(req.user)) {
+    if (req.user.role === 'redaktion' || req.user.role === 'admin') return true;
+    return { or: [nurVeroeffentlicht, { createdBy: { equals: req.user.id } }] };
+  }
   return nurVeroeffentlicht;
 };
