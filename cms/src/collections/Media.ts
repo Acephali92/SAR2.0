@@ -9,9 +9,25 @@ export const Media: CollectionConfig = {
     staticDir: process.env.UPLOAD_DIR ?? 'uploads',
     mimeTypes: ['image/png', 'image/jpeg', 'image/webp', 'application/pdf'],
     imageSizes: [
-      { name: 'thumbnail', width: 400, fit: 'inside' },
-      { name: 'card', width: 800, fit: 'inside' },
-      { name: 'og', width: 1200, height: 630, fit: 'cover' },
+      {
+        name: 'thumbnail',
+        width: 400,
+        fit: 'inside',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'card',
+        width: 800,
+        fit: 'inside',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
+      {
+        name: 'og',
+        width: 1200,
+        height: 630,
+        fit: 'cover',
+        formatOptions: { format: 'webp', options: { quality: 80 } },
+      },
     ],
     adminThumbnail: 'thumbnail',
     formatOptions: { format: 'webp', options: { quality: 80 } },

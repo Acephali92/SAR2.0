@@ -122,7 +122,17 @@ Mehrere Publish-Ereignisse kurz hintereinander werden nicht parallel gebaut — 
 
 **Nächtliches Backup** (03:00 Uhr, `cms/backup/backup.sh`): `pg_dump` (gzip) der Datenbank + `tar` des Uploads-Volumes, 14 Tage lokale Aufbewahrung. Liegt unter dem `backups`-Volume im `backup`-Container.
 
-> Offsite-Kopie noch offen: siehe [REDAKTION-TODO.md](./REDAKTION-TODO.md) — lokale Backups allein schützen nicht vor Totalausfall des Servers.
+**Offsite-Kopie (optional, per rclone):** Der `backup`-Container enthält bereits `rclone`; die Kopie läuft automatisch am Ende von `backup.sh` mit, sobald konfiguriert. Einmalige Einrichtung, sobald ein zweiter, räumlich getrennter EU-Anbieter feststeht (z. B. ein weiterer Object-Storage-Anbieter):
+
+```bash
+cd cms
+docker compose run --rm backup rclone config   # interaktiv: Remote anlegen, Zugangsdaten eingeben
+# Ergebnis nach secrets/rclone.conf kopieren (Pfad im Container: /root/.config/rclone/rclone.conf)
+```
+
+Danach in `cms/docker-compose.yml` den Mount `./secrets/rclone.conf:/root/.config/rclone/rclone.conf:ro` im `backup`-Service einkommentieren und in `.env` `OFFSITE_RCLONE_REMOTE=<remote-name>:<pfad>` setzen (siehe `.env.example`). Ohne diese beiden Schritte läuft weiterhin nur das lokale Backup — kein Verhaltensunterschied.
+
+Welcher Anbieter das konkret sein soll, ist noch offen — siehe [REDAKTION-TODO.md](./REDAKTION-TODO.md).
 
 **Wiederherstellung:**
 
@@ -154,6 +164,8 @@ npm run export   # schreibt nach cms/exports/{beitraege,termine}/
 
 ## Server-Konfiguration (Caddy)
 
+Versionierte Vorlage: [`deploy/Caddyfile.example`](../deploy/Caddyfile.example) — Domain anpassen und als `/etc/caddy/Caddyfile` einspielen.
+
 ```caddyfile
 stoppramstein.de {
     root * /var/www/stoppramstein
@@ -174,6 +186,8 @@ stoppramstein.de {
 ```
 
 ## Server-Konfiguration (nginx)
+
+Versionierte Vorlage: [`deploy/nginx.conf.example`](../deploy/nginx.conf.example) — Domain und TLS-Zertifikatspfade anpassen und nach `/etc/nginx/sites-available/` einspielen.
 
 ```nginx
 server {
@@ -202,7 +216,7 @@ server {
 }
 ```
 
-Weder eine `Caddyfile` noch eine nginx-Config liegt aktuell im Repository — diese Blöcke sind Referenzkonfiguration für das Deploy-Ziel, keine versionierten Dateien dieses Projekts.
+Beide Blöcke oben liegen zusätzlich als versionierte Vorlage unter `deploy/` (`Caddyfile.example`/`nginx.conf.example`), damit die tatsächliche Server-Konfiguration nicht nur aus dieser Doku abgetippt werden muss. Welcher der beiden Webserver produktiv läuft, ist noch offen — siehe [REDAKTION-TODO.md](./REDAKTION-TODO.md).
 
 ## 404-Handling
 

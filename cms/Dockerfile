@@ -27,4 +27,7 @@ COPY --from=builder /app/package.json ./package.json
 RUN mkdir -p /data/uploads && chown -R payload:payload /data/uploads
 USER payload
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+# Wendet vor dem Start alle ausstehenden Migrationen an (cms/src/migrations/) - sonst bekommt ein
+# frischer Produktionsserver kein Datenbankschema, da NODE_ENV=production Payloads automatisches
+# "Push" deaktiviert (siehe docs/REDAKTION-TODO.md, "LAUNCH-BLOCKER").
+CMD ["sh", "-c", "npx payload migrate && npm run start"]
