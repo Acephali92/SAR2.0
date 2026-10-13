@@ -30,8 +30,8 @@ Der Verein erfüllt diese Zwecke durch:
 Füllen Sie den Antrag auf Fördermitgliedschaft aus und senden Sie ihn an:
 
 Aktiv für den Frieden – Stopp Ramstein e.V.
-Postfach 27 04 15
-13474 Berlin
+Saarstr. 2
+67366 Weingarten
 
 **Per E-Mail:**
 
