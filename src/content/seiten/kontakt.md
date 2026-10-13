@@ -8,10 +8,10 @@ showInNav: true
 
 ## So erreichen Sie uns
 
-**Aktionsbüro**
+**Aktiv für den Frieden – Stopp Ramstein e.V.**
 Stopp Air Base Ramstein Kampagne
-Marienstr. 19/20
-10117 Berlin
+Saarstr. 2
+67366 Weingarten
 
 ## E-Mail
 
@@ -24,7 +24,7 @@ Für allgemeine Anfragen:
 
 ## Presseanfragen
 
-Für Presseanfragen und Interview-Anfragen wenden Sie sich bitte an unser Aktionsbüro.
+Für Presseanfragen und Interview-Anfragen wenden Sie sich bitte direkt an uns.
 
 [Zur Presseseite →](/presse/)
 

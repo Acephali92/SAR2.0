@@ -2,7 +2,7 @@
 title: "Datenschutzerklärung"
 description: "Informationen zum Datenschutz auf der Website der Stopp Air Base Ramstein Kampagne."
 publishedAt: 2024-01-01
-updatedAt: 2026-09-16
+updatedAt: 2026-10-13
 pageWidth: "narrow"
 showInNav: false
 ---
@@ -11,9 +11,10 @@ showInNav: false
 
 ## 1. Verantwortliche Stelle
 
+Aktiv für den Frieden – Stopp Ramstein e.V.
 Stopp Air Base Ramstein Kampagne
-Marienstr. 19/20
-10117 Berlin
+Saarstr. 2
+67366 Weingarten
 
 **E-Mail:** info@stoppramstein.de
 

@@ -6,12 +6,12 @@ pageWidth: "narrow"
 showInNav: false
 ---
 
-## Angaben gemäß § 5 TMG
+## Angaben gemäß § 5 DDG
 
-**Aktionsbüro**
+**Aktiv für den Frieden – Stopp Ramstein e.V.**
 Stopp Air Base Ramstein Kampagne
-Marienstr. 19/20
-10117 Berlin
+Saarstr. 2
+67366 Weingarten
 
 ## Kontakt
 
