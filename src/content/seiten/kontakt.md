@@ -18,10 +18,6 @@ Saarstr. 2
 Für allgemeine Anfragen:
 **info@stoppramstein.de**
 
-## Telefon
-
-**0152 / 266 038 72**
-
 ## Presseanfragen
 
 Für Presseanfragen und Interview-Anfragen wenden Sie sich bitte direkt an uns.

@@ -13,16 +13,19 @@ Stopp Air Base Ramstein Kampagne
 Saarstr. 2
 67366 Weingarten
 
+Registergericht: Amtsgericht Berlin-Charlottenburg
+
+Vereinsregisternummer: VR 35809
+
 ## Kontakt
 
 **E-Mail:** info@stoppramstein.de
-**Telefon:** 0152 / 266 038 72
 
 ## Verantwortlich für den Inhalt
 
-V.i.S.d.P.: Pascal Luig
+V.i.S.d.P.: Aktiv für den Frieden – Stopp Ramstein e.V., Saarstr. 2, 67366 Weingarten
 
-Redaktionelle Bearbeitung: Pascal Luig
+Redaktionelle Bearbeitung: Alexander C. Wolf
 
 ## Haftung für Links
 
