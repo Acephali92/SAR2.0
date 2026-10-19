@@ -11,7 +11,6 @@ showInNav: false
 Für Medienanfragen wenden Sie sich bitte an:
 
 **E-Mail:** info@stoppramstein.de
-**Telefon:** 0152 / 266 038 72
 
 ## Pressemitteilungen
 
