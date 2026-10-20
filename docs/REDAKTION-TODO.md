@@ -35,7 +35,7 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 
 - **GESCHLOSSEN (2026-10-21): Keine automatische Abhängigkeitspflege.** Dependabot war nicht eingerichtet: Alerts und Security-Updates waren aus, und ein `.github/dependabot.yml` gab es nicht. *Fix:* `.github/dependabot.yml` legt Folgendes fest:
   - **Versions-Updates:** wöchentlich und gebündelt für `github-actions` und `npm` im Root-Projekt. Ein neues Release wird erst nach 7 Tagen vorgeschlagen (`cooldown`, Schutz vor kompromittierten Releases).
-  - **Major-Updates gesperrt:** für Astro und Tailwind, wegen der Stack-Vorgabe Astro 5.x und Tailwind CSS 3.x.
+  - **Major-Updates:** Auch die von Astro und Tailwind werden vorgeschlagen, jedes als eigener, ungebündelter PR. Major-Versionen bringen Breaking Changes, deshalb ist für jeden dieser PRs eine Migration von Hand nötig. Ob der Build bricht, zeigt die CI. `guidelines.md` legt den Stack in Abschnitt 2 „Fixed Tech Stack“ als fest auf Astro 5.x und Tailwind CSS 3.x fest. Einen solchen PR zu mergen ist daher eine bewusste Änderung dieser Vorgabe. Im selben Zug müssen die Stack-Angaben in `guidelines.md`, `CLAUDE.md` und `README.md` angepasst werden.
   - **`cms/`:** bewusst nur Security-Updates, keine Versions-Updates.
 
   Security-Updates werden pro Bereich zu einem PR gebündelt. Dependabot-Alerts und Security-Updates werden nach dem Merge in den Repo-Einstellungen eingeschaltet. **Nicht abgedeckt:** das Semgrep-Image in `.github/workflows/security.yml` (`semgrep/semgrep:<version>@sha256:…`). Es steht in einem Workflow und nicht in einem Dockerfile und muss von Hand aktualisiert werden.
@@ -44,7 +44,7 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
   - **Root-Projekt:** 34 (1 kritisch, 23 hoch, 10 mittel). Direkt betroffen sind `astro` (Fix in 5.18.2, innerhalb von Astro 5), `sharp`, `tailwindcss` und `@tailwindcss/typography`.
   - **`cms/`:** 24 (2 kritisch, 7 hoch, 15 mittel), unter anderem `next` (Fix in 16.4.2) und `payload`.
 
-  Die meisten Fixes sollten als Dependabot-Security-PRs kommen. **Entscheidung nötig:** `npm audit` bietet für `tailwindcss` nur einen Fix in Tailwind 4 an. Das widerspricht der Stack-Vorgabe Tailwind 3.x. Zu prüfen ist, ob ein Override der betroffenen Unterabhängigkeit reicht oder ob die Vorgabe angepasst werden muss.
+  Die meisten Fixes sollten als Dependabot-Security-PRs kommen. **Sonderfall `tailwindcss`:** `npm audit` bietet nur einen Fix in Tailwind 4 an. Dependabot schlägt das Major-Update als eigenen PR vor. Bis die Migration auf Tailwind 4 erledigt und gemergt ist, bleibt diese Schwachstelle offen.
 
 ## Screenshot
 
