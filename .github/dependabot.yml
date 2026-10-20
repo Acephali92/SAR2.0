@@ -19,12 +19,14 @@ updates:
     cooldown:
       default-days: 7
     groups:
-      # Major updates (e.g. Astro, Tailwind) stay ungrouped: one PR each, since they need manual migration
+      # Major updates (e.g. Astro, Tailwind) stay ungrouped, security fixes included: one PR each,
+      # since they need manual migration and would otherwise break the whole group
       npm-minor-patch:
         update-types: ['minor', 'patch']
       npm-security:
         applies-to: security-updates
         patterns: ['*']
+        update-types: ['minor', 'patch']
     commit-message:
       prefix: chore
       include: scope
@@ -41,6 +43,7 @@ updates:
       cms-security:
         applies-to: security-updates
         patterns: ['*']
+        update-types: ['minor', 'patch']
     commit-message:
       prefix: chore
       include: scope
