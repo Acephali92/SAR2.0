@@ -12,7 +12,7 @@
  * Usage: node scripts/check-csp.mjs
  */
 
-import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
+import { readFileSync, existsSync, readdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -28,16 +28,12 @@ const EVENT_HANDLER_ATTRS = [
   'onmouseover', 'onmouseout', 'onkeydown', 'onkeyup', 'onfocus', 'onblur',
 ];
 
-// Collect all HTML files recursively
-function getHtmlFiles(dir, files = []) {
-  const entries = readdirSync(dir);
-  for (const entry of entries) {
-    const fullPath = join(dir, entry);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      getHtmlFiles(fullPath, files);
-    } else if (entry.endsWith('.html')) {
-      files.push(fullPath);
+// Collect all HTML files in dist/ recursively
+function getHtmlFiles() {
+  const files = [];
+  for (const entry of readdirSync(DIST_DIR, { recursive: true, withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.html')) {
+      files.push(join(entry.parentPath, entry.name));
     }
   }
   return files;
@@ -118,7 +114,7 @@ function main() {
     process.exit(1);
   }
 
-  const htmlFiles = getHtmlFiles(DIST_DIR);
+  const htmlFiles = getHtmlFiles();
   console.log(`Found ${htmlFiles.length} HTML files\n`);
 
   const allViolations = [];
