@@ -5,6 +5,11 @@ Statische Website der Friedensinitiative „Stopp Air Base Ramstein“ ([stoppra
 ![Screenshot der Startseite](docs/screenshot.png)
 
 ![CI](https://github.com/Acephali92/SAR2.0/actions/workflows/ci.yml/badge.svg)
+![Astro](https://img.shields.io/badge/Astro-BC52EE?style=flat-square&logo=astro&logoColor=white)
+
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
 
 ## Status
 
