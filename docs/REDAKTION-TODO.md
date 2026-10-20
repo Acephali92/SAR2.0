@@ -38,13 +38,27 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
   - **Major-Updates:** Auch die von Astro und Tailwind werden vorgeschlagen, jedes als eigener, ungebündelter PR. Major-Versionen bringen Breaking Changes, deshalb ist für jeden dieser PRs eine Migration von Hand nötig. Ob der Build bricht, zeigt die CI. `guidelines.md` legt den Stack in Abschnitt 2 „Fixed Tech Stack“ als fest auf Astro 5.x und Tailwind CSS 3.x fest. Einen solchen PR zu mergen ist daher eine bewusste Änderung dieser Vorgabe. Im selben Zug müssen die Stack-Angaben in `guidelines.md`, `CLAUDE.md` und `README.md` angepasst werden.
   - **`cms/`:** bewusst nur Security-Updates, keine Versions-Updates.
 
-  Security-Updates werden pro Bereich zu einem PR gebündelt. Dependabot-Alerts und Security-Updates werden nach dem Merge in den Repo-Einstellungen eingeschaltet. **Nicht abgedeckt:** das Semgrep-Image in `.github/workflows/security.yml` (`semgrep/semgrep:<version>@sha256:…`). Es steht in einem Workflow und nicht in einem Dockerfile und muss von Hand aktualisiert werden.
+  Security-Updates werden pro Bereich zu einem PR gebündelt. Major-Sprünge sind davon ausgenommen und kommen als eigene PRs. Sonst bricht ein einziges Major-Update das ganze Bündel: Das erste Root-Bündel (#21) hob `astro` auf 7.2.8, und `npm ci` scheiterte am Peer-Bereich von `@astrojs/tailwind` (`astro ^3 || ^4 || ^5`). Dependabot-Alerts und Security-Updates sind seit 2026-10-21 in den Repo-Einstellungen eingeschaltet. **Nicht abgedeckt:** das Semgrep-Image in `.github/workflows/security.yml` (`semgrep/semgrep:<version>@sha256:…`). Es steht in einem Workflow und nicht in einem Dockerfile und muss von Hand aktualisiert werden.
 
-- **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Ermittelt mit `npm audit --package-lock-only`:
-  - **Root-Projekt:** 34 (1 kritisch, 23 hoch, 10 mittel). Direkt betroffen sind `astro` (Fix in 5.18.2, innerhalb von Astro 5), `sharp`, `tailwindcss` und `@tailwindcss/typography`.
-  - **`cms/`:** 24 (2 kritisch, 7 hoch, 15 mittel), unter anderem `next` (Fix in 16.4.2) und `payload`.
+- **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Laut Dependabot-Alerts (Stand 2026-10-21) sind 132 offen:
+  - **Root-Projekt:** 89 (1 kritisch, 42 hoch, 37 mittel, 9 niedrig).
+  - **`cms/`:** 43 (4 kritisch, 16 hoch, 16 mittel, 7 niedrig).
 
-  Die meisten Fixes sollten als Dependabot-Security-PRs kommen. **Sonderfall `tailwindcss`:** `npm audit` bietet nur einen Fix in Tailwind 4 an. Dependabot schlägt das Major-Update als eigenen PR vor. Bis die Migration auf Tailwind 4 erledigt und gemergt ist, bleibt diese Schwachstelle offen.
+  Dependabot zählt pro Advisory. `npm audit` zählt pro Paket und meldete deshalb weniger (34 bzw. 24).
+
+  **Astro:** Eine frühere Fassung dieses Eintrags nannte, nach `npm audit`, einen Fix in Astro 5.18.2. Das ist falsch. Den kritischen Advisory GHSA-26w7-cxv4-gfx2 behebt erst Astro 7.2.8, zwei hohe brauchen Astro 6.3.3 (GHSA-8hv8-536x-4wqp) bzw. 6.4.6 (GHSA-2pvr-wf23-7pc7). Innerhalb von Astro 5 ist das nicht zu beheben. Für die Seite in ihrer jetzigen Form sind sie nicht ausnutzbar:
+  - **GHSA-26w7-cxv4-gfx2 (kritisch):** Ausführung von Fremdcode über eine präparierte AVIF-Datei in Astros Sharp-Bilddienst. Astro 5.1.1 bringt dafür ein eigenes `sharp@0.33.5` mit. Die Seite nutzt Astros Bildoptimierung aber nicht:
+    - kein `astro:assets` und kein `image()` in `src/content.config.ts`
+    - keine relativen Bilder in `src/content`
+    - CMS-Bilder kopiert `src/lib/payload-loader.ts` unverarbeitet nach `public/media/cms/`
+    - `cms/src/collections/Media.ts` erlaubt kein AVIF
+
+    **Das ändert sich, sobald jemand `astro:assets` oder Bildoptimierung einführt.** Dann ist die Migration auf Astro 7 Pflicht.
+  - **GHSA-8hv8-536x-4wqp, GHSA-2pvr-wf23-7pc7 und GHSA-wrwg-2hg8-v723:** betreffen nur SSR bzw. Server Islands. Die Seite baut statisch (`output: 'static'`).
+
+  **`tailwindcss`:** `npm audit` bietet nur einen Fix in Tailwind 4 an. Dependabot schlägt das Major-Update als eigenen PR vor. Astro 7 und Tailwind 4 gehören zusammen, weil `@astrojs/tailwind` nur bis Astro 5 reicht.
+
+  **`cms/`:** Die CI baut `cms/` nicht. Ein grüner Check bei einem CMS-Security-PR sagt deshalb nichts darüber, ob das CMS danach noch läuft.
 
 ## Screenshot
 
