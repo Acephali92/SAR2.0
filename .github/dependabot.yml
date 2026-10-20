@@ -1,0 +1,53 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    ignore:
+      # Stack requirement (CLAUDE.md): Astro 5.x, Tailwind CSS 3.x
+      - dependency-name: 'astro'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@astrojs/*'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'tailwindcss'
+        update-types: ['version-update:semver-major']
+      - dependency-name: '@tailwindcss/*'
+        update-types: ['version-update:semver-major']
+    groups:
+      npm-minor-patch:
+        update-types: ['minor', 'patch']
+      npm-security:
+        applies-to: security-updates
+        patterns: ['*']
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # cms/ is deferred: security updates only, no version updates
+  - package-ecosystem: npm
+    directory: /cms
+    open-pull-requests-limit: 0
+    schedule:
+      interval: weekly
+    groups:
+      cms-security:
+        applies-to: security-updates
+        patterns: ['*']
+    commit-message:
+      prefix: chore
+      include: scope
