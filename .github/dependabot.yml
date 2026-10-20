@@ -1,0 +1,46 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      # Major updates (e.g. Astro, Tailwind) stay ungrouped: one PR each, since they need manual migration
+      npm-minor-patch:
+        update-types: ['minor', 'patch']
+      npm-security:
+        applies-to: security-updates
+        patterns: ['*']
+    commit-message:
+      prefix: chore
+      include: scope
+
+  # cms/ is deferred: security updates only, no version updates
+  - package-ecosystem: npm
+    directory: /cms
+    open-pull-requests-limit: 0
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7
+    groups:
+      cms-security:
+        applies-to: security-updates
+        patterns: ['*']
+    commit-message:
+      prefix: chore
+      include: scope
