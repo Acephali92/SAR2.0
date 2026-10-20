@@ -33,6 +33,19 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 
   *Verifiziert:* Semgrep meldet außerhalb von `cms/` nichts mehr. `npm run verify` läuft durch, mit denselben 23 HTML-Dateien wie vorher. **Bewusst zurückgestellt:** die 4 Findings in `cms/` (2× Dockerfile ohne `USER`, `spawn` mit `shell` in `cms/webhook/rebuild-server.mjs`, `dangerouslySetInnerHTML` in `cms/src/components/VorschauView.tsx`). Sie erscheinen in GitHub Code Scanning und blockieren keine Pull Requests.
 
+- **GESCHLOSSEN (2026-10-21): Keine automatische Abhängigkeitspflege.** Dependabot war nicht eingerichtet: Alerts und Security-Updates waren aus, und ein `.github/dependabot.yml` gab es nicht. *Fix:* `.github/dependabot.yml` legt Folgendes fest:
+  - **Versions-Updates:** wöchentlich und gebündelt für `github-actions` und `npm` im Root-Projekt. Ein neues Release wird erst nach 7 Tagen vorgeschlagen (`cooldown`, Schutz vor kompromittierten Releases).
+  - **Major-Updates gesperrt:** für Astro und Tailwind, wegen der Stack-Vorgabe Astro 5.x und Tailwind CSS 3.x.
+  - **`cms/`:** bewusst nur Security-Updates, keine Versions-Updates.
+
+  Security-Updates werden pro Bereich zu einem PR gebündelt. Dependabot-Alerts und Security-Updates werden nach dem Merge in den Repo-Einstellungen eingeschaltet. **Nicht abgedeckt:** das Semgrep-Image in `.github/workflows/security.yml` (`semgrep/semgrep:<version>@sha256:…`). Es steht in einem Workflow und nicht in einem Dockerfile und muss von Hand aktualisiert werden.
+
+- **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Ermittelt mit `npm audit --package-lock-only`:
+  - **Root-Projekt:** 34 (1 kritisch, 23 hoch, 10 mittel). Direkt betroffen sind `astro` (Fix in 5.18.2, innerhalb von Astro 5), `sharp`, `tailwindcss` und `@tailwindcss/typography`.
+  - **`cms/`:** 24 (2 kritisch, 7 hoch, 15 mittel), unter anderem `next` (Fix in 16.4.2) und `payload`.
+
+  Die meisten Fixes sollten als Dependabot-Security-PRs kommen. **Entscheidung nötig:** `npm audit` bietet für `tailwindcss` nur einen Fix in Tailwind 4 an. Das widerspricht der Stack-Vorgabe Tailwind 3.x. Zu prüfen ist, ob ein Override der betroffenen Unterabhängigkeit reicht oder ob die Vorgabe angepasst werden muss.
+
 ## Screenshot
 
 - `docs/screenshot.png` wurde aus `screenshots/Screenshot 2026-09-16 182321.png` übernommen (manueller Screenshot der Startseite, da automatisierte Erstellung per Browser-Tool in dieser Session nicht möglich war). Bei Layout-Änderungen an der Startseite aktualisieren.
