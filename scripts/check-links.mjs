@@ -8,26 +8,28 @@
  * Usage: node scripts/check-links.mjs
  */
 
-import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
-import { join, dirname } from 'path';
+import { readFileSync, existsSync, readdirSync } from 'fs';
+import { join, dirname, relative, isAbsolute, sep } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST_DIR = join(__dirname, '..', 'dist');
 
-// Collect all HTML files recursively
-function getHtmlFiles(dir, files = []) {
-  const entries = readdirSync(dir);
-  for (const entry of entries) {
-    const fullPath = join(dir, entry);
-    const stat = statSync(fullPath);
-    if (stat.isDirectory()) {
-      getHtmlFiles(fullPath, files);
-    } else if (entry.endsWith('.html')) {
-      files.push(fullPath);
+// Collect all HTML files in dist/ recursively
+function getHtmlFiles() {
+  const files = [];
+  for (const entry of readdirSync(DIST_DIR, { recursive: true, withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.html')) {
+      files.push(join(entry.parentPath, entry.name));
     }
   }
   return files;
+}
+
+// dist/ is the web server's document root, so a link resolving outside of it is broken on the live site
+function isInsideDist(targetPath) {
+  const rel = relative(DIST_DIR, targetPath);
+  return rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
 }
 
 // Extract links from HTML content
@@ -70,35 +72,23 @@ function checkLink(url, sourceFile) {
     return { valid: true, special: true };
   }
 
-  // Handle absolute paths (starting with /)
-  let targetPath;
-  if (url.startsWith('/')) {
-    // Remove query string and hash
-    const cleanUrl = url.split('?')[0].split('#')[0];
-    targetPath = join(DIST_DIR, cleanUrl);
-  } else {
-    // Relative path
-    const cleanUrl = url.split('?')[0].split('#')[0];
-    targetPath = join(dirname(sourceFile), cleanUrl);
+  // Remove query string and hash; absolute paths (starting with /) resolve from dist/,
+  // relative paths from the linking file
+  const cleanUrl = url.split('?')[0].split('#')[0];
+  const baseDir = url.startsWith('/') ? DIST_DIR : dirname(sourceFile);
+  // url comes from our own build output, and isInsideDist() confines the result to dist/
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+  const targetPath = join(baseDir, cleanUrl);
+  if (!isInsideDist(targetPath)) {
+    return { valid: false, resolved: targetPath };
   }
 
-  // Check if file exists directly
-  if (existsSync(targetPath)) {
-    return { valid: true };
-  }
-
-  // Check if it's a directory with index.html
-  if (existsSync(join(targetPath, 'index.html'))) {
-    return { valid: true };
-  }
-
-  // Check without trailing slash
-  if (targetPath.endsWith('/')) {
-    const withoutSlash = targetPath.slice(0, -1);
-    if (existsSync(withoutSlash)) {
-      return { valid: true };
-    }
-    if (existsSync(join(withoutSlash, 'index.html'))) {
+  // Check the file directly, then as a directory with index.html, then both without trailing slash
+  const candidates = targetPath.endsWith('/') ? [targetPath, targetPath.slice(0, -1)] : [targetPath];
+  for (const candidate of candidates) {
+    // candidate is targetPath (confined to dist/ above), optionally without trailing slash
+    // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+    if (existsSync(candidate) || existsSync(join(candidate, 'index.html'))) {
       return { valid: true };
     }
   }
@@ -115,7 +105,7 @@ function main() {
     process.exit(1);
   }
 
-  const htmlFiles = getHtmlFiles(DIST_DIR);
+  const htmlFiles = getHtmlFiles();
   console.log(`Found ${htmlFiles.length} HTML files\n`);
 
   const brokenLinks = [];
