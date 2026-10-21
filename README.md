@@ -38,7 +38,7 @@ Dev-Server: `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.
 
 ## Stack
 
-Astro 5.x (statische Ausgabe) · Tailwind CSS 3.x · Astro Content Collections mit Zod-Validierung · Pagefind-Suche · TypeScript (strict). Details: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md).
+Astro 7.x (statische Ausgabe) · Tailwind CSS 3.x · Astro Content Collections mit Zod-Validierung · Pagefind-Suche · TypeScript (strict). Details: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md).
 
 Beiträge (Nachrichten/Analysen) und Termine werden über eine selbst gehostete Redaktionsoberfläche (Payload CMS 3 + PostgreSQL, eigenständiges Projekt in `cms/`) gepflegt und fließen nur zur Build-Zeit in die statische Seite ein — die Website bleibt vollständig statisch und funktioniert auch bei einem CMS-Ausfall weiter. CMS-Befehle laufen unter `npm --prefix cms run <script>`, siehe [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 

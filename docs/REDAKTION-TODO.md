@@ -35,7 +35,7 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 
 - **GESCHLOSSEN (2026-10-21): Keine automatische Abhängigkeitspflege.** Dependabot war nicht eingerichtet: Alerts und Security-Updates waren aus, und ein `.github/dependabot.yml` gab es nicht. *Fix:* `.github/dependabot.yml` legt Folgendes fest:
   - **Versions-Updates:** wöchentlich und gebündelt für `github-actions` und `npm` im Root-Projekt. Ein neues Release wird erst nach 7 Tagen vorgeschlagen (`cooldown`, Schutz vor kompromittierten Releases).
-  - **Major-Updates:** Auch die von Astro und Tailwind werden vorgeschlagen, jedes als eigener, ungebündelter PR. Major-Versionen bringen Breaking Changes, deshalb ist für jeden dieser PRs eine Migration von Hand nötig. Ob der Build bricht, zeigt die CI. `guidelines.md` legt den Stack in Abschnitt 2 „Fixed Tech Stack“ als fest auf Astro 5.x und Tailwind CSS 3.x fest. Einen solchen PR zu mergen ist daher eine bewusste Änderung dieser Vorgabe. Im selben Zug müssen die Stack-Angaben in `guidelines.md`, `CLAUDE.md` und `README.md` angepasst werden.
+  - **Major-Updates:** Auch die von Astro und Tailwind werden vorgeschlagen, jedes als eigener, ungebündelter PR. Major-Versionen bringen Breaking Changes, deshalb ist für jeden dieser PRs eine Migration von Hand nötig. Ob der Build bricht, zeigt die CI. `guidelines.md` legt den Stack in Abschnitt 2 „Fixed Tech Stack“ fest, derzeit auf Astro 7.x und Tailwind CSS 3.x. Einen solchen PR zu mergen ist daher eine bewusste Änderung dieser Vorgabe. Im selben Zug müssen die Stack-Angaben in `guidelines.md`, `CLAUDE.md` und `README.md` angepasst werden.
   - **`cms/`:** bewusst nur Security-Updates, keine Versions-Updates.
 
   Security-Updates werden pro Bereich zu einem PR gebündelt. Major-Sprünge sind davon ausgenommen und kommen als eigene PRs. Sonst bricht ein einziges Major-Update das ganze Bündel: Das erste Root-Bündel (#21) hob `astro` auf 7.2.8, und `npm ci` scheiterte am Peer-Bereich von `@astrojs/tailwind` (`astro ^3 || ^4 || ^5`). Dependabot-Alerts und Security-Updates sind seit 2026-10-21 in den Repo-Einstellungen eingeschaltet. **Nicht abgedeckt:** das Semgrep-Image in `.github/workflows/security.yml` (`semgrep/semgrep:<version>@sha256:…`). Es steht in einem Workflow und nicht in einem Dockerfile und muss von Hand aktualisiert werden.
@@ -43,7 +43,21 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 - **GESCHLOSSEN (2026-10-21): `@astrojs/tailwind` blockierte Astro 6/7.** Die Integration ist eingestellt. Ihre letzte Version 6.0.2 verlangt `astro ^3 || ^4 || ^5` und verhinderte damit die Astro-Updates, die mehrere Sicherheitslücken schließen (siehe nächster Punkt). Die Integration selbst hängte nur `tailwindcss` und `autoprefixer` in die PostCSS-Kette von Vite. *Fix:* Das übernimmt jetzt `postcss.config.mjs`. Die Integration ist aus `astro.config.mjs` und `package.json` entfernt, `autoprefixer` ist auf die bisher aufgelöste Version 10.4.23 festgelegt, und in `guidelines.md` §10.1 ersetzt es `@astrojs/tailwind` in der Liste der erlaubten Abhängigkeiten. Unverändert bleiben Tailwind CSS 3, `tailwind.config.mjs` und alle `@apply`-Stellen.
   - *Verifiziert:* Der Build (`dist/`, 97 Dateien) ist byte-genau identisch mit dem Stand vorher, und der Build war vorher nachweislich reproduzierbar. Im Dev-Server werden die Theme-Werte aus `tailwind.config.mjs` korrekt erzeugt. `npm run verify` läuft durch.
   - *Probe mit Astro 7.3.8* in einer Wegwerf-Kopie, nicht committet: Die Installation läuft ohne Peer-Konflikt. `npm run verify` ist grün (0 Fehler, 0 Warnungen, 23 HTML-Dateien, alle Links gültig, keine CSP-Verstöße).
-  - **Offen für das Upgrade auf Astro 7 (Dependabot-PR #18):** `astro check` meldet 59 statt 10 Hinweise, vor allem, dass `z` aus `astro:content` veraltet ist (`src/content.config.ts`). Außerdem minifiziert Astro 7 das CSS anders und teilt es anders auf. Ob die Seite gleich aussieht, muss deshalb ein Screenshot-Vergleich zeigen, ein Textvergleich reicht nicht.
+  - **Offen für das Upgrade auf Astro 7 (Dependabot-PR #18):** `astro check` meldet 59 statt 10 Hinweise, vor allem, dass `z` aus `astro:content` veraltet ist (`src/content.config.ts`). Außerdem minifiziert Astro 7 das CSS anders und teilt es anders auf. Ob die Seite gleich aussieht, muss deshalb ein Screenshot-Vergleich zeigen, ein Textvergleich reicht nicht. Erledigt, siehe nächster Punkt.
+
+- **GESCHLOSSEN (2026-10-21): Upgrade auf Astro 7.** Astro 5.1.1 → 7.3.8, damit kommen Vite 8 und Zod 4. *Änderungen:*
+  - **`src/content.config.ts`:** `z` kommt aus `astro/zod` statt aus `astro:content`. `z.string().url()` wird zu `z.url()`, `z.string().email()` zu `z.email()` (Zod 4). Damit sind die 47 `deprecated`-Warnungen von `astro check` weg.
+  - **`astro.config.mjs`, `compressHTML: true`:** Astro 7 entfernt standardmäßig (`'jsx'`) Leerzeichen zwischen Inline-Elementen. Ohne die Einstellung fehlten auf allen 23 Seiten Leerzeichen, zum Beispiel „Datenschutz·Impressum“ oder die Tags „geopolitikusaarktis“.
+  - **`astro.config.mjs`, `vite.build.cssTarget`:** steht auf dem bisherigen Ziel (Chrome 87, Firefox 78, Safari 14, Edge 88) statt auf dem Vite-8-Standard (Chrome 111, Firefox 114, Safari 16.4). Die Wirkung ist messbar: `clamp()` wird zu `max(min())`, `inset:` wird vermieden, und es gibt mehr `-webkit-`-Präfixe. Ein JS-Ziel ist nicht gesetzt. Es gibt kein gebündeltes JavaScript, und `build.target` als Liste bricht den Build mit Rolldown ab („'es2020' is already specified“).
+  - **`package.json`:** `engines.node` steht auf `>=22.12.0`, wie Astro 7 es verlangt.
+  - **Stack-Angaben** in `CLAUDE.md`, `guidelines.md` und `README.md` stehen jetzt auf Astro 7.x.
+
+  *Verifiziert* durch den Vergleich der Builds von Astro 5 und Astro 7 bei gleichem Inhalt:
+  - **Text:** Der sichtbare Text aller 23 Seiten ist identisch, bis auf ein Zeichen. In `mitmachen/aufruf` (Quelle: `„… ausgehen."`) wird das schließende Anführungszeichen jetzt korrekt deutsch als `“` statt `”` gesetzt (neuer Markdown-Prozessor).
+  - **Struktur:** Element-IDs und Anker sind identisch, die Sitemaps sind byte-gleich, und Pagefind indexiert wie vorher 23 Seiten.
+  - **Screenshots:** alle 23 Seiten bei 1280 und 390 px (Firefox headless, reduzierte Bewegung). Sie sind pixelgleich bis auf dieses Anführungszeichen. Abweichungen am Fortschrittsbalken des Startseiten-Sliders treten auch zwischen zwei Aufnahmen von Astro 5 auf (Animation).
+  - **Prüfungen:** `npm run verify` ist grün, und der Dev-Server liefert die Seiten aus.
+  - **Nicht getestet:** der Loader mit echtem `PAYLOAD_URL`. CI und Tests nutzen die Fixtures.
 
 - **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Laut Dependabot-Alerts (Stand 2026-10-21) sind 132 offen:
   - **Root-Projekt:** 89 (1 kritisch, 42 hoch, 37 mittel, 9 niedrig).
@@ -51,15 +65,13 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 
   Dependabot zählt pro Advisory. `npm audit` zählt pro Paket und meldete deshalb weniger (34 bzw. 24).
 
-  **Astro:** Eine frühere Fassung dieses Eintrags nannte, nach `npm audit`, einen Fix in Astro 5.18.2. Das ist falsch. Den kritischen Advisory GHSA-26w7-cxv4-gfx2 behebt erst Astro 7.2.8, zwei hohe brauchen Astro 6.3.3 (GHSA-8hv8-536x-4wqp) bzw. 6.4.6 (GHSA-2pvr-wf23-7pc7). Innerhalb von Astro 5 ist das nicht zu beheben. Für die Seite in ihrer jetzigen Form sind sie nicht ausnutzbar:
-  - **GHSA-26w7-cxv4-gfx2 (kritisch):** Ausführung von Fremdcode über eine präparierte AVIF-Datei in Astros Sharp-Bilddienst. Astro 5.1.1 bringt dafür ein eigenes `sharp@0.33.5` mit. Die Seite nutzt Astros Bildoptimierung aber nicht:
-    - kein `astro:assets` und kein `image()` in `src/content.config.ts`
-    - keine relativen Bilder in `src/content`
-    - CMS-Bilder kopiert `src/lib/payload-loader.ts` unverarbeitet nach `public/media/cms/`
-    - `cms/src/collections/Media.ts` erlaubt kein AVIF
+  Die Zahlen stammen von vor dem Upgrade auf Astro 7.
 
-    **Das ändert sich, sobald jemand `astro:assets` oder Bildoptimierung einführt.** Dann ist die Migration auf Astro 7 Pflicht.
-  - **GHSA-8hv8-536x-4wqp, GHSA-2pvr-wf23-7pc7 und GHSA-wrwg-2hg8-v723:** betreffen nur SSR bzw. Server Islands. Die Seite baut statisch (`output: 'static'`).
+  **Astro:** Das Upgrade auf Astro 7.3.8 (siehe Punkt davor) schließt die Advisories, die sich innerhalb von Astro 5 nicht beheben ließen:
+  - **GHSA-26w7-cxv4-gfx2 (kritisch, Fix in 7.2.8):** Ausführung von Fremdcode über eine präparierte AVIF-Datei in Astros Sharp-Bilddienst. Für diese Seite war das nicht ausnutzbar, weil sie Astros Bildoptimierung nicht nutzt.
+  - **GHSA-8hv8-536x-4wqp (6.3.3) und GHSA-2pvr-wf23-7pc7 (6.4.6):** Sie betreffen nur SSR, die Seite baut statisch.
+
+  Eine frühere Fassung dieses Eintrags nannte, nach `npm audit`, einen Fix in Astro 5.18.2. Das war falsch.
 
   **`tailwindcss`:** Dependabot führt keinen Alert für `tailwindcss`. Der „Fix nur in Tailwind 4“ aus `npm audit` war eine Zuschreibung über Unterabhängigkeiten. Einen Sicherheitsgrund für Tailwind 4 gibt es also nicht. Seit `@astrojs/tailwind` entfernt ist, hängt das Upgrade auf Astro 7 auch nicht mehr an Tailwind 4 (siehe Punkt davor). Tailwind 4 setzt Safari 16.4+, Chrome 111+ und Firefox 128+ voraus (Tailwind-Upgrade-Guide).
 

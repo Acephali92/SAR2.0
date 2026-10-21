@@ -1,5 +1,5 @@
 /**
- * Content Collections Configuration (Astro 5 Content Layer)
+ * Content Collections Configuration (Astro Content Layer)
  * ===========================================================
  * Single source of truth for alle Content-Schemas.
  *
@@ -14,8 +14,9 @@
  *   cms/ - ersetzt die fruehere analysen/aktionen-Markdown-Collection, siehe docs/ARCHITEKTUR.md)
  */
 
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
 import { payloadLoader } from './lib/payload-loader';
 
 // Base schema shared by the git-based Markdown collections
@@ -37,7 +38,7 @@ const warumRamstein = defineCollection({
       .array(
         z.object({
           label: z.string(),
-          url: z.string().url(),
+          url: z.url(),
         })
       )
       .optional(),
@@ -49,7 +50,7 @@ const mitmachen = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/mitmachen' }),
   schema: baseSchema.extend({
     ctaType: z.enum(['spenden', 'mitgliedschaft', 'ehrenamt', 'petition']),
-    contactEmail: z.string().email().optional(),
+    contactEmail: z.email().optional(),
     order: z.number().default(0),
   }),
 });
