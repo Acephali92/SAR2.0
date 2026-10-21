@@ -38,7 +38,7 @@ This website serves as the official digital presence for the "Stopp Air Base Ram
 
 | Layer | Technology | Version | Rationale |
 |-------|------------|---------|-----------|
-| **Framework** | Astro | 5.x | Static-first, native Markdown support, minimal JS |
+| **Framework** | Astro | 7.x | Static-first, native Markdown support, minimal JS |
 | **Content** | Markdown + Astro Content Collections | — | Type-safe content, file-based routing |
 | **Styling** | Tailwind CSS | 3.x | Utility-first, no runtime CSS-in-JS |
 | **Typography** | IBM Plex (Sans, Serif, Mono) | Self-hosted | No Google Fonts; excellent German language support |

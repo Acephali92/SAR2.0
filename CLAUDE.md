@@ -2,7 +2,7 @@
 
 ## Stack
 
-- **Framework:** Astro 5.x (statische Ausgabe)
+- **Framework:** Astro 7.x (statische Ausgabe)
 - **Styling:** Tailwind CSS 3.x
 - **Content:** Astro Content Collections mit Zod-Validierung (`src/content.config.ts`) — teils Markdown (git), teils aus dem CMS (Build-Zeit-Fetch)
 - **Suche:** Pagefind
