@@ -11,7 +11,7 @@ Statische Website der Friedensinitiative „Stopp Air Base Ramstein“ ([stoppra
 
 ## Status
 
-Kernbereiche sind live: Warum-Ramstein-Argumente (4 Artikel), Analysen (2 Artikel), eine Aktion (Friedenswoche 2026), Mitmach-Seiten (Spenden, Mitgliedschaft, Ehrenamt, Aufruf) sowie die rechtlich nötigen Seiten (Impressum, Datenschutz, Kontakt, Presse, Über uns, Fakten). Laufende Redaktionsarbeit und bekannte offene Punkte: siehe [`docs/REDAKTION-TODO.md`](docs/REDAKTION-TODO.md).
+Kernbereiche sind live: Warum-Ramstein-Argumente (4 Artikel), Analysen (2 Artikel), eine Aktion (Friedenswoche 2026), Mitmach-Seiten (Spenden, Mitgliedschaft, Ehrenamt, Aufruf) sowie die rechtlich nötigen Seiten (Impressum, Datenschutz, Kontakt, Presse, Über uns, Fakten). Offene Punkte für die Redaktion: [`docs/REDAKTION-TODO.md`](docs/REDAKTION-TODO.md). Offene Punkte zu Technik und Betrieb: [`docs/OFFENE-PUNKTE.md`](docs/OFFENE-PUNKTE.md).
 
 ## Schnellstart
 
@@ -51,7 +51,9 @@ Beiträge (Nachrichten/Analysen) und Termine werden über eine selbst gehostete 
 | [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md) | Datenfluss, Komponenten, Content-Schema, Verzeichnisstruktur (mit Diagrammen) |
 | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) | Server-Konfiguration (Caddy/nginx), CSP-Header, Rebuild-Prozess, Team-Vorschau |
 | [`docs/INHALTE-PFLEGEN.md`](docs/INHALTE-PFLEGEN.md) | Anleitung für die Redaktion zum Bearbeiten von Inhalten |
-| [`docs/REDAKTION-TODO.md`](docs/REDAKTION-TODO.md) | Unbelegte Aussagen, bekannte offene Probleme |
+| [`docs/REDAKTION-TODO.md`](docs/REDAKTION-TODO.md) | Für die Redaktion: unbelegte Aussagen, inhaltliche Lücken, offene redaktionelle Entscheidungen |
+| [`docs/OFFENE-PUNKTE.md`](docs/OFFENE-PUNKTE.md) | Technik und Betrieb: Anforderungsstatus, Betreiber-Entscheidungen, offene technische Punkte, bewusste Einschränkungen |
+| [`docs/AENDERUNGSPROTOKOLL.md`](docs/AENDERUNGSPROTOKOLL.md) | Erledigte Fehlerbehebungen, Sicherheitsfixes und Umbauten |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Setup und Ablauf für Ehrenamtliche |
 | [`cms/README.md`](cms/README.md) | Redaktionsoberfläche (Payload CMS 3): lokales Setup, Datenmodell, Scripts, Troubleshooting |
 
