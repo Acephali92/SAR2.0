@@ -40,6 +40,11 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 
   Security-Updates werden pro Bereich zu einem PR gebündelt. Major-Sprünge sind davon ausgenommen und kommen als eigene PRs. Sonst bricht ein einziges Major-Update das ganze Bündel: Das erste Root-Bündel (#21) hob `astro` auf 7.2.8, und `npm ci` scheiterte am Peer-Bereich von `@astrojs/tailwind` (`astro ^3 || ^4 || ^5`). Dependabot-Alerts und Security-Updates sind seit 2026-10-21 in den Repo-Einstellungen eingeschaltet. **Nicht abgedeckt:** das Semgrep-Image in `.github/workflows/security.yml` (`semgrep/semgrep:<version>@sha256:…`). Es steht in einem Workflow und nicht in einem Dockerfile und muss von Hand aktualisiert werden.
 
+- **GESCHLOSSEN (2026-10-21): `@astrojs/tailwind` blockierte Astro 6/7.** Die Integration ist eingestellt. Ihre letzte Version 6.0.2 verlangt `astro ^3 || ^4 || ^5` und verhinderte damit die Astro-Updates, die mehrere Sicherheitslücken schließen (siehe nächster Punkt). Die Integration selbst hängte nur `tailwindcss` und `autoprefixer` in die PostCSS-Kette von Vite. *Fix:* Das übernimmt jetzt `postcss.config.mjs`. Die Integration ist aus `astro.config.mjs` und `package.json` entfernt, `autoprefixer` ist auf die bisher aufgelöste Version 10.4.23 festgelegt, und in `guidelines.md` §10.1 ersetzt es `@astrojs/tailwind` in der Liste der erlaubten Abhängigkeiten. Unverändert bleiben Tailwind CSS 3, `tailwind.config.mjs` und alle `@apply`-Stellen.
+  - *Verifiziert:* Der Build (`dist/`, 97 Dateien) ist byte-genau identisch mit dem Stand vorher, und der Build war vorher nachweislich reproduzierbar. Im Dev-Server werden die Theme-Werte aus `tailwind.config.mjs` korrekt erzeugt. `npm run verify` läuft durch.
+  - *Probe mit Astro 7.3.8* in einer Wegwerf-Kopie, nicht committet: Die Installation läuft ohne Peer-Konflikt. `npm run verify` ist grün (0 Fehler, 0 Warnungen, 23 HTML-Dateien, alle Links gültig, keine CSP-Verstöße).
+  - **Offen für das Upgrade auf Astro 7 (Dependabot-PR #18):** `astro check` meldet 59 statt 10 Hinweise, vor allem, dass `z` aus `astro:content` veraltet ist (`src/content.config.ts`). Außerdem minifiziert Astro 7 das CSS anders und teilt es anders auf. Ob die Seite gleich aussieht, muss deshalb ein Screenshot-Vergleich zeigen, ein Textvergleich reicht nicht.
+
 - **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Laut Dependabot-Alerts (Stand 2026-10-21) sind 132 offen:
   - **Root-Projekt:** 89 (1 kritisch, 42 hoch, 37 mittel, 9 niedrig).
   - **`cms/`:** 43 (4 kritisch, 16 hoch, 16 mittel, 7 niedrig).
@@ -56,7 +61,7 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
     **Das ändert sich, sobald jemand `astro:assets` oder Bildoptimierung einführt.** Dann ist die Migration auf Astro 7 Pflicht.
   - **GHSA-8hv8-536x-4wqp, GHSA-2pvr-wf23-7pc7 und GHSA-wrwg-2hg8-v723:** betreffen nur SSR bzw. Server Islands. Die Seite baut statisch (`output: 'static'`).
 
-  **`tailwindcss`:** `npm audit` bietet nur einen Fix in Tailwind 4 an. Dependabot schlägt das Major-Update als eigenen PR vor. Astro 7 und Tailwind 4 gehören zusammen, weil `@astrojs/tailwind` nur bis Astro 5 reicht.
+  **`tailwindcss`:** Dependabot führt keinen Alert für `tailwindcss`. Der „Fix nur in Tailwind 4“ aus `npm audit` war eine Zuschreibung über Unterabhängigkeiten. Einen Sicherheitsgrund für Tailwind 4 gibt es also nicht. Seit `@astrojs/tailwind` entfernt ist, hängt das Upgrade auf Astro 7 auch nicht mehr an Tailwind 4 (siehe Punkt davor). Tailwind 4 setzt Safari 16.4+, Chrome 111+ und Firefox 128+ voraus (Tailwind-Upgrade-Guide).
 
   **`cms/`:** Die CI baut `cms/` nicht. Ein grüner Check bei einem CMS-Security-PR sagt deshalb nichts darüber, ob das CMS danach noch läuft.
 
