@@ -132,7 +132,7 @@ docker compose run --rm backup rclone config   # interaktiv: Remote anlegen, Zug
 
 Danach in `cms/docker-compose.yml` den Mount `./secrets/rclone.conf:/root/.config/rclone/rclone.conf:ro` im `backup`-Service einkommentieren und in `.env` `OFFSITE_RCLONE_REMOTE=<remote-name>:<pfad>` setzen (siehe `.env.example`). Ohne diese beiden Schritte läuft weiterhin nur das lokale Backup — kein Verhaltensunterschied.
 
-Welcher Anbieter das konkret sein soll, ist noch offen — siehe [REDAKTION-TODO.md](./REDAKTION-TODO.md).
+Welcher Anbieter das konkret sein soll, ist noch offen — siehe [OFFENE-PUNKTE.md](./OFFENE-PUNKTE.md#offsite-backup). Dort stehen auch zwei vermutete Fehler im Backup-Container, die vorher behoben werden sollten.
 
 **Wiederherstellung:**
 
@@ -216,7 +216,7 @@ server {
 }
 ```
 
-Beide Blöcke oben liegen zusätzlich als versionierte Vorlage unter `deploy/` (`Caddyfile.example`/`nginx.conf.example`), damit die tatsächliche Server-Konfiguration nicht nur aus dieser Doku abgetippt werden muss. Welcher der beiden Webserver produktiv läuft, ist noch offen — siehe [REDAKTION-TODO.md](./REDAKTION-TODO.md).
+Beide Blöcke oben liegen zusätzlich als versionierte Vorlage unter `deploy/` (`Caddyfile.example`/`nginx.conf.example`), damit die tatsächliche Server-Konfiguration nicht nur aus dieser Doku abgetippt werden muss. Welcher der beiden Webserver produktiv läuft, ist noch offen — siehe [OFFENE-PUNKTE.md](./OFFENE-PUNKTE.md#hosting-und-webserver).
 
 ## 404-Handling
 

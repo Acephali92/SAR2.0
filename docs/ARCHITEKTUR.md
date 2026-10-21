@@ -6,16 +6,20 @@ Technischer Überblick über SAR2.0: Datenfluss, Komponenten-Hierarchie, Content
 
 | Layer | Technologie | Version | Zweck |
 |-------|-------------|---------|-------|
-| Framework | Astro | 5.1.1 | Statische Seitengenerierung, kein JS by default |
-| Content | Astro Content Collections | — | Typsicheres Markdown mit Zod-Validierung |
-| Styling | Tailwind CSS | 3.4.17 | Utility-first CSS |
-| Typografie | `@tailwindcss/typography` | 0.5.16 | Prose-Styling für Artikel |
+| Framework | Astro | 7.3.8 | Statische Seitengenerierung, kein JS by default |
+| Content | Astro Content Collections | — | Typsicheres Markdown mit Zod-Validierung (`z` aus `astro/zod`) |
+| Styling | Tailwind CSS | 3.4.17 | Utility-first CSS, eingebunden über `postcss.config.mjs` (mit `autoprefixer`) |
+| Typografie | `@tailwindcss/typography` | 0.5.20 | Prose-Styling für Artikel |
 | Typsicherheit | TypeScript | 5.7.3 | Strict Mode |
-| Suche | Pagefind | 1.3.0 | Statischer, clientseitiger Suchindex |
-| Bildoptimierung | sharp | 0.33.5 | Für `scripts/generate-assets.mjs` |
+| Suche | Pagefind | 1.5.2 | Statischer, clientseitiger Suchindex |
+| Bildoptimierung | sharp | 0.35.5 | Für `scripts/generate-assets.mjs` |
 | Redaktion (Build-Zeit-Quelle) | Payload CMS 3 + PostgreSQL | siehe `cms/package.json` | Eigenständiges Projekt in `cms/`, siehe Abschnitt "CMS-Integration" unten |
 
 Selbst gehostete Schriften: IBM Plex Sans/Serif/Mono unter `public/fonts/`. Keine Google Fonts, keine externen CDNs (siehe CLAUDE.md).
+
+Zwei bewusste Einstellungen in `astro.config.mjs`:
+- **`compressHTML: true`:** Der Astro-7-Standard (`'jsx'`) würde Leerzeichen zwischen Inline-Elementen entfernen.
+- **`vite.build.cssTarget`:** Das CSS wird für Chrome 87, Firefox 78, Safari 14 und Edge 88 erzeugt, statt für den Vite-8-Standard (Chrome 111, Firefox 114, Safari 16.4). Gebündeltes JavaScript gibt es nicht, alle Skripte laufen inline.
 
 **Wichtige Grenze:** `cms/` ist eine eigenständige Next.js/React-Anwendung für die Redaktion. Sie wird **nie** in den öffentlichen Astro-Build eingebunden und läuft ausschließlich unter einer eigenen Subdomain (`redaktion.stoppramstein.de`). Das "keine JS-Frameworks"-Verbot aus `CLAUDE.md` bezieht sich auf die öffentliche Seite (`dist/`) — nicht auf dieses interne Redaktionswerkzeug.
 

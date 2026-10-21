@@ -83,4 +83,19 @@ Muss fehlerfrei durchlaufen (Typecheck + Build + Link-Check + CSP-Check, siehe [
 
 - Kurze, klare Beschreibung: was wurde geändert und warum.
 - Bei Content-PRs: Quellen für neue Fakten verlinken.
-- CI (`.github/workflows/ci.yml`) führt `npm run verify` automatisch aus.
+- Die automatischen Prüfungen (siehe unten) müssen grün sein.
+
+## Automatische Prüfungen
+
+Bei jedem Push und Pull Request laufen:
+
+- **Verify** (`.github/workflows/ci.yml`): `npm run verify` für die öffentliche Seite.
+- **CMS** (`.github/workflows/ci.yml`): `npm ci`, `tsc --noEmit` und `next build` in `cms/`. Eine Datenbank wird dafür nicht gebraucht.
+- **Semgrep** (`.github/workflows/security.yml`): Sicherheitsscan ohne Semgrep-Konto. Ein Pull Request scheitert nur, wenn er neue Findings bringt. Alle Ergebnisse erscheinen im Repo unter *Security → Code scanning*.
+
+Dependabot (`.github/dependabot.yml`) schlägt Updates als Pull Requests vor:
+- **Versions-Updates:** wöchentlich und gebündelt, frühestens 7 Tage nach einem Release. Major-Updates kommen als eigene PRs und brauchen meist eine Migration.
+- **Sicherheitsupdates:** kommen sofort, für `cms/` ausschließlich diese.
+- **Payload:** `payload` und alle `@payloadcms/*` müssen dieselbe Version haben. Wird der CMS-Check bei einem Dependabot-PR rot, die übrigen `@payloadcms/*` von Hand nachziehen.
+
+Offene technische Punkte stehen in [`docs/OFFENE-PUNKTE.md`](./docs/OFFENE-PUNKTE.md), erledigte im [Änderungsprotokoll](./docs/AENDERUNGSPROTOKOLL.md).

@@ -154,10 +154,11 @@ API-Key-Zugriffe (der Build-Nutzer, siehe [Umgebungsvariablen](#umgebungsvariabl
 
 | Wer | Sieht |
 |-----|-------|
-| Session-Login (Admin-UI) | alles (Rollenlogik über `update`/`delete`) |
+| Session-Login (Admin-UI), Rolle Redaktion oder Admin | alles |
+| Session-Login (Admin-UI), Rolle Autor | nur Veröffentlichtes und eigene Dokumente (analog zu `src/access/ownDraftOrRedaktion.ts` für `update`/`delete`) |
 | anonym **oder** API-Key (Astro-Build) | nur `freigabeStatus = veroeffentlicht` **UND** `_status = published` |
 
-Beide Felder sind nötig: `freigabeStatus` bleibt `veroeffentlicht`, wenn nach der Veröffentlichung ein Entwurf gespeichert wird, und Payload liefert mit `?draft=true` (REST) bzw. `draft: true` (GraphQL) die neueste Version — ohne `_status`-Prüfung also den unveröffentlichten Entwurf. Das war bis 2026-09-18 anonym ausnutzbar (siehe `docs/REDAKTION-TODO.md`). Unterschieden wird über `req.user._strategy`, das Payload zur Laufzeit setzt (`'api-key'` bzw. `'local-jwt'`), das aber im generierten `User`-Typ fehlt — daher der Helper `istApiKeyZugriff()`.
+Beide Felder sind nötig: `freigabeStatus` bleibt `veroeffentlicht`, wenn nach der Veröffentlichung ein Entwurf gespeichert wird, und Payload liefert mit `?draft=true` (REST) bzw. `draft: true` (GraphQL) die neueste Version — ohne `_status`-Prüfung also den unveröffentlichten Entwurf. Das war bis 2026-09-18 anonym ausnutzbar (siehe [`docs/AENDERUNGSPROTOKOLL.md`](../docs/AENDERUNGSPROTOKOLL.md)). Unterschieden wird über `req.user._strategy`, das Payload zur Laufzeit setzt (`'api-key'` bzw. `'local-jwt'`), das aber im generierten `User`-Typ fehlt — daher der Helper `istApiKeyZugriff()`.
 
 Folgen: Ein Dokument ist erst öffentlich, wenn in der Admin-UI zusätzlich „Änderungen veröffentlichen" geklickt wurde. `src/jobs/schedulePublish.ts` setzt deshalb neben `freigabeStatus` auch `_status: 'published'` — `payload.update()` übernähme sonst den `_status` der neuesten Version (meist `draft`).
 
