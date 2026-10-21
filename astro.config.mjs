@@ -1,6 +1,5 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
@@ -9,10 +8,8 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
 
+  // Tailwind CSS runs via postcss.config.mjs
   integrations: [
-    tailwind({
-      applyBaseStyles: false,
-    }),
     sitemap({
       i18n: {
         defaultLocale: 'de',

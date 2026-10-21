@@ -352,7 +352,7 @@ Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor grö
 | Package | Purpose | Status |
 |---------|---------|--------|
 | `astro` | Core framework | Required |
-| `@astrojs/tailwind` | Tailwind integration | Required |
+| `autoprefixer` | PostCSS plugin for Tailwind 3 (replaces the deprecated `@astrojs/tailwind`) | Required |
 | `@astrojs/sitemap` | Sitemap generation | Required |
 | `tailwindcss` | CSS framework | Required |
 | `@tailwindcss/typography` | Prose styling | Required |
