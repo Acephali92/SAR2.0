@@ -23,3 +23,35 @@ jobs:
 
       - name: Run verify (typecheck + build + check-links + check-csp)
         run: npm run verify
+
+  cms:
+    name: CMS (install, typecheck, build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cms
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: cms/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # Placeholder values only: next build needs them set, but connects to no database
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          PAYLOAD_SECRET: ci-build-placeholder
+          DATABASE_URI: postgres://ci:ci@127.0.0.1:1/ci
+          PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
