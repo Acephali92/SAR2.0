@@ -40,6 +40,12 @@ updates:
     cooldown:
       default-days: 7
     groups:
+      # Payload packages must share one version. Security updates only bump packages with an
+      # advisory, so a partial bump can still happen; the CI job "CMS" turns such a PR red.
+      payload:
+        applies-to: security-updates
+        patterns: ['payload', '@payloadcms/*']
+        update-types: ['minor', 'patch']
       cms-security:
         applies-to: security-updates
         patterns: ['*']

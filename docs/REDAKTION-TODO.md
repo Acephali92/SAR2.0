@@ -59,13 +59,18 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
   - **Prüfungen:** `npm run verify` ist grün, und der Dev-Server liefert die Seiten aus.
   - **Nicht getestet:** der Loader mit echtem `PAYLOAD_URL`. CI und Tests nutzen die Fixtures.
 
-- **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Laut Dependabot-Alerts (Stand 2026-10-21) sind 132 offen:
-  - **Root-Projekt:** 89 (1 kritisch, 42 hoch, 37 mittel, 9 niedrig).
-  - **`cms/`:** 43 (4 kritisch, 16 hoch, 16 mittel, 7 niedrig).
+- **GESCHLOSSEN (2026-10-21): CMS ließ sich nach Dependabot-Updates nicht mehr installieren.** Die gemergten cms-Security-Bündel (#20, #29, #30) hoben nur `payload` und `@payloadcms/graphql` auf 3.91.0, weil nur diese Pakete Advisories hatten. `@payloadcms/db-postgres`, `next`, `richtext-lexical` und `translations` blieben auf 3.89.0 und verlangen exakt `payload@3.89.0`. Deshalb brach `npm ci` in `cms/` mit `ERESOLVE` ab, und das CMS-Image war nicht mehr baubar. Aufgefallen ist das nicht, weil die CI `cms/` gar nicht baute. *Fix:*
+  - **Versionen:** Alle `@payloadcms/*` in `cms/package.json` stehen auf `^3.91.0`, der Lockfile ist neu erzeugt. Die ganze Payload-Familie liegt jetzt einheitlich auf 3.91.0.
+  - **CI:** `.github/workflows/ci.yml` hat einen neuen Job „CMS (install, typecheck, build)“: `npm ci`, `tsc --noEmit` und `next build` mit Platzhalter-Umgebungsvariablen. Eine Datenbank braucht `next build` nicht.
+  - **Dependabot:** In `.github/dependabot.yml` bündelt eine Gruppe `payload` die Security-Updates von `payload` und `@payloadcms/*`. Ein Teil-Update verhindern kann sie nicht, weil Security-Updates nur Pakete mit Advisory anfassen. Wird ein solcher PR im CI-Job rot, die übrigen `@payloadcms/*` von Hand nachziehen, wie hier.
 
-  Dependabot zählt pro Advisory. `npm audit` zählt pro Paket und meldete deshalb weniger (34 bzw. 24).
+  *Verifiziert:* Lokal laufen `npm ci`, `tsc --noEmit` (0 Fehler) und `next build` durch.
 
-  Die Zahlen stammen von vor dem Upgrade auf Astro 7.
+- **OFFEN (2026-10-21): Bekannte Schwachstellen in npm-Abhängigkeiten.** Laut Dependabot-Alerts waren am 2026-10-21 vor den Updates 132 offen (Root-Projekt 89, `cms/` 43, davon 5 kritisch). Dependabot zählt pro Advisory. `npm audit` zählt pro Paket und meldete deshalb weniger (34 bzw. 24).
+
+  Nach den Dependabot-Updates und dem Upgrade auf Astro 7 sind 114 behoben, Stand vor dem CMS-Fix im Punkt davor. Offen sind noch 19, davon keiner kritisch:
+  - **Root-Projekt:** 3 (1 hoch: `braces`; 1 mittel und 1 niedrig: `postcss-selector-parser`).
+  - **`cms/`:** 16 (4 hoch, 7 mittel, 5 niedrig).
 
   **Astro:** Das Upgrade auf Astro 7.3.8 (siehe Punkt davor) schließt die Advisories, die sich innerhalb von Astro 5 nicht beheben ließen:
   - **GHSA-26w7-cxv4-gfx2 (kritisch, Fix in 7.2.8):** Ausführung von Fremdcode über eine präparierte AVIF-Datei in Astros Sharp-Bilddienst. Für diese Seite war das nicht ausnutzbar, weil sie Astros Bildoptimierung nicht nutzt.
@@ -75,7 +80,7 @@ Abgleich der Muss-/Soll-Anforderungsliste des Referenz-CMS-Lastenhefts mit dem a
 
   **`tailwindcss`:** Dependabot führt keinen Alert für `tailwindcss`. Der „Fix nur in Tailwind 4“ aus `npm audit` war eine Zuschreibung über Unterabhängigkeiten. Einen Sicherheitsgrund für Tailwind 4 gibt es also nicht. Seit `@astrojs/tailwind` entfernt ist, hängt das Upgrade auf Astro 7 auch nicht mehr an Tailwind 4 (siehe Punkt davor). Tailwind 4 setzt Safari 16.4+, Chrome 111+ und Firefox 128+ voraus (Tailwind-Upgrade-Guide).
 
-  **`cms/`:** Die CI baut `cms/` nicht. Ein grüner Check bei einem CMS-Security-PR sagt deshalb nichts darüber, ob das CMS danach noch läuft.
+  **`cms/`:** Seit dem CMS-Fix oben installiert, prüft und baut die CI auch `cms/`. Was sie nicht abdeckt, ist der Betrieb gegen eine echte Datenbank (Migrationen, Admin-Oberfläche). Den prüft nur ein Test mit Docker.
 
 ## Screenshot
 
