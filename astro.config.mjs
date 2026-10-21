@@ -7,6 +7,9 @@ export default defineConfig({
   site: 'https://stoppramstein.de',
   output: 'static',
   trailingSlash: 'always',
+  // Astro 7 defaults to 'jsx', which strips whitespace between inline elements
+  // (e.g. "Datenschutz · Impressum" -> "Datenschutz·Impressum"). Keep the previous behavior.
+  compressHTML: true,
 
   // Tailwind CSS runs via postcss.config.mjs
   integrations: [
@@ -43,6 +46,9 @@ export default defineConfig({
   vite: {
     build: {
       cssMinify: true,
+      // Keep the CSS browser support of Vite 6 (Astro 5) instead of Vite 8's newer default
+      // (Chrome 111, Firefox 114, Safari 16.4). No JS target needed: there are no bundled scripts.
+      cssTarget: ['es2020', 'edge88', 'firefox78', 'chrome87', 'safari14'],
     },
   },
 });
