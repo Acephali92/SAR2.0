@@ -508,8 +508,7 @@ chore: update dependencies
 
 ### 13.2 Branch Strategy
 
-- `main`: Production-ready code only
-- `develop`: Integration branch
+- `master`: Production-ready code only. Protected by the ruleset `master-schutz`: changes land via pull request with green checks, no force pushes (see `CONTRIBUTING.md`)
 - Feature branches: `feat/article-layout`, `fix/font-loading`
 
 ### 13.3 What to Commit
