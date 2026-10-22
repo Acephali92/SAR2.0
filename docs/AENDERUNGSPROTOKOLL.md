@@ -2,6 +2,20 @@
 
 Erledigte Fehlerbehebungen, Sicherheitsfixes und größere Umbauten. Neueste zuerst. Jeder Eintrag nennt Problem, Fix und Nachweis. Details stehen in den verlinkten Pull Requests bzw. Commits. Was noch offen ist, steht in [`OFFENE-PUNKTE.md`](./OFFENE-PUNKTE.md).
 
+## 2026-10-22
+
+### `master` per Ruleset geschützt (PR #34)
+
+`master` hatte weder Branch-Schutz noch ein Ruleset. Ein roter Check verhinderte keinen Merge, und Direkt-Pushes, Force-Pushes und das Löschen von `master` waren möglich.
+
+- *Fix:* Ruleset „master-schutz“ (*Settings → Rules → Rulesets*) für den Default-Branch, ohne Bypass, auch nicht für Admins:
+  - kein Löschen, kein Force-Push
+  - Änderungen nur per Pull Request, ohne Pflicht-Review, weil ein einzelner Maintainer eigene PRs nicht freigeben kann
+  - Pflicht-Checks „Verify (typecheck, build, link/CSP checks)“, „CMS (install, typecheck, build)“ und „Semgrep“. Der PR muss vor dem Merge nicht auf dem neuesten `master`-Stand sein.
+
+  Außerdem löscht GitHub PR-Branches nach dem Merge automatisch.
+- *Nachweis:* `gh api repos/Acephali92/SAR2.0/rules/branches/master` listet `deletion`, `non_fast_forward`, `pull_request` und `required_status_checks` mit den drei Checks.
+
 ## 2026-10-21
 
 ### CMS ließ sich nach Dependabot-Updates nicht mehr installieren (PR #31)

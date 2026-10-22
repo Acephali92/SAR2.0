@@ -85,10 +85,6 @@ Das Titelbild aus dem CMS liegt als `data.image` vor (`src/lib/payload-loader.ts
 - Das CMS gegen eine echte Datenbank (Migrationen, Admin-Oberfläche). Der CI-Job „CMS“ installiert, prüft Typen und baut, braucht aber keine Datenbank.
 - Der Rebuild-Webhook und das Backup im Container.
 
-### Kein Branch-Schutz auf master
-
-`master` hat weder Branch-Schutz noch ein Ruleset. Ein roter Check verhindert deshalb keinen Merge. Empfehlung: ein Ruleset, das die Checks „Verify“, „CMS“ und „Semgrep“ verlangt.
-
 ### Screenshot in der Doku
 
 `docs/screenshot.png` ist ein manueller Screenshot der Startseite (übernommen aus `screenshots/Screenshot 2026-09-16 182321.png`). Bei Layout-Änderungen an der Startseite aktualisieren.
