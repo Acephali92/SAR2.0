@@ -220,7 +220,42 @@ Beide Blöcke oben liegen zusätzlich als versionierte Vorlage unter `deploy/` (
 
 ## 404-Handling
 
-`src/pages/404.astro` wird von Astro als statisches `dist/404.html` gebaut. Sowohl die Caddy- als auch die nginx-Konfiguration oben leiten fehlende Routen dorthin um.
+`src/pages/404.astro` wird von Astro als statisches `dist/404.html` gebaut. Sowohl die Caddy- als auch die nginx-Konfiguration oben liefern sie für fehlende Routen aus.
+
+Nach dem Deployment prüfen, dass dabei der Status 404 ankommt und nicht 200 oder eine Weiterleitung (`guidelines.md` §17.7):
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://stoppramstein.de/gibt-es-nicht/   # erwartet: 404
+```
+
+## Weiterleitungen
+
+Veröffentlichte URLs bleiben erreichbar (`guidelines.md` §17.8). Zitate in Presse und Wissenschaft dürfen nicht ins Leere laufen.
+
+- **Wo:** Weiterleitungen stehen als feste 301-Paare in der Server-Konfiguration, also in `deploy/Caddyfile.example` bzw. `deploy/nginx.conf.example` und von dort auf dem Server. Sie werden nie entfernt.
+- **Alte WordPress-URLs:** Die Liste steht in den Zeilen „Original URL“ der Dateien unter `stoppramstein_content/`. Jede alte URL bekommt ein Ziel: die passende neue Seite, sonst die nächsthöhere Rubrik, nie pauschal die Startseite.
+- **www:** Die alte Seite lief unter `www.stoppramstein.de`. `www` wird per 301 auf `https://stoppramstein.de` umgeleitet, der Pfad bleibt erhalten.
+- **Sicherheit:** Ziele sind feste interne Pfade, nie aus Query-Parametern übernommen (`guidelines.md` §14.8).
+- **Stand:** Die Weiterleitungstabelle und die `www`-Umleitung fehlen in beiden Vorlagen noch (siehe [OFFENE-PUNKTE.md](./OFFENE-PUNKTE.md#weiterleitungen-für-alte-urls-fehlen)).
+
+Prüfen nach dem Deployment:
+
+```bash
+curl -sI https://www.stoppramstein.de/fakten/ | grep -iE '^(HTTP|location)'   # erwartet: 301, location: https://stoppramstein.de/fakten/
+```
+
+## Header nach dem Deployment prüfen
+
+Nach jedem Deployment, jeder Änderung der Server-Konfiguration und mindestens vierteljährlich (`guidelines.md` §14.9):
+
+```bash
+for path in / /404.html /gibt-es-nicht/; do
+  echo "== $path"
+  curl -sI "https://stoppramstein.de$path" | grep -iE '^(HTTP|content-security-policy|x-content-type-options|x-frame-options|referrer-policy)'
+done
+```
+
+Alle vier Header aus den Vorlagen oben müssen bei jedem Pfad erscheinen, auch bei der Fehlerseite. Fehlt einer, ist die Server-Konfiguration nicht korrekt ausgerollt.
 
 ## CSP-Hinweis
 

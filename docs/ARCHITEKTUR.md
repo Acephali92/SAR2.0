@@ -216,6 +216,13 @@ flowchart LR
 
 Die Website sammelt keine Nutzerdaten über Standard-HTTP-Server-Logs hinaus: keine Cookies, keine Analytics, keine Third-Party-Tracker, keine serverseitige Formularverarbeitung (Kontakt läuft über `mailto:`-Links). Details: `/datenschutz/`.
 
+Cookiefrei heißt aber nicht automatisch datenschutzkonform (`guidelines.md` §14.11):
+
+- **Server-Logs:** IP-Adresse, Zeitpunkt, Pfad und User-Agent sind personenbezogene Daten. Speicherdauer und eine Kürzung oder Anonymisierung der IP-Adressen hängen vom Hosting-Anbieter ab und sind noch offen (siehe [OFFENE-PUNKTE.md](./OFFENE-PUNKTE.md#speicherdauer-und-anonymisierung-der-server-logs)). Danach müssen sie in `src/content/seiten/datenschutz.md` stehen.
+- **Externe Ressourcen und Einbettungen:** Die Seite lädt nichts von fremden Servern, die CSP erzwingt das. Videos, Karten oder Social-Media-Beiträge werden verlinkt statt eingebettet.
+- **Redaktionsoberfläche:** Das CMS setzt für den Login ein Sitzungs-Cookie, nur für die Redaktion. Die Mails (Passwort-Reset, Fehlerbenachrichtigung) gehen über einen SMTP-Anbieter, der noch auszuwählen ist.
+- **Neue Datenverarbeitung** wird vor dem Einsatz hier und in der Datenschutzerklärung nachgezogen.
+
 ## Verzeichnisstruktur
 
 ```

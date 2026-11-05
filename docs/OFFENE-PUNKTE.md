@@ -2,7 +2,7 @@
 
 Was technisch oder organisatorisch noch offen ist, bevor die Seite mit der Redaktionsoberfläche produktiv gehen kann. Erledigtes steht im [Änderungsprotokoll](./AENDERUNGSPROTOKOLL.md), Redaktionelles in [`REDAKTION-TODO.md`](./REDAKTION-TODO.md).
 
-Stand: 2026-10-21
+Stand: 2026-11-05
 
 ## Stand der Anforderungen (M1–M10, S1–S4)
 
@@ -39,7 +39,71 @@ Für die Passwort-Reset-E-Mails von Payload und die Fehlerbenachrichtigung des R
 
 Der Mechanismus ist da: `cms/backup/backup.sh` kopiert die Archive per `rclone`, sobald `OFFSITE_RCLONE_REMOTE` und `secrets/rclone.conf` gesetzt sind. Offen ist, welcher zweite, räumlich getrennte Anbieter in der EU genutzt wird. Einrichtung: [`DEPLOYMENT.md`](./DEPLOYMENT.md), „Backups & Wiederherstellung“. Vorher müssen die beiden Backup-Punkte unten behoben sein.
 
+### Meldeweg für Sicherheitsvorfälle
+
+`guidelines.md` §14.10 beschreibt den Ablauf bei Sicherheitsvorfällen, aber nicht, wohin eine Meldung geht. Zu entscheiden ist ein vertraulicher Meldeweg, z. B. GitHub Private Vulnerability Reporting (in den Repo-Einstellungen einzuschalten) oder eine eigene Kontaktadresse, außerdem wer Meldungen bearbeitet. Danach eine `SECURITY.md` im Repo-Wurzelverzeichnis anlegen und in §14.10 verlinken.
+
+### Speicherdauer und Anonymisierung der Server-Logs
+
+Hängt an der [Hosting-Entscheidung](#hosting-und-webserver). Festzulegen sind die Speicherdauer der Zugriffs- und Fehlerlogs und ob IP-Adressen gekürzt oder anonymisiert werden (`guidelines.md` §14.11). Danach den Platzhalter in `src/content/seiten/datenschutz.md` („[Bitte ergänzen]: Name des Hosting-Anbieters und Speicherdauer der Server-Logs“) füllen und die Log-Einstellung in die Vorlagen unter `deploy/` übernehmen.
+
 ## Offene technische Punkte
+
+### Weiterleitungen für alte URLs fehlen
+
+`guidelines.md` §17.8 verlangt, dass alte URLs erhalten bleiben. Es gibt aber weder eine Weiterleitungstabelle noch eine Umleitung von `www.stoppramstein.de` auf `stoppramstein.de` (`astro.config.mjs`: `site: 'https://stoppramstein.de'`, die alte Seite lief unter `www`). Beides fehlt in `deploy/Caddyfile.example` und `deploy/nginx.conf.example`.
+
+Bisher bekannt sind nur die 21 migrierten Seiten aus den Zeilen „Original URL“ in `stoppramstein_content/`. Vorschlag für die Ziele:
+
+| Alte URL | Vorgeschlagenes Ziel | Anmerkung |
+|---|---|---|
+| `/`, `/fakten/`, `/presse/`, `/kontakt/`, `/ueber-uns/`, `/impressum/` | gleicher Pfad | Nur die `www`-Umleitung nötig |
+| `/warum-stopp-air-base-ramstein/` | `/warum-ramstein/` | |
+| `/aufruf` | `/mitmachen/aufruf/` | |
+| `/spenden/` | `/mitmachen/spenden/` | |
+| `/werde-mitglied-foerderverein` | `/mitmachen/mitglied-werden/` | |
+| `/hilf-uns-bei-der-organisation/` | `/mitmachen/ehrenamt/` | Inhalt vergleichen |
+| `/der-griff-nach-groenland/` | `/analysen/der-griff-nach-groenland/` | Slug laut Fixture, im CMS prüfen |
+| `/was-hat-der-us-voelkerrechtsbruch-gegenueber-venezuela-mit-der-air-base-ramstein-zu-tun/` | `/analysen/venezuela-ramstein/` | Slug laut Fixture, im CMS prüfen |
+| `/friedenswoche-2026-20-bis-28-juni/`, `/event/friedenswoche-2026-20-bis-28-juni/` | `/aktionen/friedenswoche-2026/` | Slug laut Fixture, im CMS prüfen |
+| `/event/` | `/aktionen/` | |
+| `/aufruf-zur-demo-am-14-februar-2026-in-muenchen/`, `/nachrichten/`, `/newsletter`, `/infomaterial/`, `/impressionen-2025/` | offen | Entscheidung der Redaktion, siehe [`REDAKTION-TODO.md`](./REDAKTION-TODO.md) |
+
+**Vollständiges Inventar steht aus.** Die alte WordPress-Seite ist nicht mehr per URL erreichbar. Ihre Daten liegen aber noch auf dem alten Strato-Webspace: `wordpress_backup.zip` (Oktober 2026) und der Datenbank-Dump `ramstein.sql` (Februar 2022). Daraus sind noch zu ermitteln:
+
+- alle veröffentlichten Seiten, Beiträge und Events (`wp_posts`)
+- die Permalink-Struktur (`wp_options`)
+- Kategorie- und Schlagwort-Archive
+- vorhandene Weiterleitungen (`.htaccess`, ggf. Redirect-Plugin)
+- alle hochgeladenen Dateien unter `/wp-content/uploads/…`, z. B. PDFs, auf die von außen verlinkt wird
+
+Personenbezogene Daten aus dem Dump (Nutzer, Kommentare, E-Mail- und IP-Adressen) werden dafür nicht gebraucht und nicht ins Repo übernommen. Ergebnis: eine eigene Datei `docs/WEITERLEITUNGEN.md`, die diese Tabelle ersetzt. Zu prüfen ist außerdem, ob Caddy fehlende Schrägstriche selbst per Weiterleitung ergänzt. Die nginx-Vorlage hat dafür eine eigene Regel.
+
+### Automatisierte Tests: Playwright und axe-core fehlen
+
+`guidelines.md` §18.1 sieht funktionale Tests (Playwright), automatische Accessibility-Prüfungen (axe-core) und Screenshot-Vergleiche bei 390, 768 und 1280 px vor. Nichts davon ist eingerichtet. Zu tun:
+
+- `@playwright/test` und `@axe-core/playwright` als devDependencies, exakt gepinnt (§2.2).
+- Tests gegen `npm run preview`: Navigation inkl. mobilem Menü, Suche, 404-Seite, axe-core auf allen Seiten.
+- Einen CI-Job in `.github/workflows/ci.yml` für Funktions- und Accessibility-Tests. Screenshots bleiben lokal.
+- Die Befehle in `README.md`, „Befehle“, und in §18.1 eintragen.
+
+### SEO-Metadaten unvollständig
+
+Lücken gegenüber `guidelines.md` §17:
+
+- `og:type` ist in `src/layouts/BaseLayout.astro` immer `website`, auch bei Artikeln und Analysen (Soll: `article` mit Veröffentlichungsdatum).
+- Es gibt keine strukturierten Daten (JSON-LD für `Organization`, `Article`, `Event`).
+- Die Sitemap filtert Seiten mit `noIndex` nicht heraus (`astro.config.mjs`, kein `filter`). Bisher setzt keine Seite `noIndex`.
+- `description` von Beiträgen und Terminen ist in `src/content.config.ts` (Payload-Loader) nicht auf 160 Zeichen begrenzt, im CMS ebenso wenig.
+
+### HSTS und Permissions-Policy fehlen in den Header-Vorlagen
+
+`deploy/Caddyfile.example`, `deploy/nginx.conf.example` und `scripts/write-preview-headers.mjs` setzen CSP, `X-Content-Type-Options`, `X-Frame-Options` und `Referrer-Policy`. `Strict-Transport-Security` und `Permissions-Policy` fehlen (`guidelines.md` §14.9). HSTS erst setzen, wenn TLS auf der endgültigen Domain stabil läuft, weil Browser es sich merken.
+
+### `cms/secrets/rclone.conf` ist nicht von Git ausgeschlossen
+
+[`DEPLOYMENT.md`](./DEPLOYMENT.md) sagt, die rclone-Konfiguration für das Offsite-Backup gehört nach `secrets/rclone.conf` (unter `cms/`). `cms/.gitignore` schließt aber nur `secrets/*.txt` aus, ein `git add` würde die Zugangsdaten mitnehmen (`git check-ignore cms/secrets/rclone.conf` findet keine Regel). Verstößt gegen `guidelines.md` §14.4. Abhilfe: in `cms/.gitignore` `secrets/*` mit Ausnahme `!secrets/.gitkeep`.
 
 ### Backup erzeugt vermutlich leere Datenbank-Dumps
 
@@ -84,10 +148,6 @@ Das Titelbild aus dem CMS liegt als `data.image` vor (`src/lib/payload-loader.ts
 - Der Payload-Loader mit echtem `PAYLOAD_URL`. CI und lokale Prüfungen nutzen die Fixtures unter `src/content/_fixtures/`.
 - Das CMS gegen eine echte Datenbank (Migrationen, Admin-Oberfläche). Der CI-Job „CMS“ installiert, prüft Typen und baut, braucht aber keine Datenbank.
 - Der Rebuild-Webhook und das Backup im Container.
-
-### Kein Branch-Schutz auf master
-
-`master` hat weder Branch-Schutz noch ein Ruleset. Ein roter Check verhindert deshalb keinen Merge. Empfehlung: ein Ruleset, das die Checks „Verify“, „CMS“ und „Semgrep“ verlangt.
 
 ### Screenshot in der Doku
 

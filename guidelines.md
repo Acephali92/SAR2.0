@@ -1,7 +1,8 @@
 # Project Guidelines — Stopp Air Base Ramstein Website Relaunch
 
-**Document Version:** 1.0
+**Document Version:** 1.1
 **Created:** 2026-01-30
+**Updated:** 2026-11-05
 **Status:** Active
 
 ---
@@ -23,10 +24,11 @@ This website serves as the official digital presence for the "Stopp Air Base Ram
 |------|-------------|
 | **Documentation Quality** | All claims must link to verifiable sources; citations must be machine-readable |
 | **Credibility** | Professional presentation; no visual elements that undermine seriousness |
-| **Citation-Readiness** | Stable URLs, proper metadata, Open Graph tags for sharing |
+| **Usability** | Every target group finds its entry point; information architecture before visual design (see §16) |
+| **Citation-Readiness** | Stable URLs, proper metadata, Open Graph tags for sharing (see §17) |
 | **Accessibility** | WCAG 2.1 AA compliance minimum |
 | **Performance** | Lighthouse score ≥90 on all metrics; Time to Interactive <2s on 3G |
-| **Privacy** | Zero third-party tracking; no cookies requiring consent |
+| **Privacy** | Zero third-party tracking; no cookies requiring consent; cookie-free alone is not enough (see §14.11) |
 | **Sovereignty** | No dependencies on U.S.-based CDNs or services in production |
 | **Longevity** | Static output; no runtime dependencies; content survives framework changes |
 
@@ -349,7 +351,7 @@ Not implemented. The site is light-only; design tokens in `tailwind.config.mjs` 
 
 ### 9.3 Build Verification
 
-Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor größeren Releases oder Layout-Änderungen) — sie sind **nicht** Teil der automatisierten CI. Die automatisierten Gates sind ausschließlich `npm run verify` (Typecheck, Build, Link-Check, CSP-Check), siehe 11.3 und `.github/workflows/ci.yml`.
+Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor größeren Releases oder Layout-Änderungen) — sie sind **nicht** Teil der automatisierten CI. Die automatisierten Gates sind ausschließlich `npm run verify` (Typecheck, Build, Link-Check, CSP-Check), siehe 11.3 und `.github/workflows/ci.yml`. Welche Prüfungen insgesamt automatisiert und welche manuell laufen, regelt §18.
 
 ---
 
@@ -368,6 +370,8 @@ Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor grö
 | `@tailwindcss/typography` | Prose styling | Required |
 | `pagefind` | Static search | Required |
 | `sharp` | Image optimization | Optional |
+| `@playwright/test` | Funktionale und visuelle Tests (§18), nur devDependency | Geplant |
+| `@axe-core/playwright` | Accessibility-Tests (§18), nur devDependency | Geplant |
 
 ### 10.2 Disallowed Dependencies
 
@@ -386,7 +390,7 @@ Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor grö
 Before adding any new dependency:
 
 1. Check bundle size impact
-2. Verify MIT/Apache-2.0 compatible license
+2. Verify MIT/Apache-2.0 compatible license. Ausnahme: Reine Entwicklungswerkzeuge, die nicht in `dist/` landen, dürfen auch unter MPL-2.0 stehen (betrifft axe-core).
 3. Confirm no transitive dependencies on disallowed packages
 4. Document rationale in commit message
 
@@ -479,14 +483,11 @@ Every implementation phase must be:
 
 ### 12.3 Self-Verification Checklist
 
-After each step, confirm:
+Nach jedem Schritt gilt die Definition of Done (§18.2). Zusätzlich zu den dort genannten Punkten:
 
-- [ ] `npm run build` succeeds without errors
-- [ ] `npm run typecheck` passes
 - [ ] No console errors in browser
 - [ ] Changes comply with this guidelines.md
 - [ ] No disallowed dependencies introduced
-- [ ] Accessibility not regressed (keyboard navigation works)
 
 ---
 
@@ -516,7 +517,9 @@ chore: update dependencies
 
 ---
 
-## 14. Security
+## 14. Security & Privacy by Design
+
+Sicherheit und Datenschutz sind Eigenschaften der ganzen Seite, nicht nur der HTTP-Header. 14.1–14.3 regeln Header, Links und Eingaben, 14.4–14.11 Geheimnisse, Abhängigkeiten, Inhalte, Betrieb und Datenschutz.
 
 ### 14.1 Content Security Policy
 
@@ -540,6 +543,65 @@ All external links must include:
 ### 14.3 No User Input
 
 This is a static site. There are no forms that submit to the server. Newsletter signup and contact forms must use a third-party service (e.g., self-hosted form handler) or `mailto:` links.
+
+### 14.4 Keine Geheimnisse im Repository
+
+- Passwörter, API-Keys, Tokens, `PAYLOAD_SECRET`, Datenbank-URLs mit Passwort und Zugangsdaten für Backups (`rclone.conf`) gehören nie ins Repository. Sie liegen nur auf dem Server: in `.env`-Dateien oder unter `cms/secrets/`.
+- Im Repository stehen nur Vorlagen ohne echte Werte (`*.example`, z. B. `cms/.env.example`).
+- Ein neuer Ablageort für Geheimnisse wird im selben Commit in `.gitignore` bzw. `cms/.gitignore` aufgenommen.
+- Wurde ein Geheimnis committet oder gepusht, gilt es als offengelegt: sofort beim Anbieter widerrufen bzw. neu erzeugen, dann den Vorfall nach 14.10 behandeln. Allein aus der Git-History entfernen reicht nicht.
+
+### 14.5 Abhängigkeiten prüfen
+
+- Dependabot meldet bekannte Sicherheitslücken und schlägt Updates vor, Semgrep prüft den Code (Details: `CONTRIBUTING.md`, „Automatische Prüfungen“). Offene Alerts werden in `docs/OFFENE-PUNKTE.md` mit Stand und Schweregrad geführt.
+- Vor jedem Release laufen `npm audit` im Root und in `cms/`. Kritische und hohe Funde werden vor dem Release behoben oder mit Begründung als nicht ausnutzbar dokumentiert (Beispiel: Astro-Advisories im Änderungsprotokoll, 2026-10-21).
+- Neue Abhängigkeiten nur nach §10.3. Jede Abhängigkeit ist Angriffsfläche, weniger ist besser.
+
+### 14.6 Externe Verbindungen minimieren
+
+- Die öffentliche Seite lädt nichts von fremden Servern: keine Skripte, Stylesheets, Fonts, Bilder, Videos oder iFrames. Die CSP in 14.1 erzwingt das im Browser.
+- Externe Links sind erlaubt, weil sie erst beim Klick eine Verbindung aufbauen (14.2).
+- Auch im Build gilt: Externe Daten kommen nur aus dem eigenen CMS. Bilder fremder Herkunft lassen den Build scheitern (`src/lib/payload-loader.ts`).
+
+### 14.7 Kein ungeprüftes HTML
+
+- Roh-HTML per `set:html` ist nur für zwei Quellen erlaubt: eigene SVG-Konstanten im Code und das HTML aus dem CMS, das `cms/src/lib/lexicalToHtml.ts` erzeugt. Dort wird Text escaped und Link-URLs werden bereinigt, der Editor lässt kein HTML zu.
+- Jede neue Quelle für `set:html` braucht eine Begründung im Pull Request: Woher kommt das HTML, und wer kann es verändern?
+- Markdown-Inhalte enthalten kein Roh-HTML aus fremden Quellen. Aus `stoppramstein_content/` werden Texte übernommen, keine `<script>`-, `<iframe>`- oder `style`-Fragmente von WordPress.
+- Schutz vor XSS hat Vorrang vor Bequemlichkeit: lieber eine Komponente bauen als HTML-Strings zusammensetzen.
+
+### 14.8 Keine unsicheren Weiterleitungen
+
+- Weiterleitungen stehen als feste Paare (alte URL → neue URL) in der Server-Konfiguration (§17.8).
+- Kein Weiterleitungsziel wird aus Query-Parametern, Pfadteilen oder anderen Eingaben übernommen (keine Open Redirects).
+- Ziele sind interne Pfade. Externe Ziele nur im Einzelfall und mit Begründung im Pull Request.
+
+### 14.9 Security-Header regelmäßig prüfen
+
+- Nach jedem Deployment, nach jeder Änderung der Server-Konfiguration und mindestens vierteljährlich werden die Header der Live-Seite gegen 14.1 geprüft, z. B. mit `curl -sI https://stoppramstein.de/`. Ablauf: `docs/DEPLOYMENT.md`, „Header nach dem Deployment prüfen“.
+- Gilt auch für die Fehlerseite (`/404.html`) und für Dateien unter `/_astro/` und `/pagefind/`.
+- HSTS (`Strict-Transport-Security`) und `Permissions-Policy` fehlen noch in den Vorlagen unter `deploy/` (siehe `docs/OFFENE-PUNKTE.md`).
+
+### 14.10 Umgang mit Sicherheitsvorfällen
+
+Ein Sicherheitsvorfall ist jede Lücke, die ausgenutzt wurde oder ausgenutzt werden könnte: ein offengelegtes Geheimnis, ein Zugriff auf unveröffentlichte Inhalte, eine kompromittierte Abhängigkeit, eine veränderte Seite. Ablauf:
+
+1. **Melden:** Wer einen Vorfall bemerkt, meldet ihn sofort vertraulich, nicht in einem öffentlichen Issue. Der Meldeweg ist noch festzulegen (siehe `docs/OFFENE-PUNKTE.md`).
+2. **Eindämmen:** Schaden begrenzen, bevor die Ursache geklärt ist, z. B. Geheimnis widerrufen, betroffenes Konto sperren, CMS vom Netz nehmen, letzte saubere Fassung von `dist/` ausliefern.
+3. **Beheben:** Ursache finden und beheben, mit Nachweis (Test oder reproduzierbare Prüfung).
+4. **Informieren:** Betroffene informieren. Sind personenbezogene Daten betroffen, prüft der Betreiber die Meldepflicht an die Aufsichtsbehörde (Art. 33 DSGVO, binnen 72 Stunden) und die Benachrichtigung Betroffener (Art. 34 DSGVO).
+5. **Dokumentieren:** Eintrag in `docs/AENDERUNGSPROTOKOLL.md` mit Problem, Zeitraum, Ursache, Fix und Nachweis. Vorbild ist der Eintrag „Entwürfe und Mediathek waren über die API anonym lesbar“ (2026-09-18).
+
+### 14.11 Datenschutz: Cookiefrei ist nicht automatisch datenschutzkonform
+
+Dass die Seite keine Cookies setzt, ist nur ein Teil. Zu berücksichtigen sind außerdem:
+
+- **Server-Logs und IP-Adressen:** Jeder Aufruf hinterlässt beim Hosting-Anbieter IP-Adresse, Zeitpunkt, Pfad und User-Agent. Logs werden nur so lange wie nötig gespeichert, IP-Adressen möglichst gekürzt oder anonymisiert. Speicherdauer und Anbieter müssen in der Datenschutzerklärung stehen (`src/content/seiten/datenschutz.md`).
+- **Externe Ressourcen:** keine (14.6). Jede Ausnahme wäre eine Datenübermittlung an Dritte und bräuchte eine Rechtsgrundlage.
+- **Eingebettete Inhalte:** Videos, Karten oder Social-Media-Beiträge werden nicht eingebettet, sondern verlinkt, wahlweise mit selbst gehostetem Vorschaubild. Nichts darf beim Seitenaufruf einen fremden Server kontaktieren.
+- **Redaktionsoberfläche:** Das CMS setzt für den Login ein Sitzungs-Cookie. Das betrifft nur die Redaktion, nicht die öffentliche Seite. Es lädt nichts von externen Diensten (Gravatar ist abgeschaltet).
+- **E-Mail:** Passwort-Reset und Fehlerbenachrichtigungen laufen über einen SMTP-Anbieter in der EU.
+- **Neue Datenverarbeitung:** Jede neue Verarbeitung personenbezogener Daten (neuer Dienst, neues Formular, neue Log-Auswertung) wird vor dem Einsatz in `datenschutz.md` und in `docs/ARCHITEKTUR.md`, „Datenverarbeitung“, nachgezogen.
 
 ---
 
@@ -568,7 +630,153 @@ rsync -avz --delete dist/ user@server:/var/www/stoppramstein.de/
 
 ---
 
-## 16. Resolved Decisions
+## 16. User Experience & Information Architecture
+
+### 16.1 Zielgruppen und Nutzungssituationen
+
+Die Seite bedient Zielgruppen mit unterschiedlichen Fragen, Vorkenntnissen und Geräten. Jede Zielgruppe muss von der Startseite und aus der Hauptnavigation (`src/components/global/Header.astro`) ohne Umweg ihren Einstieg finden.
+
+| Zielgruppe | Typische Situation und Frage | Einstieg |
+|------------|------------------------------|----------|
+| **Interessierte Bürger** | Erster Kontakt, wenig Vorwissen: „Worum geht es, und warum betrifft mich das?“ | Startseite, `/warum-ramstein/` |
+| **Friedensaktivisten** | Wollen handeln und Material weitergeben: „Was steht an, wie kann ich helfen?“ | `/aktionen/`, `/mitmachen/` |
+| **Journalisten** | Unter Zeitdruck, brauchen Belege und Ansprechpartner: „Welche Fakten sind belegt, wen frage ich?“ | `/presse/`, `/fakten/` |
+| **Wissenschaftler** | Lesen gründlich, prüfen Quellen: „Worauf stützt sich die Aussage, wie zitiere ich sie?“ | `/analysen/`, `/fakten/`, Quellenblock jedes Artikels |
+| **Politiker und Entscheidungsträger** | Wenig Zeit, brauchen Kernaussagen und Forderungen: „Was wird konkret gefordert und warum?“ | `/warum-ramstein/`, `/ueber-uns/` |
+| **Teilnehmer des Friedenscamps** | Oft unterwegs am Smartphone: „Wann, wo, wie komme ich hin, was muss ich mitbringen?“ | `/aktionen/` und die jeweilige Terminseite |
+
+Die Tabelle beschreibt Annahmen über Nutzungssituationen, keine erhobenen Daten. Sie wird angepasst, sobald Rückmeldungen aus diesen Gruppen vorliegen.
+
+### 16.2 Prinzipien
+
+Jedes Prinzip hat eine Regel, an der sich eine Seite prüfen lässt.
+
+1. **Jede Seite verfolgt einen klar erkennbaren Zweck.** Titel und Einleitung sagen, worum es geht und für wen. Lässt sich der Zweck nicht in einem Satz sagen, wird die Seite geteilt.
+2. **Die wichtigsten Informationen sind ohne unnötiges Scrollen erreichbar.** Kernaussage und, falls vorhanden, die primäre Handlung stehen bei 390 px Breite im ersten Bildschirm. Bei Terminen gehören Datum, Ort und Uhrzeit nach oben, nicht in den Fließtext.
+3. **Navigation und Seitenstruktur bleiben konsistent.** Header, Footer und Hauptnavigation kommen ausschließlich aus `PageLayout.astro`. Gleiche Inhaltstypen nutzen dasselbe Layout (§5). Bezeichnungen in der Navigation, in Überschriften und in URLs passen zueinander.
+4. **Komplexe Sachverhalte werden verständlich aufbereitet.** Erst die Kernaussage, dann die Details. Kurze Absätze, sprechende Zwischenüberschriften, Fachbegriffe und Abkürzungen bei der ersten Nennung erklärt. Lange Artikel bekommen ein Inhaltsverzeichnis (`ArticleLayout.astro`).
+5. **Quellen und weiterführende Informationen sind leicht auffindbar.** Belege stehen direkt an der Aussage (Link oder `SourceLink`) und gesammelt im Quellenblock am Artikelende. Downloads sind als solche gekennzeichnet (Format, Größe).
+6. **Handlungsaufforderungen sind eindeutig, aber nicht aufdringlich.** Höchstens eine primäre Handlung pro Abschnitt, mit einem Verb, das sagt, was passiert („Jetzt spenden“, „Termin ansehen“). Keine Pop-ups, Overlays, Countdowns als Druckmittel oder Unterbrechungen beim Lesen.
+7. **Mobile, Tablet- und Desktop-Darstellung werden gleichermaßen berücksichtigt.** Jede Seite wird bei 390, 768 und 1280 px geprüft (§18). Keine Funktion und kein Inhalt ist nur auf einer Gerätegröße verfügbar.
+
+### 16.3 Informationsarchitektur vor visueller Gestaltung
+
+Eine schöne Website ist nicht automatisch eine verständliche Website. Deshalb werden zwei Fragen getrennt entschieden und getrennt geprüft:
+
+- **Informationsarchitektur:** Welche Seiten gibt es, wie heißen sie, wo liegen sie in der Navigation, welche URL haben sie, wie sind sie untereinander verlinkt, was steht auf einer Seite in welcher Reihenfolge?
+- **Visuelle Gestaltung:** Farben, Typografie, Abstände, Bilder, Animationen.
+
+Regeln:
+
+- Neue Seiten und Umbauten beginnen mit der Struktur: Zweck, Zielgruppe (16.1), Platz in der Navigation, URL (§17.8) und Gliederung. Erst danach folgt die Gestaltung.
+- Die Struktur muss auch ohne Gestaltung funktionieren: Eine Seite ist mit abgeschaltetem CSS in sinnvoller Reihenfolge lesbar, und die Überschriftenhierarchie allein ergibt eine verständliche Gliederung (§8.2).
+- Gestaltung darf die Struktur nicht verändern. Eine Designänderung, die Navigation, Reihenfolge oder Benennung ändert, ist eine IA-Änderung und wird als solche begründet.
+
+---
+
+## 17. SEO, Metadata & Discoverability
+
+Ziel ist nicht Reichweite um jeden Preis, sondern Auffindbarkeit und Zitierfähigkeit: Wer die Seite einmal zitiert hat, muss den Inhalt unter derselben Adresse wiederfinden. Jeder Unterabschnitt nennt die Regel und den aktuellen Stand.
+
+### 17.1 Title und Description
+
+- **Title:** `{Seitentitel} — Stopp Air Base Ramstein`, auf der Startseite nur der Name. Erzeugt in `src/layouts/BaseLayout.astro`. Der Seitentitel ist eindeutig, beschreibt den Inhalt und wiederholt nicht den Seitennamen. Richtwert: Seitentitel höchstens 50 Zeichen. Suchmaschinen kürzen lange Titel, der wichtige Teil steht deshalb vorn.
+- **Description:** ein bis zwei vollständige Sätze, höchstens 160 Zeichen, eigener Text pro Seite (nicht der erste Absatz kopiert). Für Markdown erzwingt das Schema in `src/content.config.ts` die 160 Zeichen. Für Beiträge und Termine aus dem CMS fehlt die Grenze noch (siehe `docs/OFFENE-PUNKTE.md`).
+- Title und Description sind Pflicht-Props jedes Layouts (§5.2).
+
+### 17.2 Canonical URLs
+
+- Jede Seite hat genau eine kanonische URL: `https://stoppramstein.de/…/` mit abschließendem Schrägstrich (`site` und `trailingSlash: 'always'` in `astro.config.mjs`). `BaseLayout.astro` setzt `<link rel="canonical">`.
+- `canonicalUrl` wird nur überschrieben, wenn derselbe Inhalt bewusst unter einer zweiten Adresse liegt. Dann zeigt der Canonical auf das Original.
+
+### 17.3 XML-Sitemap
+
+- `@astrojs/sitemap` erzeugt `sitemap-index.xml` bei jedem Build. Sie enthält nur indexierbare Seiten mit Status 200.
+- Seiten mit `noIndex` gehören nicht in die Sitemap. Ein entsprechender `filter` fehlt in `astro.config.mjs` noch (siehe `docs/OFFENE-PUNKTE.md`). Bisher setzt keine Seite `noIndex`.
+
+### 17.4 Robots-Regeln
+
+- `public/robots.txt` erlaubt alles und verweist auf die Sitemap. Inhalte werden nicht über `robots.txt` versteckt, sondern über `noIndex` oder gar nicht veröffentlicht.
+- Die Team-Vorschau setzt `X-Robots-Tag: noindex, nofollow` (`scripts/write-preview-headers.mjs`). Das darf nie in die Produktion gelangen.
+
+### 17.5 Open Graph und Social-Media-Metadaten
+
+- `BaseLayout.astro` setzt `og:title`, `og:description`, `og:url` (gleich dem Canonical), `og:image` (absolut), `og:locale`, `og:site_name` sowie die Twitter-Card-Tags.
+- Jede Seite hat ein Vorschaubild. Fallback: `/images/og-default.jpg`, bei CMS-Beiträgen das Titelbild.
+- Artikel und Analysen sollen `og:type` `article` mit Veröffentlichungsdatum setzen. Bisher ist es überall `website` (siehe `docs/OFFENE-PUNKTE.md`).
+
+### 17.6 Strukturierte Daten
+
+- Strukturierte Daten (JSON-LD, schema.org) nur dort, wo sie den Inhalt korrekt beschreiben: `Organization` auf der Startseite, `Article` für Analysen und Beiträge, `Event` für Termine. Kein Markup für Inhalte, die auf der Seite nicht sichtbar sind.
+- Eingebunden als `<script type="application/ld+json">`. Das führt kein JavaScript aus und ist mit `script-src 'self'` vereinbar. `scripts/check-csp.mjs` lässt diesen Typ bereits zu.
+- Bisher gibt es keine strukturierten Daten.
+
+### 17.7 HTTP-Statuscodes und 404-Seite
+
+- Vorhandene Seiten antworten mit 200, verschobene mit 301 (17.8), fehlende mit 404. Kein „Soft 404“: Eine fehlende Seite liefert nie Status 200 oder eine Weiterleitung auf die Startseite.
+- `src/pages/404.astro` wird zu `dist/404.html`. Beide Server-Vorlagen unter `deploy/` liefern sie für fehlende Pfade aus. Nach dem Deployment wird geprüft, dass dabei Status 404 ankommt (`docs/DEPLOYMENT.md`).
+- Die 404-Seite hilft weiter: Sie verlinkt die Startseite, den Kontakt und die Hauptrubriken (`src/pages/404.astro`). Kommt eine neue Hauptrubrik hinzu, wird sie dort ergänzt.
+
+### 17.8 Stabile URLs und Weiterleitungen
+
+Bestehende URLs und zitierfähige Inhalte bleiben erhalten. Eine Änderung der URL-Struktur darf nicht dazu führen, dass journalistische oder wissenschaftliche Verweise ins Leere laufen.
+
+- **Veröffentlichte URLs sind dauerhaft.** Slugs werden nach der Veröffentlichung nicht geändert, auch nicht bei Titeländerungen. Ausnahme nur mit Weiterleitung.
+- **Jede geänderte oder entfallene URL bekommt eine 301-Weiterleitung** auf die inhaltlich passende neue Seite, ersatzweise auf die nächsthöhere Rubrik. Nie pauschal auf die Startseite. Gibt es den Inhalt nicht mehr, ist 404 (bzw. 410) richtig.
+- **Migration von WordPress:** Alle alten URLs werden abgebildet. Die Quelle ist die Zeile „Original URL“ in jeder Datei unter `stoppramstein_content/`. Die alte Seite lief unter `www.stoppramstein.de`, die neue unter `stoppramstein.de`. Auch `www` muss per 301 umgeleitet werden, unter Beibehaltung des Pfads.
+- **Pflege:** Weiterleitungen stehen als feste Paare in der Server-Konfiguration (`deploy/Caddyfile.example`, `deploy/nginx.conf.example`, Ablauf in `docs/DEPLOYMENT.md`, „Weiterleitungen“) und werden nie entfernt. Für Sicherheit gilt 14.8.
+- **Stand:** Eine Weiterleitungstabelle gibt es noch nicht. Mehrere alte URLs haben kein direktes Gegenstück (siehe `docs/OFFENE-PUNKTE.md`).
+
+### 17.9 Doppelte Inhalte vermeiden
+
+- Jeder Inhalt ist nur unter einer URL erreichbar. Alle Varianten leiten per 301 dorthin: `www` → ohne `www`, `http` → `https`, ohne → mit abschließendem Schrägstrich (die nginx-Vorlage enthält die Regel für den Schrägstrich).
+- Texte werden nicht auf mehrere Seiten kopiert. Wird derselbe Inhalt an zwei Stellen gebraucht, verlinkt eine Seite auf die andere, oder der Inhalt wird als Komponente bzw. Collection-Eintrag wiederverwendet und der Canonical zeigt auf die Hauptseite.
+- Gefilterte oder sortierte Listen erzeugen keine eigenen indexierbaren URLs.
+
+### 17.10 Interne Verlinkung
+
+- Kernargumente (`/warum-ramstein/`), Fakten und Analysen verweisen aufeinander, wo sie dasselbe Thema behandeln. Jede Analyse verlinkt mindestens ein passendes Kernargument oder die Faktenseite.
+- Keine Waisenseiten: Jede indexierbare Seite ist über Navigation, Footer oder einen Link aus dem Inhalt erreichbar, nicht nur über die Sitemap.
+- Linktexte beschreiben das Ziel („Völkerrechtliche Bewertung“), nicht „hier“ oder „mehr“.
+- Interne Links zeigen direkt auf die kanonische URL, nicht auf eine Weiterleitung. `npm run check-links` prüft, dass interne Links auflösen.
+
+---
+
+## 18. Testing & Quality Assurance
+
+### 18.1 Prüfebenen
+
+Die Qualitätssicherung hat vier Ebenen. Nicht jede Prüfung muss in der CI laufen. Aber für jede ist festgelegt, ob sie automatisiert oder manuell läuft und wann.
+
+| Ebene | Was wird geprüft? | Werkzeug | Ausführung | Stand |
+|-------|-------------------|----------|------------|-------|
+| **Statisch** | Typen, Syntax, Content-Schemas; dazu interne Links, CSP-Verträglichkeit, Versionsangaben der Doku | Astro Check, TypeScript, Zod; `check-links`, `check-csp`, `check-doc-versions` | Automatisch: `npm run verify`, lokal vor jedem Commit und in der CI | Vorhanden |
+| **Funktional** | Navigation, Suche, Interaktionen (mobiles Menü, Pagefind, Weiterleitungen in der Vorschau) | Playwright | Automatisch in der CI | Geplant |
+| **Accessibility** | Kontrast, Semantik, Tastaturbedienung | axe-core (über Playwright) | Automatisch in der CI. Zusätzlich manuell vor Releases und bei neuen interaktiven Komponenten: komplette Tastaturbedienung und Stichprobe mit einem Screenreader | Geplant (automatisch), manuell ab sofort |
+| **Visuell** | Layout, Responsive Design, Regressionen | Playwright-Screenshots bei 390, 768 und 1280 px | Manuell bzw. lokal bei Layout-Änderungen, nicht in der CI, weil die Schriftdarstellung zwischen Systemen schwankt. Ergebnis im Pull Request nennen | Geplant, bis dahin manuelle Screenshots |
+
+Weitere manuelle Prüfungen:
+
+- **Lighthouse** vor größeren Releases oder Layout-Änderungen (§9.3).
+- **Security-Header** der Live-Seite nach jedem Deployment (§14.9).
+- **Redaktionsoberfläche und Payload-Loader gegen eine echte Datenbank** sind bisher nicht automatisch getestet (`docs/OFFENE-PUNKTE.md`, „Nicht automatisch getestet“).
+
+Sobald Playwright und axe-core eingerichtet sind, werden die Testbefehle hier und in `README.md`, „Befehle“, eingetragen.
+
+### 18.2 Definition of Done
+
+Eine Aufgabe gilt erst als abgeschlossen, wenn:
+
+- [ ] **die Implementierung vollständig ist:** keine Platzhalter, keine auskommentierten Reste, keine stillschweigend ausgelassenen Teile. Was bewusst offen bleibt, steht in `docs/OFFENE-PUNKTE.md` bzw. `docs/REDAKTION-TODO.md`.
+- [ ] **die relevanten Tests erfolgreich sind:** immer `npm run verify`, dazu die Prüfebenen aus 18.1, die die Änderung berührt (z. B. Screenshots bei Layout-Änderungen, `cms/` bauen bei CMS-Änderungen).
+- [ ] **keine bestehenden Funktionen unbeabsichtigt beschädigt wurden:** Navigation, Suche, interne Links und bestehende URLs funktionieren weiter (§17.8).
+- [ ] **die Barrierefreiheit nicht verschlechtert wurde:** Tastaturbedienung, Fokus, Kontrast und Überschriftenhierarchie sind mindestens so gut wie vorher (§8).
+- [ ] **die Dokumentation aktualisiert wurde, sofern erforderlich:** Guidelines, `README.md`, `CONTRIBUTING.md` und `docs/` beschreiben den neuen Stand.
+- [ ] **die Änderungen nachvollziehbar dokumentiert sind:** Commit-Messages nach §13.1, Pull Request mit Was und Warum. Fehlerbehebungen und größere Umbauten bekommen einen Eintrag in `docs/AENDERUNGSPROTOKOLL.md` (Problem, Fix, Nachweis).
+
+---
+
+## 19. Resolved Decisions
 
 The following items were clarified on 2026-01-30:
 
@@ -582,11 +790,12 @@ The following items were clarified on 2026-01-30:
 
 ---
 
-## 17. Changelog
+## 20. Changelog
 
 | Date | Version | Changes |
 |------|---------|---------|
 | 2026-01-30 | 1.0 | Initial guidelines document |
+| 2026-11-05 | 1.1 | Neu: §16 User Experience & Information Architecture, §17 SEO, Metadata & Discoverability, §18 Testing & Quality Assurance mit Definition of Done. §14 zu „Security & Privacy by Design“ erweitert (14.4–14.11). |
 
 ---
 
