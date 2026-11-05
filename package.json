@@ -12,7 +12,8 @@
     "typecheck": "astro check",
     "check-links": "node scripts/check-links.mjs",
     "check-csp": "node scripts/check-csp.mjs",
-    "verify": "npm run typecheck && npm run build && npm run check-links && npm run check-csp"
+    "check-doc-versions": "node scripts/check-doc-versions.mjs",
+    "verify": "npm run check-doc-versions && npm run typecheck && npm run build && npm run check-links && npm run check-csp"
   },
   "dependencies": {
     "@astrojs/check": "0.9.12",

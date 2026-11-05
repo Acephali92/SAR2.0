@@ -6,14 +6,16 @@ Technischer Überblick über SAR2.0: Datenfluss, Komponenten-Hierarchie, Content
 
 | Layer | Technologie | Version | Zweck |
 |-------|-------------|---------|-------|
-| Framework | Astro | 7.3.8 | Statische Seitengenerierung, kein JS by default |
+| Framework | Astro | 7.x | Statische Seitengenerierung, kein JS by default |
 | Content | Astro Content Collections | — | Typsicheres Markdown mit Zod-Validierung (`z` aus `astro/zod`) |
-| Styling | Tailwind CSS | 3.4.17 | Utility-first CSS, eingebunden über `postcss.config.mjs` (mit `autoprefixer`) |
-| Typografie | `@tailwindcss/typography` | 0.5.20 | Prose-Styling für Artikel |
-| Typsicherheit | TypeScript | 5.7.3 | Strict Mode |
-| Suche | Pagefind | 1.5.2 | Statischer, clientseitiger Suchindex |
-| Bildoptimierung | sharp | 0.35.5 | Für `scripts/generate-assets.mjs` |
-| Redaktion (Build-Zeit-Quelle) | Payload CMS 3 + PostgreSQL | siehe `cms/package.json` | Eigenständiges Projekt in `cms/`, siehe Abschnitt "CMS-Integration" unten |
+| Styling | Tailwind CSS | 3.x | Utility-first CSS, eingebunden über `postcss.config.mjs` (mit `autoprefixer`) |
+| Typografie | `@tailwindcss/typography` | 0.5.x | Prose-Styling für Artikel |
+| Typsicherheit | TypeScript | 5.x | Strict Mode |
+| Suche | Pagefind | 1.x | Statischer, clientseitiger Suchindex |
+| Bildoptimierung | sharp | 0.35.x | Für `scripts/generate-assets.mjs` |
+| Redaktion (Build-Zeit-Quelle) | Payload CMS + PostgreSQL | 3.x | Eigenständiges Projekt in `cms/`, siehe Abschnitt "CMS-Integration" unten |
+
+Die Tabelle nennt nur Hauptversionen. Die exakten Versionen stehen ausschließlich in `package.json` bzw. `cms/package.json` und den Lock-Dateien, die Node.js-Mindestversion in deren `engines.node` (siehe [`guidelines.md`](../guidelines.md) §2.2). `npm run check-doc-versions` prüft, dass diese Tabelle dazu passt.
 
 Selbst gehostete Schriften: IBM Plex Sans/Serif/Mono unter `public/fonts/`. Keine Google Fonts, keine externen CDNs (siehe CLAUDE.md).
 
@@ -241,7 +243,7 @@ SAR2.0/
 ├── public/
 │   ├── media/cms/                  # Von payload-loader.ts heruntergeladene CMS-Bilder (build-generiert, git-ignoriert)
 │   └── scripts/                    # Page-Scripts als externe Dateien (CSP: script-src 'self', keine Inline-Scripts)
-├── scripts/                        # check-links.mjs, check-csp.mjs, generate-assets.mjs
+├── scripts/                        # check-links.mjs, check-csp.mjs, check-doc-versions.mjs, generate-assets.mjs
 ├── tools/                          # scraper.py (einmaliges Migrationswerkzeug, siehe unten)
 ├── stoppramstein_content/          # Migrierte WordPress-Inhalte — nur lesen, nicht verändern
 ├── docs/                           # Diese Dokumentation
