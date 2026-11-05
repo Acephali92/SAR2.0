@@ -86,7 +86,7 @@ Muss fehlerfrei durchlaufen (Typecheck + Build + Link-Check + CSP-Check, siehe [
 
 - Kurze, klare Beschreibung: was wurde geändert und warum.
 - Bei Content-PRs: Quellen für neue Fakten verlinken.
-- Die automatischen Prüfungen (siehe unten) müssen grün sein.
+- Die automatischen Prüfungen (siehe unten) müssen grün sein. `master` ist per Ruleset geschützt: Gemergt wird nur über einen Pull Request, wenn „Verify“, „CMS“ und „Semgrep“ grün sind.
 - Fertig ist ein PR erst, wenn er die Definition of Done erfüllt ([`guidelines.md`](./guidelines.md) §18.2). Dazu gehört, dass Barrierefreiheit und bestehende URLs nicht schlechter werden. Manuelle Prüfungen (z. B. Screenshots bei Layout-Änderungen) mit Ergebnis in der PR-Beschreibung nennen.
 
 ## Automatische Prüfungen
