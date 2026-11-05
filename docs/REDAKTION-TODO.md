@@ -10,11 +10,12 @@ Was nicht hierher gehört:
 
 ## Unbelegte Aussagen
 
-*(Noch keine gemeldet. Beim Redigieren von Inhalten in `src/content/warum-ramstein/` bzw. Beiträgen im CMS hier eintragen, wenn eine Aussage keine Quelle hat.)*
+- **Unterschriftenzahl des Aufrufs:** `src/content/mitmachen/aufruf.md` („Bereits 24.978 Unterschriften“, Description „über 24.900“) und `src/layouts/MitmachenLayout.astro` (Zähler und Hinweistext beim Aufruf) nennen eine Zahl ohne Quelle und ohne Datum. Seit unterschrieben wird auf ramsteinschliessen.de, veraltet sie. Zu entscheiden: aktuelle Zahl mit Stand und Quelle (z. B. von ramsteinschliessen.de) eintragen oder streichen.
 
 ## Inhaltliche Lücken
 
-*(Noch keine gemeldet.)*
+- **Pressearchiv verweist auf die alte Website:** `src/content/seiten/presse.md` verlinkt „Ältere Pressemitteilungen“ auf `https://www.stoppramstein.de/presse/`. Die alte Seite ist nicht mehr erreichbar, nach dem Umzug zeigt die Adresse auf die neue Seite. Ältere Pressemitteilungen werden mit der Migration der Altdaten übernommen (Branch `feat/wordpress-altdaten`). Danach den Link auf die neue Stelle setzen.
+- **Gendersprache im Aufruf-Text:** `src/content/mitmachen/aufruf.md` enthält „Mitarbeiter*innen“ und „Bürger*innen“, entgegen der Projektregel. Weil das der Wortlaut des unterzeichneten Aufrufs ist, nicht eigenmächtig ändern: Die Redaktion entscheidet, ob der Text angepasst oder als Zitat des Originals gekennzeichnet wird.
 
 ## Offene Entscheidungen
 

@@ -59,8 +59,8 @@ const { title, description, ctaType, heroImage, contactEmail } = Astro.props;
  */
 const ctaConfig: Record<string, CtaConfig> = {
   petition: {
-    label: 'Aufruf per E-Mail unterzeichnen',
-    href: 'mailto:info@stoppramstein.de?subject=Aufruf%20unterzeichnen',
+    label: 'Aufruf auf ramsteinschliessen.de unterzeichnen',
+    href: 'https://ramsteinschliessen.de/',
     icon: 'pencil',
     accentColor: 'text-amber-500',
     accentBg: 'bg-amber-500',
@@ -101,6 +101,9 @@ const ctaConfig: Record<string, CtaConfig> = {
 };
 
 const cta = ctaConfig[ctaType];
+
+/** mailto: and external web links open with target="_blank" rel="noopener noreferrer" (guidelines.md §14.2). */
+const isExternal = (href: string) => /^(mailto:|https?:\/\/)/.test(href);
 
 /**
  * Hero background images per engagement type.
@@ -226,7 +229,7 @@ const getIcon = (name: keyof typeof icons) => icons[name];
 
             <!-- Primary CTA with icon -->
             <div class="flex flex-col sm:flex-row items-start gap-4">
-              <Button href={cta.href} variant="primary" size="lg" external={cta.href.startsWith('mailto:')}>
+              <Button href={cta.href} variant="primary" size="lg" external={isExternal(cta.href)}>
                 <span class="flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon(cta.icon)} />
                   {cta.label}
@@ -310,7 +313,7 @@ const getIcon = (name: keyof typeof icons) => icons[name];
 
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button href={cta.href} variant="primary" size="lg" external={cta.href.startsWith('mailto:')}>
+              <Button href={cta.href} variant="primary" size="lg" external={isExternal(cta.href)}>
                 <span class="flex items-center gap-2">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={getIcon(cta.icon)} />
                   {cta.label}
