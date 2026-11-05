@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-Dev-Server läuft unter `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.
+Dev-Server läuft unter `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.12. Am einfachsten nimmst du die Version aus `.nvmrc`, mit nvm per `nvm use`.
 
 ## Bevor du beiträgst
 

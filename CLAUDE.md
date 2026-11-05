@@ -17,7 +17,8 @@ npm run build       # Produktion (nach dist/)
 npm run typecheck   # Nur TypeScript-Prüfung
 npm run check-links # Interne Links im Build-Output prüfen
 npm run check-csp   # Build-Output auf Inline-Scripts/CSP-Verstöße prüfen
-npm run verify      # typecheck + build + check-links + check-csp (CI-Validation)
+npm run check-doc-versions  # Versionsangaben der Doku gegen package.json/.nvmrc prüfen
+npm run verify      # check-doc-versions + typecheck + build + check-links + check-csp (CI-Validation)
 ```
 
 ## Verbindliche Regeln
@@ -41,6 +42,10 @@ Gilt für die öffentliche Astro-Seite (`src/`, `dist/`). Ausnahme: `cms/` ist e
 - **Keine Fakten, Zahlen, Quellen oder Personen erfinden!**
 - Unbelegte Aussagen in `docs/REDAKTION-TODO.md` notieren
 - **Keine Gendersprache:** Keine Doppelpunkt-/Sternchen-/Unterstrich-Formen (`Autor:in`, `Nutzer*innen`, `Leser_innen` etc.) — weder in Inhalten noch in Dokumentation oder UI-Texten. Stattdessen ein passendes neutrales Kollektivum nutzen (z. B. „Redaktion" statt „Redakteur:innen") oder die generische Form (z. B. „Autor", „Nutzer").
+
+### Versionen
+
+Exakte Versionen stehen nur in `package.json`/`cms/package.json` (Node.js-Minimum: `engines.node`, Entwicklung/CI: `.nvmrc`). In Dokumentation nur Hauptversionen nennen („Astro 7.x“). Siehe `guidelines.md` §2.2.
 
 ### Content Security Policy
 

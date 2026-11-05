@@ -22,7 +22,7 @@ npm install
 npm run dev
 ```
 
-Dev-Server: `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.
+Dev-Server: `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.12 (empfohlen: die Version aus `.nvmrc`, mit nvm per `nvm use`).
 
 ## Befehle
 
@@ -34,11 +34,12 @@ Dev-Server: `http://localhost:4321`. Voraussetzung: Node.js ≥ 22.
 | `npm run typecheck` | TypeScript-/Schema-Prüfung |
 | `npm run check-links` | Interne Links im Build-Output prüfen |
 | `npm run check-csp` | Build-Output auf Inline-Scripts/CSP-Verstöße prüfen |
-| `npm run verify` | typecheck + build + check-links + check-csp — **vor jedem Commit ausführen** |
+| `npm run check-doc-versions` | Versionsangaben in der Doku gegen `package.json`, `.nvmrc`, CI und Dockerfiles prüfen |
+| `npm run verify` | check-doc-versions + typecheck + build + check-links + check-csp — **vor jedem Commit ausführen** |
 
 ## Stack
 
-Astro 7.x (statische Ausgabe) · Tailwind CSS 3.x · Astro Content Collections mit Zod-Validierung · Pagefind-Suche · TypeScript (strict). Details: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md).
+Astro 7.x (statische Ausgabe) · Tailwind CSS 3.x · Astro Content Collections mit Zod-Validierung · Pagefind-Suche · TypeScript (strict). Details: [`docs/ARCHITEKTUR.md`](docs/ARCHITEKTUR.md). Exakte Versionen stehen nur in `package.json`, siehe [`guidelines.md`](guidelines.md) §2.2.
 
 Beiträge (Nachrichten/Analysen) und Termine werden über eine selbst gehostete Redaktionsoberfläche (Payload CMS 3 + PostgreSQL, eigenständiges Projekt in `cms/`) gepflegt und fließen nur zur Build-Zeit in die statische Seite ein — die Website bleibt vollständig statisch und funktioniert auch bei einem CMS-Ausfall weiter. CMS-Befehle laufen unter `npm --prefix cms run <script>`, siehe [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 

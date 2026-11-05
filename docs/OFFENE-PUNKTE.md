@@ -71,7 +71,7 @@ Dazu kommen die Alerts #5–#7 in `scripts/check-links.mjs`. Sie sind im Code mi
 - **Offene Dependabot-PRs:**
   - #17 Tailwind 4: Major-Update mit Migrationsaufwand. Tailwind 4 setzt Safari 16.4+, Chrome 111+ und Firefox 128+ voraus. Für `tailwindcss` selbst gibt es keinen Alert.
   - #19 TypeScript 7: Major-Update.
-  - #18 Astro 7: überholt, `master` hat Astro 7.3.8. Kann geschlossen werden.
+  - Bei beiden schlägt `npm run check-doc-versions` fehl, bis die Hauptversion in der Doku nachgezogen ist (`guidelines.md` §2.2).
 - **Payload-Pakete:** `payload` und alle `@payloadcms/*` brauchen dieselbe Version. Dependabot-Security-Updates heben nur Pakete mit Advisory. Wird der CI-Job „CMS“ bei so einem PR rot, die übrigen `@payloadcms/*` von Hand nachziehen.
 - **Semgrep-Image:** `semgrep/semgrep:<version>@sha256:…` in `.github/workflows/security.yml` deckt Dependabot nicht ab. Es muss von Hand aktualisiert werden.
 

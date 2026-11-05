@@ -43,24 +43,32 @@ This website serves as the official digital presence for the "Stopp Air Base Ram
 | **Styling** | Tailwind CSS | 3.x | Utility-first, no runtime CSS-in-JS |
 | **Typography** | IBM Plex (Sans, Serif, Mono) | Self-hosted | No Google Fonts; excellent German language support |
 | **Icons** | Inline SVG | — | No icon library dependency |
-| **Search** | Pagefind | Latest | Static search index, zero runtime cost |
+| **Search** | Pagefind | 1.x | Static search index, zero runtime cost |
 | **Build** | Vite (via Astro) | — | Fast builds, ES modules |
 
-### 2.2 Version Pinning
+### 2.2 Versionen: eine Quelle pro Angabe
 
-All dependencies must be pinned to exact versions in `package.json` (no `^` or `~` prefixes for core dependencies). This ensures reproducible builds.
+Jede Versionsangabe hat genau eine Quelle. Alles andere verweist darauf oder nennt höchstens die Hauptversion.
 
-```json
-{
-  "dependencies": {
-    "astro": "5.1.1"
-  }
-}
-```
+| Angabe | Einzige Quelle |
+|--------|----------------|
+| Abhängigkeiten der Website | `package.json` + `package-lock.json`. Exakt gepinnt, kein `^` oder `~`. |
+| Abhängigkeiten des CMS | `cms/package.json` + `cms/package-lock.json`. Caret-Ranges (alle `@payloadcms/*` brauchen dieselbe Version wie `payload`), reproduzierbar über die Lock-Datei und `npm ci`. |
+| Node.js-Mindestversion | `engines.node` in `package.json` bzw. `cms/package.json` |
+| Node.js für Entwicklung und CI | `.nvmrc` (nur die Hauptversion). Die CI liest die Datei über `node-version-file`. |
+| Node.js in den CMS-Containern | `FROM node:<Hauptversion>-alpine` in den Dockerfiles unter `cms/`, muss zu `.nvmrc` passen |
+
+Regeln für Dokumentation:
+
+- Nur Hauptversionen nennen: „Astro 7“ oder „Tailwind CSS 3.x“, in Tabellen „7.x“. Bei 0.x-Paketen zählt die zweite Stelle als Hauptversion („0.5.x“). Exakte Versionen veralten mit jedem Dependabot-Update und gehören nicht in die Doku.
+- Die Node.js-Mindestversion steht genau so wie in `engines.node`, z. B. „Node.js ≥ 22.12“.
+- `npm run check-doc-versions` (Teil von `npm run verify`) prüft `README.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `guidelines.md`, `docs/ARCHITEKTUR.md`, `docs/DEPLOYMENT.md`, `docs/INHALTE-PFLEGEN.md` und `cms/README.md` gegen diese Quellen, außerdem `.nvmrc`, CI-Workflows und Dockerfiles untereinander. Ausgenommen sind `docs/AENDERUNGSPROTOKOLL.md` (alte Versionen sind dort richtig) und `docs/OFFENE-PUNKTE.md` (nennt künftige Versionen).
+- Nach einem Major-Update (z. B. Tailwind 3 → 4) schlägt die Prüfung fehl, bis die Doku angepasst ist. Das ist gewollt: Ein Major-Update ändert meist auch beschriebenes Verhalten.
 
 ### 2.3 Node.js Requirement
 
-- **Minimum:** Node.js 22.x LTS
+- **Minimum:** Node.js ≥ 22.12 (`engines.node` in `package.json`, von Astro 7 vorgegeben)
+- **Entwicklung, CI und Container:** Node.js 22 laut `.nvmrc` (mit nvm: `nvm use`)
 - **Package Manager:** npm (not yarn, pnpm, or bun) for maximum compatibility
 
 ---
@@ -352,6 +360,8 @@ Die Lighthouse-Ziele aus 9.1 sind ein manueller Pre-Release-Check (z.B. vor grö
 | Package | Purpose | Status |
 |---------|---------|--------|
 | `astro` | Core framework | Required |
+| `@astrojs/check` | Type and schema check (`npm run typecheck`) | Required |
+| `typescript` | Strict type checking, used by `@astrojs/check` | Required |
 | `autoprefixer` | PostCSS plugin for Tailwind 3 (replaces the deprecated `@astrojs/tailwind`) | Required |
 | `@astrojs/sitemap` | Sitemap generation | Required |
 | `tailwindcss` | CSS framework | Required |
@@ -416,26 +426,13 @@ npm run postbuild
 # Type checking
 npm run typecheck
 
-# Full verification (types + build + link-check + CSP-check)
+# Full verification (doc versions + types + build + link-check + CSP-check)
 npm run verify
 ```
 
 ### 11.4 Package.json Scripts
 
-```json
-{
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "postbuild": "pagefind --site dist",
-    "typecheck": "astro check",
-    "check-links": "node scripts/check-links.mjs",
-    "check-csp": "node scripts/check-csp.mjs",
-    "verify": "npm run typecheck && npm run build && npm run check-links && npm run check-csp"
-  }
-}
-```
+Die Scripts stehen nur in `package.json`. Eine Übersicht mit Zweck steht in `README.md`, Abschnitt „Befehle“.
 
 ---
 

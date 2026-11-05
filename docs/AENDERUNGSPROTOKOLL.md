@@ -2,6 +2,22 @@
 
 Erledigte Fehlerbehebungen, Sicherheitsfixes und größere Umbauten. Neueste zuerst. Jeder Eintrag nennt Problem, Fix und Nachweis. Details stehen in den verlinkten Pull Requests bzw. Commits. Was noch offen ist, steht in [`OFFENE-PUNKTE.md`](./OFFENE-PUNKTE.md).
 
+## 2026-11-05
+
+### Versionsangaben in der Doku widersprachen sich
+
+README, `guidelines.md`, `docs/ARCHITEKTUR.md` und `package.json` nannten unterschiedliche Versionen. Das erschwerte neuen Ehrenamtlichen den Einstieg:
+
+- `docs/ARCHITEKTUR.md` nannte Astro 7.3.8, installiert ist laut `package.json` längst eine neuere 7er-Version. Die übrigen exakten Versionen der Tabelle hätten beim nächsten Dependabot-Update genauso veraltet.
+- README, `CONTRIBUTING.md` und `guidelines.md` nannten Node.js „≥ 22“ bzw. „22.x“. `engines.node` verlangt 22.12, weil Astro 7 das voraussetzt (`engines` von `astro`). Node.js 22.0 bis 22.11 wird nicht unterstützt, `npm install` warnt dann nur mit `EBADENGINE`.
+- `guidelines.md` zeigte als Pinning-Beispiel `"astro": "5.1.1"`, führte Pagefind als „Latest“ (widerspricht der Pinning-Regel) und kopierte den `scripts`-Block aus `package.json`. Die Pinning-Regel galt dem Wortlaut nach für alle Abhängigkeiten, `cms/` nutzt aber bewusst Caret-Ranges (PR #31). In §10.1 fehlten `@astrojs/check` und `typescript`.
+- `docs/OFFENE-PUNKTE.md` führte den längst geschlossenen Dependabot-PR #18 noch als offen.
+
+- *Ursache:* Exakte Versionen wurden an mehreren Stellen von Hand gepflegt.
+- *Fix:* Jede Versionsangabe hat eine einzige Quelle (`guidelines.md` §2.2): `package.json`/`cms/package.json` für Abhängigkeiten und `engines.node`, `.nvmrc` für Entwicklung, CI und Container. Die Doku nennt nur Hauptversionen. Die CI liest die Node.js-Version über `node-version-file: .nvmrc` statt einer eigenen Angabe. Der `scripts`-Block in `guidelines.md` ist durch einen Verweis ersetzt.
+- *Absicherung:* `scripts/check-doc-versions.mjs` (`npm run check-doc-versions`, Teil von `npm run verify`) prüft die Doku gegen diese Quellen sowie `.nvmrc`, CI-Workflows und Dockerfiles untereinander. Nach einem Major-Update schlägt die Prüfung fehl, bis die Doku nachgezogen ist.
+- *Nachweis:* Auf dem alten Stand meldete die Prüfung 8 Abweichungen, auf dem neuen keine. Gegenproben mit absichtlich falschen Angaben (Tailwind 4, Node.js ≥ 22, `node:20` im Dockerfile) schlagen an. `npm run verify` ist grün.
+
 ## 2026-10-21
 
 ### CMS ließ sich nach Dependabot-Updates nicht mehr installieren (PR #31)
