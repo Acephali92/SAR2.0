@@ -251,7 +251,7 @@ SAR2.0/
 │   ├── media/cms/                  # Von payload-loader.ts heruntergeladene CMS-Bilder (build-generiert, git-ignoriert)
 │   └── scripts/                    # Page-Scripts als externe Dateien (CSP: script-src 'self', keine Inline-Scripts)
 ├── scripts/                        # check-links.mjs, check-csp.mjs, check-doc-versions.mjs, generate-assets.mjs
-├── tools/                          # scraper.py (einmaliges Migrationswerkzeug, siehe unten)
+├── tools/                          # Einmalige Migrationswerkzeuge (scraper.py, wp-inventar.py, wp-freigabe.py), siehe unten
 ├── stoppramstein_content/          # Migrierte WordPress-Inhalte — nur lesen, nicht verändern
 ├── docs/                           # Diese Dokumentation
 ├── dist/                           # Build-Output (git-ignoriert)
@@ -308,4 +308,10 @@ Die Grenze ist strikt: stoppramstein.de bleibt `output: 'static'` und sieht Entw
 
 ## Migrationswerkzeug
 
-`tools/scraper.py` extrahiert Inhalte von der alten WordPress-Seite nach `stoppramstein_content/`. Einmaliges Werkzeug, nicht Teil des Build-Prozesses. Ausführung: `cd tools && pip install -r requirements.txt && python scraper.py`.
+Einmalige Werkzeuge, nicht Teil des Build-Prozesses:
+
+- `tools/scraper.py` hat Inhalte der alten WordPress-Seite nach `stoppramstein_content/` extrahiert, solange sie noch online war. Ausführung: `cd tools && pip install -r requirements.txt && python scraper.py`.
+- `tools/wp-inventar.py` liest einen Datenbank-Dump der alten Seite und schreibt `docs/migration/inventar.csv`, `medien.csv` und `altdaten-weiterleitungen.csv`. Es liest nur die Tabellen und Spalten seiner Positivliste. Nutzerkonten, Kommentare, Newsletter-Abonnenten, Spenden, Formulareinträge und Unterschriften werden nie ausgelesen (von den Unterschriften nur die Anzahl). Nur Standardbibliothek: `python3 -I tools/wp-inventar.py --dump <Ordner mit *.sql> --uploads <uploads.tsv> --out docs/migration`.
+- `tools/wp-freigabe.py` erzeugt daraus `docs/migration/freigabe.csv` und die Übersicht [`MIGRATION-ALTDATEN.md`](./MIGRATION-ALTDATEN.md): `python3 -I tools/wp-freigabe.py --dir docs/migration --doc docs/MIGRATION-ALTDATEN.md`.
+
+Die Rohdaten (Datenbank-Backup, `.htaccess`, Liste der Uploads) liegen nur lokal außerhalb des Repos. Sie enthalten personenbezogene Daten und gehören nie ins Repo.
