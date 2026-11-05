@@ -70,13 +70,9 @@ Wir fordern vom Deutschen Bundestag und von der Bundesregierung:
 
 Ohne persönlichen Einsatz und demonstrative Aktionen kann die brandgefährliche Militärpolitik nicht gestoppt werden.
 
-**Kontaktieren Sie uns per E-Mail, um den Aufruf zu unterzeichnen:**
+**Den Aufruf unterzeichnen Sie auf <a href="https://ramsteinschliessen.de/" target="_blank" rel="noopener noreferrer">ramsteinschliessen.de</a>.**
 
-E-Mail: info@stoppramstein.de
-
-Betreff: Aufruf unterzeichnen
-
-Bitte geben Sie Ihren Namen und Ihren Wohnort an.
+Der Link führt zu einer externen Website. Dort gelten deren Datenschutzhinweise.
 
 ---
 
