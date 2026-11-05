@@ -11,7 +11,7 @@
  * ("Astro 7", "Tailwind CSS 3.x", "7.x" in a table; for 0.x packages the
  * second digit counts as the major: "0.5.x"). This script fails if a doc names
  * an exact version, a different major, or a Node.js minimum other than
- * engines.node, and if .nvmrc, the CI workflows and the Dockerfiles disagree
+ * engines.node, and if .nvmrc, the CI workflows and the DOCKERFILES disagree
  * on the Node.js major.
  *
  * Deliberately not checked: docs/AENDERUNGSPROTOKOLL.md (historical versions)
@@ -21,10 +21,10 @@
  */
 
 import { readFileSync, existsSync, readdirSync } from 'fs';
-import { join, dirname, relative } from 'path';
+import { dirname, resolve, sep } from 'path';
 import { fileURLToPath } from 'url';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const DOCS = [
   'README.md',
@@ -36,8 +36,18 @@ const DOCS = [
   'docs/INHALTE-PFLEGEN.md',
   'cms/README.md',
 ];
+const DOCKERFILES = ['cms/Dockerfile', 'cms/webhook/Dockerfile', 'cms/backup/Dockerfile'];
+const WORKFLOWS_DIR = '.github/workflows';
 
-const readText = (path) => readFileSync(join(ROOT, path), 'utf8');
+// All paths are constants of this script or file names from WORKFLOWS_DIR.
+// The check below keeps every one of them inside the repository.
+function repoPath(path) {
+  // nosemgrep: javascript.lang.security.audit.path-traversal.path-join-resolve-traversal.path-join-resolve-traversal
+  const full = resolve(ROOT, path);
+  if (!full.startsWith(ROOT + sep)) throw new Error(`${path} liegt außerhalb des Repositorys`);
+  return full;
+}
+const readText = (path) => readFileSync(repoPath(path), 'utf8');
 const readJson = (path) => JSON.parse(readText(path));
 
 const projects = {
@@ -46,22 +56,36 @@ const projects = {
 };
 const rootLock = readJson('package-lock.json');
 
-// name: label in messages; pattern: how docs write it (case-sensitive);
+// aliases: how docs write the name (must match TOOL_NAMES below);
 // version(): the version from the single source
 const TOOLS = [
-  { name: 'Astro', pattern: 'Astro', version: () => dep('root', 'astro') },
-  { name: 'Tailwind CSS', pattern: 'Tailwind(?: CSS)?', version: () => dep('root', 'tailwindcss') },
-  { name: '@tailwindcss/typography', pattern: '@tailwindcss/typography', version: () => dep('root', '@tailwindcss/typography') },
-  { name: 'TypeScript', pattern: 'TypeScript', version: () => dep('root', 'typescript') },
-  { name: 'Pagefind', pattern: 'Pagefind', version: () => dep('root', 'pagefind') },
-  { name: 'sharp', pattern: 'sharp', version: () => dep('root', 'sharp') },
-  { name: 'Vite', pattern: 'Vite', version: () => locked('node_modules/vite'), source: 'package-lock.json (über Astro)' },
-  { name: 'Payload CMS', pattern: 'Payload(?: CMS)?', version: () => dep('cms', 'payload'), source: 'cms/package.json' },
-  { name: 'Next.js', pattern: 'Next\\.js', version: () => dep('cms', 'next'), source: 'cms/package.json' },
+  { name: 'Astro', aliases: ['Astro'], version: () => dep('root', 'astro') },
+  { name: 'Tailwind CSS', aliases: ['Tailwind CSS', 'Tailwind'], version: () => dep('root', 'tailwindcss') },
+  { name: '@tailwindcss/typography', aliases: ['@tailwindcss/typography'], version: () => dep('root', '@tailwindcss/typography') },
+  { name: 'TypeScript', aliases: ['TypeScript'], version: () => dep('root', 'typescript') },
+  { name: 'Pagefind', aliases: ['Pagefind'], version: () => dep('root', 'pagefind') },
+  { name: 'sharp', aliases: ['sharp'], version: () => dep('root', 'sharp') },
+  { name: 'Vite', aliases: ['Vite'], version: () => locked('node_modules/vite'), source: 'package-lock.json (über Astro)' },
+  { name: 'Payload CMS', aliases: ['Payload CMS', 'Payload'], version: () => dep('cms', 'payload'), source: 'cms/package.json' },
+  { name: 'Next.js', aliases: ['Next.js'], version: () => dep('cms', 'next'), source: 'cms/package.json' },
 ];
+
+// Same names as the aliases above, longer variants first.
+// Prose: "Astro 7", "Astro 7.x", "Astro-7-Standard"; not "@astrojs" or "Astro islands"
+const PROSE_REGEX = /(?<![\w@/.-])(Astro|Tailwind CSS|Tailwind|@tailwindcss\/typography|TypeScript|Pagefind|sharp|Vite|Payload CMS|Payload|Next\.js)[ -](\d+(?:\.\d+)*(?:\.x)?)(?![\d.])/g;
+// Table cell holding exactly a tool name: "| Astro | 7.x | ..."
+const CELL_REGEX = /^(?:Astro|Tailwind CSS|Tailwind|@tailwindcss\/typography|TypeScript|Pagefind|sharp|Vite|Payload CMS|Payload|Next\.js)$/;
+const VERSION_CELL = /^\d+(?:\.\d+)*(?:\.x)?$/;
+const NODE_REGEX = /\bNode\.js\s*(≥|>=)?\s*(\d+(?:\.\d+)*)(?:\.x)?/g;
 
 const errors = [];
 const report = (file, line, message) => errors.push(`${file}:${line}: ${message}`);
+
+function toolFor(name) {
+  const tool = TOOLS.find((t) => t.aliases.includes(name));
+  if (!tool) throw new Error(`Kein Eintrag in TOOLS für „${name}“`);
+  return tool;
+}
 
 function dep(project, name) {
   const { pkg, manifest } = projects[project];
@@ -103,44 +127,28 @@ function engineMinimum(project) {
 
 const trimZeros = (version) => version.replace(/(\.0)+$/, '');
 
-const toolRegexes = TOOLS.map((tool) => ({
-  tool,
-  // "Astro 7", "Astro 7.x", "Astro-7-Standard"; not "@astrojs" or "Astro islands"
-  prose: new RegExp(`(?<![\\w@/.-])${tool.pattern}[ -](\\d+(?:\\.\\d+)*(?:\\.x)?)(?![\\d.])`, 'g'),
-  cell: new RegExp(`^${tool.pattern}$`),
-}));
-const NODE_REGEX = /\bNode\.js\s*(≥|>=)?\s*(\d+(?:\.\d+)*)(?:\.x)?/g;
-const VERSION_CELL = /^\d+(?:\.\d+)*(?:\.x)?$/;
-
-for (const file of DOCS) {
-  if (!existsSync(join(ROOT, file))) {
-    report(file, 0, 'Datei fehlt. Liste DOCS in scripts/check-doc-versions.mjs anpassen.');
-    continue;
-  }
+function checkDoc(file) {
   const project = file.startsWith('cms/') ? 'cms' : 'root';
   const minimum = engineMinimum(project);
+  const manifest = projects[project].manifest;
 
   readText(file).split('\n').forEach((text, index) => {
     const line = index + 1;
 
-    for (const { tool, prose } of toolRegexes) {
-      for (const match of text.matchAll(prose)) checkToolVersion(file, line, tool, match[1]);
+    for (const [, name, written] of text.matchAll(PROSE_REGEX)) {
+      checkToolVersion(file, line, toolFor(name), written);
     }
 
-    // Tables: "| Astro | 7.x | ..."
     if (text.trimStart().startsWith('|')) {
       const cells = text.split('|').map((cell) => cell.replace(/[`*]/g, '').trim());
-      for (const { tool, cell } of toolRegexes) {
-        const at = cells.findIndex((c) => cell.test(c));
-        if (at === -1) continue;
+      cells.forEach((cell, at) => {
+        if (!CELL_REGEX.test(cell)) return;
         const version = cells.slice(at + 1).find((c) => VERSION_CELL.test(c));
-        if (version) checkToolVersion(file, line, tool, version);
-      }
+        if (version) checkToolVersion(file, line, toolFor(cell), version);
+      });
     }
 
-    for (const match of text.matchAll(NODE_REGEX)) {
-      const [, atLeast, written] = match;
-      const manifest = projects[project].manifest;
+    for (const [, atLeast, written] of text.matchAll(NODE_REGEX)) {
       if (atLeast && trimZeros(written) !== trimZeros(minimum)) {
         report(file, line, `„Node.js ≥ ${written}“ passt nicht zu engines.node in ${manifest} (>=${minimum}). Erwartet: „Node.js ≥ ${trimZeros(minimum)}“.`);
       } else if (!atLeast && written.split('.')[0] !== minimum.split('.')[0]) {
@@ -151,35 +159,38 @@ for (const file of DOCS) {
 }
 
 // One Node.js major for local development, CI and containers
-const nvmrc = readText('.nvmrc').trim();
-if (!/^\d+$/.test(nvmrc)) report('.nvmrc', 1, `Enthält „${nvmrc}“, erwartet wird nur die Hauptversion (z. B. „22“).`);
-for (const [name, { manifest }] of Object.entries(projects)) {
-  const major = engineMinimum(name).split('.')[0];
-  if (major !== nvmrc) report('.nvmrc', 1, `Node.js ${nvmrc} passt nicht zu engines.node in ${manifest} (>=${engineMinimum(name)}).`);
-}
+function checkNodePins() {
+  const nvmrc = readText('.nvmrc').trim();
+  if (!/^\d+$/.test(nvmrc)) report('.nvmrc', 1, `Enthält „${nvmrc}“, erwartet wird nur die Hauptversion (z. B. „22“).`);
+  for (const [name, { manifest }] of Object.entries(projects)) {
+    const minimum = engineMinimum(name);
+    if (minimum.split('.')[0] !== nvmrc) report('.nvmrc', 1, `Node.js ${nvmrc} passt nicht zu engines.node in ${manifest} (>=${minimum}).`);
+  }
 
-function findFiles(dir, accept) {
-  return readdirSync(join(ROOT, dir), { withFileTypes: true }).flatMap((entry) => {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) return entry.name === 'node_modules' || entry.name.startsWith('.') ? [] : findFiles(path, accept);
-    return accept(entry.name) ? [path] : [];
-  });
-}
-
-const nodePins = [
-  { files: findFiles('.github/workflows', (n) => /\.ya?ml$/.test(n)), regex: /node-version:\s*['"]?(\d+)/ },
-  { files: findFiles('cms', (n) => n === 'Dockerfile'), regex: /^FROM\s+node:(\d+)/ },
-];
-for (const { files, regex } of nodePins) {
-  for (const file of files) {
+  const workflows = readdirSync(repoPath(WORKFLOWS_DIR))
+    .filter((name) => /\.ya?ml$/.test(name))
+    .map((name) => `${WORKFLOWS_DIR}/${name}`);
+  const pins = [
+    ...workflows.map((file) => ({ file, regex: /node-version:\s*['"]?(\d+)/ })),
+    ...DOCKERFILES.map((file) => ({ file, regex: /^FROM\s+node:(\d+)/ })),
+  ];
+  for (const { file, regex } of pins) {
+    if (!existsSync(repoPath(file))) {
+      report(file, 0, 'Datei fehlt. Liste DOCKERFILES in scripts/check-doc-versions.mjs anpassen.');
+      continue;
+    }
     readText(file).split('\n').forEach((text, index) => {
       const match = regex.exec(text);
-      if (match && match[1] !== nvmrc) {
-        report(relative(ROOT, join(ROOT, file)), index + 1, `Node.js ${match[1]} passt nicht zu .nvmrc (${nvmrc}).`);
-      }
+      if (match && match[1] !== nvmrc) report(file, index + 1, `Node.js ${match[1]} passt nicht zu .nvmrc (${nvmrc}).`);
     });
   }
 }
+
+for (const file of DOCS) {
+  if (existsSync(repoPath(file))) checkDoc(file);
+  else report(file, 0, 'Datei fehlt. Liste DOCS in scripts/check-doc-versions.mjs anpassen.');
+}
+checkNodePins();
 
 if (errors.length > 0) {
   console.error(`Versionsangaben widersprechen der einzigen Quelle (guidelines.md §2.2):\n`);
