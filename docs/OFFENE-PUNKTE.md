@@ -69,15 +69,7 @@ Bisher bekannt sind nur die 21 migrierten Seiten aus den Zeilen „Original URL�
 | `/event/` | `/aktionen/` | |
 | `/aufruf-zur-demo-am-14-februar-2026-in-muenchen/`, `/nachrichten/`, `/newsletter`, `/infomaterial/`, `/impressionen-2025/` | offen | Entscheidung der Redaktion, siehe [`REDAKTION-TODO.md`](./REDAKTION-TODO.md) |
 
-**Vollständiges Inventar steht aus.** Die alte WordPress-Seite ist nicht mehr per URL erreichbar. Ihre Daten liegen aber noch auf dem alten Strato-Webspace: `wordpress_backup.zip` (Oktober 2026) und der Datenbank-Dump `ramstein.sql` (Februar 2022). Daraus sind noch zu ermitteln:
-
-- alle veröffentlichten Seiten, Beiträge und Events (`wp_posts`)
-- die Permalink-Struktur (`wp_options`)
-- Kategorie- und Schlagwort-Archive
-- vorhandene Weiterleitungen (`.htaccess`, ggf. Redirect-Plugin)
-- alle hochgeladenen Dateien unter `/wp-content/uploads/…`, z. B. PDFs, auf die von außen verlinkt wird
-
-Personenbezogene Daten aus dem Dump (Nutzer, Kommentare, E-Mail- und IP-Adressen) werden dafür nicht gebraucht und nicht ins Repo übernommen. Ergebnis: eine eigene Datei `docs/WEITERLEITUNGEN.md`, die diese Tabelle ersetzt. Zu prüfen ist außerdem, ob Caddy fehlende Schrägstriche selbst per Weiterleitung ergänzt. Die nginx-Vorlage hat dafür eine eigene Regel.
+**Inventar liegt vor, Freigabe steht aus.** Aus dem Datenbank-Backup der alten Seite vom 2026-09-23 sind alle 1.222 alten Adressen erfasst: 698 Beiträge, 102 Termine, 89 Seiten, Archive, Petitionen und dazu 1.142 Mediendateien. Je Adresse gibt es einen Vorschlag mit neuem Ziel, siehe [`MIGRATION-ALTDATEN.md`](./MIGRATION-ALTDATEN.md) und `docs/migration/freigabe.csv`. Nach der Freigabe folgen der Import ins CMS, `docs/WEITERLEITUNGEN.md` und die Weiterleitungsregeln für Caddy und nginx. Sie ersetzen die Tabelle oben. Zu prüfen ist außerdem, ob Caddy fehlende Schrägstriche selbst per Weiterleitung ergänzt. Die nginx-Vorlage hat dafür eine eigene Regel.
 
 ### Automatisierte Tests: Playwright und axe-core fehlen
 
