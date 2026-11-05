@@ -457,7 +457,7 @@ def main():
     fields = ['id', 'typ', 'slug', 'titel', 'datum', 'geaendert', 'alte_url', 'woerter', 'kategorien',
               'schlagwoerter', 'termin', 'medien', 'im_menue', 'description', 'auffaelligkeiten']
     with open(args.out / 'inventar.csv', 'w', newline='', encoding='utf-8') as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
+        w = csv.DictWriter(fh, fieldnames=fields, lineterminator='\n')
         w.writeheader()
         for r in rows:
             w.writerow({k: r.get(k, '') for k in fields})
@@ -467,7 +467,7 @@ def main():
     media_paths |= {original_path(a['file']) for a in attachments.values()
                     if a['file'].lower().endswith('.pdf')}
     with open(args.out / 'medien.csv', 'w', newline='', encoding='utf-8') as fh:
-        w = csv.writer(fh)
+        w = csv.writer(fh, lineterminator='\n')
         w.writerow(['pfad', 'groesse_kb', 'typ', 'alt_text', 'verwendet_von', 'auf_server', 'kategorie', 'entscheidung'])
         for path in sorted(media_paths):
             aid = by_file.get(path)
@@ -484,7 +484,7 @@ def main():
     # Vorhandene Weiterleitungen aus Rank Math. Der 404-Log von Rank Math wird nicht gelesen:
     # Er enthält IP-Adressen und bestand im Backup nur aus Scanner-Zugriffen.
     with open(args.out / 'altdaten-weiterleitungen.csv', 'w', newline='', encoding='utf-8') as fh:
-        w = csv.writer(fh)
+        w = csv.writer(fh, lineterminator='\n')
         w.writerow(['quelle', 'pfad_alt', 'ziel_alt', 'code'])
         for r in t['rank_math_redirections']:
             for pattern in re.findall(r's:7:"pattern";s:\d+:"([^"]*)"', r['sources'] or ''):

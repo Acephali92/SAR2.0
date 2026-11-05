@@ -177,7 +177,7 @@ def main():
     fields = ['id', 'typ', 'titel', 'datum', 'alte_url', 'vorschlag', 'ziel', 'neue_url', 'kategorie_neu',
               'hinweise', 'entscheidung']
     with open(args.dir / 'freigabe.csv', 'w', newline='', encoding='utf-8') as fh:
-        w = csv.DictWriter(fh, fieldnames=fields)
+        w = csv.DictWriter(fh, fieldnames=fields, lineterminator='\n')
         w.writeheader()
         w.writerows(out)
 
