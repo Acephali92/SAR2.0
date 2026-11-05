@@ -43,6 +43,13 @@ Gilt für die öffentliche Astro-Seite (`src/`, `dist/`). Ausnahme: `cms/` ist e
 - Unbelegte Aussagen in `docs/REDAKTION-TODO.md` notieren
 - **Keine Gendersprache:** Keine Doppelpunkt-/Sternchen-/Unterstrich-Formen (`Autor:in`, `Nutzer*innen`, `Leser_innen` etc.) — weder in Inhalten noch in Dokumentation oder UI-Texten. Stattdessen ein passendes neutrales Kollektivum nutzen (z. B. „Redaktion" statt „Redakteur:innen") oder die generische Form (z. B. „Autor", „Nutzer").
 
+### URLs, HTML und Daten
+
+- **Stabile URLs:** Veröffentlichte URLs nicht ändern. Wenn doch: 301-Weiterleitung im selben Commit (`guidelines.md` §17.8). Alte WordPress-URLs müssen weiter funktionieren.
+- **Kein ungeprüftes HTML:** `set:html` nur für eigene SVG-Konstanten und CMS-HTML aus `cms/src/lib/lexicalToHtml.ts` (§14.7).
+- **Keine Geheimnisse im Repo**, keine Ressourcen von fremden Servern, keine Einbettungen von Dritten (§14.4, §14.6, §14.11).
+- **Struktur vor Gestaltung:** Jede Seite hat einen erkennbaren Zweck und eine Zielgruppe (§16).
+
 ### Versionen
 
 Exakte Versionen stehen nur in `package.json`/`cms/package.json` (Node.js-Minimum: `engines.node`, Entwicklung/CI: `.nvmrc`). In Dokumentation nur Hauptversionen nennen („Astro 7.x“). Siehe `guidelines.md` §2.2.
@@ -62,4 +69,4 @@ Nur lesen, nicht verändern!
 npm run verify
 ```
 
-Muss fehlerfrei durchlaufen.
+Muss fehlerfrei durchlaufen. Abgeschlossen ist eine Aufgabe erst nach der Definition of Done (`guidelines.md` §18.2).

@@ -68,6 +68,19 @@ Ist eine Aussage (noch) nicht belegbar, trage sie in [`REDAKTION-TODO.md`](./RED
 
 Verbindlich laut `CLAUDE.md`: Keine Doppelpunkt-/Sternchen-/Unterstrich-Formen wie „Autor:in" oder „Leser*innen". Stattdessen ein passendes neutrales Kollektivum nutzen (z. B. „Redaktion" statt „Redakteur:innen") oder die generische Form (z. B. „Autor", „Nutzer"). Gilt für alle Texte — Markdown-Inhalte wie Beiträge im CMS.
 
+### Titel, Beschreibung, Adresse, Quellen (gilt auch im CMS)
+
+Die Seite wird von Journalisten, Wissenschaftlern und anderen zitiert. Damit das funktioniert und Inhalte gefunden werden (`guidelines.md` §16 und §17):
+
+- **Zweck:** Jede Seite und jeder Beitrag hat einen erkennbaren Zweck. Titel und erster Absatz sagen, worum es geht. Die wichtigste Aussage steht oben, Details folgen danach.
+- **Titel:** eindeutig und beschreibend, möglichst höchstens 50 Zeichen. Der Seitenname „Stopp Air Base Ramstein“ wird automatisch angehängt.
+- **Beschreibung (`description`):** ein bis zwei eigene Sätze, höchstens 160 Zeichen. Sie erscheint in Suchergebnissen und beim Teilen in sozialen Medien. Im CMS prüft das System die Länge noch nicht, bitte selbst darauf achten.
+- **Adresse (Slug) nicht ändern:** Nach der Veröffentlichung bleibt die Adresse, auch wenn sich der Titel ändert. Andere Seiten, Presseartikel und Studien verlinken darauf. Muss sie doch geändert werden, vorher die Technik informieren, damit eine Weiterleitung eingerichtet wird.
+- **Quellen sichtbar machen:** Belege direkt an der Aussage verlinken und zusätzlich im `sources`-Feld bzw. Quellenfeld eintragen. Linktexte sagen, wohin sie führen, nicht „hier“.
+- **Querverweise:** Wo es passt, auf das zugehörige Kernargument unter „Warum Ramstein“, die Faktenseite oder verwandte Analysen verlinken.
+- **Keine fremden Einbettungen:** Videos (z. B. YouTube), Karten oder Social-Media-Beiträge nicht einbetten, sondern verlinken. Eingebettete Inhalte würden beim Seitenaufruf Daten an Dritte senden.
+- **Handlungsaufforderungen:** höchstens eine Hauptaufforderung pro Abschnitt, klar formuliert („Jetzt spenden“, „Zur Anmeldung“). Keine Druck- oder Lockformulierungen.
+
 ### Neuen Inhalt anlegen
 
 1. Neue `.md`-Datei im passenden Collection-Ordner anlegen, z. B. `src/content/warum-ramstein/neues-argument.md`.

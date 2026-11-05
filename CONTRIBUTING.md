@@ -46,6 +46,9 @@ Warum-Ramstein-Argumente, Mitmachen-Seiten und rechtliche Seiten bleiben Markdow
 - Kein React/Vue/Preact, keine UI-Libraries (shadcn, radix, …), kein Tracking, keine externen CDNs, keine Cookies (siehe `CLAUDE.md`) — gilt für die öffentliche Astro-Seite. Das CMS in `cms/` ist ein eigenständiges, intern gehostetes Next.js/React-Projekt mit eigenen Regeln (siehe `docs/ARCHITEKTUR.md`).
 - Farben/Abstände/Schriften über die bestehenden Tailwind-Tokens (`tailwind.config.mjs` → `src/styles/global.css`) verwenden, keine neuen willkürlichen Hex-Werte in Klassen wie `bg-[#...]`.
 - Inline-`<script>`-Tags vermeiden (Production-CSP ist `script-src 'self'`).
+- Kein Roh-HTML per `set:html` aus neuen Quellen ohne Begründung im PR, keine Geheimnisse im Repo (`guidelines.md` §14).
+- Neue Seiten: erst Zweck, Zielgruppe, Navigation und URL klären, dann gestalten (`guidelines.md` §16).
+- Veröffentlichte URLs nicht ändern. Wenn es doch sein muss, gehört eine 301-Weiterleitung in denselben PR (`guidelines.md` §17.8).
 
 **Am CMS (`cms/`) arbeiten:** eigenes, von der Astro-Seite unabhängiges npm-Projekt.
 
@@ -84,6 +87,7 @@ Muss fehlerfrei durchlaufen (Typecheck + Build + Link-Check + CSP-Check, siehe [
 - Kurze, klare Beschreibung: was wurde geändert und warum.
 - Bei Content-PRs: Quellen für neue Fakten verlinken.
 - Die automatischen Prüfungen (siehe unten) müssen grün sein.
+- Fertig ist ein PR erst, wenn er die Definition of Done erfüllt ([`guidelines.md`](./guidelines.md) §18.2). Dazu gehört, dass Barrierefreiheit und bestehende URLs nicht schlechter werden. Manuelle Prüfungen (z. B. Screenshots bei Layout-Änderungen) mit Ergebnis in der PR-Beschreibung nennen.
 
 ## Automatische Prüfungen
 
@@ -97,5 +101,7 @@ Dependabot (`.github/dependabot.yml`) schlägt Updates als Pull Requests vor:
 - **Versions-Updates:** wöchentlich und gebündelt, frühestens 7 Tage nach einem Release. Major-Updates kommen als eigene PRs und brauchen meist eine Migration.
 - **Sicherheitsupdates:** kommen sofort, für `cms/` ausschließlich diese.
 - **Payload:** `payload` und alle `@payloadcms/*` müssen dieselbe Version haben. Wird der CMS-Check bei einem Dependabot-PR rot, die übrigen `@payloadcms/*` von Hand nachziehen.
+
+Was davon automatisch läuft und was von Hand geprüft wird (Accessibility, Screenshots, Lighthouse, Security-Header), steht in [`guidelines.md`](./guidelines.md) §18.1.
 
 Offene technische Punkte stehen in [`docs/OFFENE-PUNKTE.md`](./docs/OFFENE-PUNKTE.md), erledigte im [Änderungsprotokoll](./docs/AENDERUNGSPROTOKOLL.md).
