@@ -219,7 +219,8 @@ Die Website sammelt keine Nutzerdaten über Standard-HTTP-Server-Logs hinaus: ke
 Cookiefrei heißt aber nicht automatisch datenschutzkonform (`guidelines.md` §14.11):
 
 - **Server-Logs:** IP-Adresse, Zeitpunkt, Pfad und User-Agent sind personenbezogene Daten. Speicherdauer und eine Kürzung oder Anonymisierung der IP-Adressen hängen vom Hosting-Anbieter ab und sind noch offen (siehe [OFFENE-PUNKTE.md](./OFFENE-PUNKTE.md#speicherdauer-und-anonymisierung-der-server-logs)). Danach müssen sie in `src/content/seiten/datenschutz.md` stehen.
-- **Externe Ressourcen und Einbettungen:** Die Seite lädt nichts von fremden Servern, die CSP erzwingt das. Videos, Karten oder Social-Media-Beiträge werden verlinkt statt eingebettet.
+- **Externe Ressourcen und Einbettungen:** Die Seite lädt beim Aufruf nichts von fremden Servern, die CSP erzwingt das. Videos, Karten oder Social-Media-Beiträge werden verlinkt statt eingebettet.
+- **Zwei-Klick-Video:** Einzige Ausnahme ist der Dokumentarfilm am Ende der Startseite (`src/components/content/VideoConsent.astro`, `public/scripts/video-consent.js`). Erst nach einem Klick auf das selbst gehostete Vorschaubild lädt der Browser den Player von Odysee (USA). Dabei gehen IP-Adresse, Browserangaben und die Domain der Seite an Odysee. Der Player lädt seinerseits Google Tag Manager, Google Analytics, DoubleClick und Sentry (geprüft am 2026-11-10). Die CSP erlaubt dafür nur `frame-src https://odysee.com`. Gespeichert wird nichts. Beschrieben in der Datenschutzerklärung, Abschnitt 5.
 - **Redaktionsoberfläche:** Das CMS setzt für den Login ein Sitzungs-Cookie, nur für die Redaktion. Die Mails (Passwort-Reset, Fehlerbenachrichtigung) gehen über einen SMTP-Anbieter, der noch auszuwählen ist.
 - **Neue Datenverarbeitung** wird vor dem Einsatz hier und in der Datenschutzerklärung nachgezogen.
 

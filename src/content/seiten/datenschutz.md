@@ -2,7 +2,7 @@
 title: "Datenschutzerklärung"
 description: "Informationen zum Datenschutz auf der Website der Stopp Air Base Ramstein Kampagne."
 publishedAt: 2024-01-01
-updatedAt: 2026-10-13
+updatedAt: 2026-11-10
 pageWidth: "narrow"
 showInNav: false
 ---
@@ -44,14 +44,29 @@ Diese Daten werden ausschließlich zur Sicherstellung eines störungsfreien Betr
 
 Diese Website verwendet keine Cookies – weder technische noch Tracking-Cookies. Es ist keine Cookie-Einwilligung erforderlich.
 
-## 5. Keine Drittanbieter-Dienste
+## 5. Drittanbieter-Dienste
 
-Diese Website lädt keine Ressourcen von Drittanbietern:
+Beim Aufruf lädt diese Website keine Ressourcen von Drittanbietern:
 
 - Keine externen Schriftarten (selbst gehostet)
 - Keine Analyse-Tools (kein Google Analytics oder ähnliches)
 - Keine Social-Media-Plugins
 - Keine externen CDNs
+
+Die einzige Ausnahme ist ein Video, das Sie selbst per Klick starten (siehe unten).
+
+### Video von Odysee (nur nach Klick)
+
+Am Ende der Startseite können Sie den Dokumentarfilm „Ramstein – Das letzte Gefecht“ abspielen. Der Film liegt beim Videodienst Odysee. Beim Aufruf der Startseite zeigen wir nur ein Vorschaubild von unserem eigenen Server. Eine Verbindung zu Odysee entsteht dabei nicht.
+
+Erst wenn Sie auf das Vorschaubild klicken, lädt Ihr Browser den Player von Odysee (`odysee.com`). Dabei werden mindestens Ihre IP-Adresse, Datum und Uhrzeit, Angaben zu Browser und Gerät sowie die Domain unserer Website an Odysee übertragen. Welche Daten Odysee darüber hinaus verarbeitet, liegt außerhalb unseres Einflusses. Bei unserer Prüfung am 10. November 2026 hat der Player von Odysee nach dem Klick zusätzlich Dienste von Google (Google Tag Manager, Google Analytics, DoubleClick) und den Fehlerdienst Sentry geladen. Diese Dienste können ebenfalls Ihre IP-Adresse und Angaben zu Ihrem Gerät erhalten und Cookies setzen.
+
+- **Anbieter:** laut eigener Datenschutzerklärung Space Odysee Inc., New York, USA
+- **Rechtsgrundlage:** Ihre Einwilligung durch den Klick (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG)
+- **Übermittlung in die USA:** Odysee und Google sitzen in den USA. Dort kann das Datenschutzniveau niedriger sein als in der EU, und Behörden können unter Umständen auf die Daten zugreifen. Die Übermittlung stützt sich auf Ihre ausdrückliche Einwilligung (Art. 49 Abs. 1 lit. a DSGVO).
+- **Keine Speicherung bei uns:** Wir speichern Ihren Klick nicht. Beim nächsten Seitenaufruf erscheint wieder nur das Vorschaubild.
+- **Ohne Player:** Sie können den Film auch direkt bei NuoFlix, YouTube oder Odysee ansehen. Dafür gelten die Datenschutzbestimmungen des jeweiligen Anbieters.
+- **Datenschutzerklärung von Odysee:** [odysee.com/$/privacypolicy](https://odysee.com/$/privacypolicy)
 
 ## 6. Kontaktaufnahme per E-Mail
 
@@ -84,4 +99,4 @@ Sie haben folgende Rechte bezüglich Ihrer personenbezogenen Daten:
 
 Wir behalten uns vor, diese Datenschutzerklärung anzupassen, um sie an geänderte Rechtslagen oder bei Änderungen des Dienstes anzupassen.
 
-Stand: September 2026
+Stand: November 2026

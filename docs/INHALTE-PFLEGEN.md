@@ -78,7 +78,7 @@ Die Seite wird von Journalisten, Wissenschaftlern und anderen zitiert. Damit das
 - **Adresse (Slug) nicht ändern:** Nach der Veröffentlichung bleibt die Adresse, auch wenn sich der Titel ändert. Andere Seiten, Presseartikel und Studien verlinken darauf. Muss sie doch geändert werden, vorher die Technik informieren, damit eine Weiterleitung eingerichtet wird.
 - **Quellen sichtbar machen:** Belege direkt an der Aussage verlinken und zusätzlich im `sources`-Feld bzw. Quellenfeld eintragen. Linktexte sagen, wohin sie führen, nicht „hier“.
 - **Querverweise:** Wo es passt, auf das zugehörige Kernargument unter „Warum Ramstein“, die Faktenseite oder verwandte Analysen verlinken.
-- **Keine fremden Einbettungen:** Videos (z. B. YouTube), Karten oder Social-Media-Beiträge nicht einbetten, sondern verlinken. Eingebettete Inhalte würden beim Seitenaufruf Daten an Dritte senden.
+- **Keine fremden Einbettungen:** Videos (z. B. YouTube), Karten oder Social-Media-Beiträge nicht einbetten, sondern verlinken. Eingebettete Inhalte würden beim Seitenaufruf Daten an Dritte senden. Soll ein Video doch direkt auf der Seite abspielbar sein, baut die Technik es als Zwei-Klick-Lösung ein (`guidelines.md` §14.6). Voraussetzung sind die Rechte am Vorschaubild.
 - **Handlungsaufforderungen:** höchstens eine Hauptaufforderung pro Abschnitt, klar formuliert („Jetzt spenden“, „Zur Anmeldung“). Keine Druck- oder Lockformulierungen.
 
 ### Neuen Inhalt anlegen

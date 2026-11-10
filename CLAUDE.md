@@ -47,7 +47,7 @@ Gilt für die öffentliche Astro-Seite (`src/`, `dist/`). Ausnahme: `cms/` ist e
 
 - **Stabile URLs:** Veröffentlichte URLs nicht ändern. Wenn doch: 301-Weiterleitung im selben Commit (`guidelines.md` §17.8). Alte WordPress-URLs müssen weiter funktionieren.
 - **Kein ungeprüftes HTML:** `set:html` nur für eigene SVG-Konstanten und CMS-HTML aus `cms/src/lib/lexicalToHtml.ts` (§14.7).
-- **Keine Geheimnisse im Repo**, keine Ressourcen von fremden Servern, keine Einbettungen von Dritten (§14.4, §14.6, §14.11).
+- **Keine Geheimnisse im Repo**, keine Ressourcen von fremden Servern, keine Einbettungen von Dritten (§14.4, §14.6, §14.11). Einzige Ausnahme: Videos als Zwei-Klick-Lösung über `VideoConsent.astro` (§14.6), kein statisches `<iframe>`.
 - **Struktur vor Gestaltung:** Jede Seite hat einen erkennbaren Zweck und eine Zielgruppe (§16).
 
 ### Versionen

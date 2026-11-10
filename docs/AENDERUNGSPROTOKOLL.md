@@ -2,6 +2,19 @@
 
 Erledigte Fehlerbehebungen, Sicherheitsfixes und größere Umbauten. Neueste zuerst. Jeder Eintrag nennt Problem, Fix und Nachweis. Details stehen in den verlinkten Pull Requests bzw. Commits. Was noch offen ist, steht in [`OFFENE-PUNKTE.md`](./OFFENE-PUNKTE.md).
 
+## 2026-11-10
+
+### Dokumentarfilm „Ramstein – Das letzte Gefecht“ mit Zwei-Klick-Player
+
+Der Film von Norbert Fleischer (2017, Alternativer Medienpreis 2017, Kategorie „Macht“) steht als eigener Abschnitt am Ende der Startseite (`/#film`) und unter Fakten → „Weiterführende Quellen“. Auf der alten WordPress-Seite stand er unter `/ramstein-das-letzte-gefecht/`. Die Weiterleitung dorthin ist in `docs/migration/freigabe.csv` (Branch `feat/wordpress-altdaten`) als Entscheidung `/#film` eingetragen.
+
+- *Bewusste Ausnahme:* Fremde iFrames waren bisher ganz verboten (`guidelines.md` §14.6). Für Videos gibt es jetzt genau eine Ausnahme: eine Zwei-Klick-Lösung (`src/components/content/VideoConsent.astro`, `public/scripts/video-consent.js`). Beim Seitenaufruf erscheint nur das selbst gehostete Vorschaubild, der Player von Odysee lädt erst nach einem Klick. Ohne JavaScript öffnet der Klick den Film bei Odysee in einem neuen Tab.
+- *Vorschaubild:* `public/images/film-ramstein-das-letzte-gefecht.{webp,jpg}` mit Erlaubnis von Norbert Fleischer und Frank Höger.
+- *CSP:* `frame-src https://odysee.com` in `deploy/`, `scripts/write-preview-headers.mjs`, `guidelines.md` §14.1 und `docs/DEPLOYMENT.md`. Das Skript lädt nur Adressen, die mit `https://odysee.com/$/embed/` beginnen.
+- *Absicherung:* `npm run check-csp` schlägt bei jedem statischen `<iframe>` im Build fehl.
+- *Datenschutz:* Neuer Abschnitt „Video von Odysee (nur nach Klick)“ in `src/content/seiten/datenschutz.md` sowie Einträge in `docs/ARCHITEKTUR.md` und `guidelines.md` §14.11.
+- *Nachweis:* `npm run verify` grün. `dist/index.html` enthält kein `<iframe>` und keine fremde Bildquelle. Browsertest in Firefox über WebDriver BiDi: Vor dem Klick keine Anfrage an fremde Hosts, nach dem Klick lädt das Odysee-iFrame und bekommt den Fokus. Der Player lädt dann selbst Google Tag Manager, Google Analytics, DoubleClick und Sentry nach, das steht so in der Datenschutzerklärung. Gegenprobe: Ein statisches `<iframe>` in `dist/index.html` lässt `check-csp` fehlschlagen.
+
 ## 2026-11-05
 
 ### Versionsangaben in der Doku widersprachen sich
