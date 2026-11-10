@@ -1,8 +1,8 @@
 # Project Guidelines — Stopp Air Base Ramstein Website Relaunch
 
-**Document Version:** 1.1
+**Document Version:** 1.2
 **Created:** 2026-01-30
-**Updated:** 2026-11-05
+**Updated:** 2026-11-10
 **Status:** Active
 
 ---
@@ -526,7 +526,7 @@ Sicherheit und Datenschutz sind Eigenschaften der ganzen Seite, nicht nur der HT
 The production server must set these headers:
 
 ```
-Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'
+Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; frame-src https://odysee.com
 X-Content-Type-Options: nosniff
 X-Frame-Options: DENY
 Referrer-Policy: strict-origin-when-cross-origin
@@ -560,6 +560,7 @@ This is a static site. There are no forms that submit to the server. Newsletter 
 ### 14.6 Externe Verbindungen minimieren
 
 - Die öffentliche Seite lädt nichts von fremden Servern: keine Skripte, Stylesheets, Fonts, Bilder, Videos oder iFrames. Die CSP in 14.1 erzwingt das im Browser.
+- **Einzige Ausnahme: Zwei-Klick-Video.** Ein fremder Video-Player darf als iFrame geladen werden, aber erst nach einem Klick auf das selbst gehostete Vorschaubild (Komponente `src/components/content/VideoConsent.astro`, Skript `public/scripts/video-consent.js`). Vorher kontaktiert die Seite den Anbieter nicht, und nichts wird gespeichert. Erlaubte Anbieter stehen an zwei Stellen, die zueinander passen müssen: in der Allowlist des Skripts und in `frame-src` der CSP (14.1). Derzeit ist das nur `https://odysee.com`. `npm run check-csp` lässt kein statisches `<iframe>` im Build zu. Ein neuer Anbieter braucht eine Begründung im Pull Request und einen Abschnitt in der Datenschutzerklärung (14.11).
 - Externe Links sind erlaubt, weil sie erst beim Klick eine Verbindung aufbauen (14.2).
 - Auch im Build gilt: Externe Daten kommen nur aus dem eigenen CMS. Bilder fremder Herkunft lassen den Build scheitern (`src/lib/payload-loader.ts`).
 
@@ -597,8 +598,8 @@ Ein Sicherheitsvorfall ist jede Lücke, die ausgenutzt wurde oder ausgenutzt wer
 Dass die Seite keine Cookies setzt, ist nur ein Teil. Zu berücksichtigen sind außerdem:
 
 - **Server-Logs und IP-Adressen:** Jeder Aufruf hinterlässt beim Hosting-Anbieter IP-Adresse, Zeitpunkt, Pfad und User-Agent. Logs werden nur so lange wie nötig gespeichert, IP-Adressen möglichst gekürzt oder anonymisiert. Speicherdauer und Anbieter müssen in der Datenschutzerklärung stehen (`src/content/seiten/datenschutz.md`).
-- **Externe Ressourcen:** keine (14.6). Jede Ausnahme wäre eine Datenübermittlung an Dritte und bräuchte eine Rechtsgrundlage.
-- **Eingebettete Inhalte:** Videos, Karten oder Social-Media-Beiträge werden nicht eingebettet, sondern verlinkt, wahlweise mit selbst gehostetem Vorschaubild. Nichts darf beim Seitenaufruf einen fremden Server kontaktieren.
+- **Externe Ressourcen:** keine (14.6). Jede Ausnahme ist eine Datenübermittlung an Dritte und braucht eine Rechtsgrundlage. Die einzige Ausnahme ist das Zwei-Klick-Video (14.6). Rechtsgrundlage ist die Einwilligung durch den Klick, der Hinweis steht direkt unter dem Player.
+- **Eingebettete Inhalte:** Videos, Karten oder Social-Media-Beiträge werden nicht eingebettet, sondern verlinkt, wahlweise mit selbst gehostetem Vorschaubild. Nichts darf beim Seitenaufruf einen fremden Server kontaktieren. Ausnahme: Videos als Zwei-Klick-Lösung nach 14.6, mit Rechten am Vorschaubild.
 - **Redaktionsoberfläche:** Das CMS setzt für den Login ein Sitzungs-Cookie. Das betrifft nur die Redaktion, nicht die öffentliche Seite. Es lädt nichts von externen Diensten (Gravatar ist abgeschaltet).
 - **E-Mail:** Passwort-Reset und Fehlerbenachrichtigungen laufen über einen SMTP-Anbieter in der EU.
 - **Neue Datenverarbeitung:** Jede neue Verarbeitung personenbezogener Daten (neuer Dienst, neues Formular, neue Log-Auswertung) wird vor dem Einsatz in `datenschutz.md` und in `docs/ARCHITEKTUR.md`, „Datenverarbeitung“, nachgezogen.
@@ -796,6 +797,7 @@ The following items were clarified on 2026-01-30:
 |------|---------|---------|
 | 2026-01-30 | 1.0 | Initial guidelines document |
 | 2026-11-05 | 1.1 | Neu: §16 User Experience & Information Architecture, §17 SEO, Metadata & Discoverability, §18 Testing & Quality Assurance mit Definition of Done. §14 zu „Security & Privacy by Design“ erweitert (14.4–14.11). |
+| 2026-11-10 | 1.2 | §14.1, §14.6 und §14.11: Zwei-Klick-Video als einzige Ausnahme vom Verbot fremder iFrames, CSP um `frame-src https://odysee.com` ergänzt. |
 
 ---
 

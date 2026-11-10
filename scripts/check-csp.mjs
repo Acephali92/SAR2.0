@@ -4,8 +4,9 @@
  *
  * Production uses `script-src 'self'` and `img-src 'self' data:` (see CLAUDE.md,
  * deploy/). Scans dist/*.html for inline <script> tags (no src attribute),
- * inline event handler attributes (onclick, onload, ...), cross-origin images
- * and references to the CMS media endpoint (/api/media/), all of which break
+ * inline event handler attributes (onclick, onload, ...), cross-origin images,
+ * static <iframe> tags (third-party players only load after a click, see
+ * guidelines.md 14.6) and references to the CMS media endpoint (/api/media/), all of which break
  * that policy or the "site survives CMS outage" rule. Exits with code 1 if any
  * violations are found.
  *
@@ -93,6 +94,13 @@ function findViolations(html, filePath) {
         violations.push({ file: filePath, type: "cross-origin-image (img-src 'self')", excerpt: url.slice(0, 80) });
       }
     }
+  }
+
+  // Zwei-Klick-Video (guidelines.md 14.6): iFrames entstehen nur per public/scripts/video-consent.js
+  // nach einem Klick. Ein statisches <iframe> im HTML wuerde den Anbieter schon beim Seitenaufruf laden.
+  const iframeRegex = /<iframe\b[^>]*>/gi;
+  while ((match = iframeRegex.exec(html)) !== null) {
+    violations.push({ file: filePath, type: 'static-iframe (Zwei-Klick-Video nutzen)', excerpt: match[0].slice(0, 80) });
   }
 
   // Verweise auf Payloads Medien-Endpunkt: die statische Seite darf das CMS zur Laufzeit nicht

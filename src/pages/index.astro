@@ -6,6 +6,20 @@
  */
 
 import PageLayout from '@layouts/PageLayout.astro';
+import VideoConsent from '@components/content/VideoConsent.astro';
+
+// Dokumentarfilm am Ende der Startseite. Quelle aller Angaben:
+// https://nuoflix.de/ramstein--das-letzte-gefecht (abgerufen 2026-11-10).
+// Vorschaubild mit Erlaubnis von Norbert Fleischer und Frank Höger selbst gehostet.
+const film = {
+  title: 'Ramstein – Das letzte Gefecht',
+  director: 'Norbert Fleischer',
+  year: 2017,
+  nuoflixUrl: 'https://nuoflix.de/ramstein--das-letzte-gefecht',
+  youtubeUrl: 'https://www.youtube.com/watch?v=GyCBz6XNqP0',
+  odyseeUrl: 'https://odysee.com/ramstein-das-letzte-gefecht:0625f578f48ece01c7fef9e61d93ef5f36350292',
+  odyseeEmbed: 'https://odysee.com/$/embed/ramstein-das-letzte-gefecht/0625f578f48ece01c7fef9e61d93ef5f36350292',
+};
 
 // Hero slides - each with unique content and background
 const heroSlides = [
@@ -304,6 +318,105 @@ const heroSlides = [
       </div>
     </div>
   </section>
+
+  <!-- Documentary Section (two-click player, see VideoConsent.astro) -->
+  <section
+    id="film"
+    class="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 py-20 text-white md:py-28"
+    aria-labelledby="film-title"
+  >
+    <div class="pointer-events-none absolute -right-40 -top-40 h-[28rem] w-[28rem] rounded-full bg-brand-red/20 blur-3xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute -bottom-48 -left-40 h-[28rem] w-[28rem] rounded-full bg-sky-500/10 blur-3xl" aria-hidden="true"></div>
+
+    <div class="container relative mx-auto px-4 md:px-6">
+      <div class="grid items-center gap-10 lg:grid-cols-5 lg:gap-14">
+        <VideoConsent
+          class="lg:col-span-3"
+          embedSrc={film.odyseeEmbed}
+          watchUrl={film.odyseeUrl}
+          title={film.title}
+          provider="Odysee"
+          poster="/images/film-ramstein-das-letzte-gefecht.jpg"
+          posterWebp="/images/film-ramstein-das-letzte-gefecht.webp"
+          posterAlt="Filmplakat: Eine Kampfdrohne vor rot glühendem Himmel, dazu ein Ortsschild „Airbase – Ramstein-Miesenbach“ und der Titel „Ramstein – Das letzte Gefecht“"
+          width={1280}
+          height={720}
+          privacyHref="/datenschutz/#video-von-odysee-nur-nach-klick"
+        />
+
+        <div class="lg:col-span-2">
+          <p class="mb-3 text-sm font-semibold uppercase tracking-widest text-red-400">
+            Dokumentarfilm · {film.year}
+          </p>
+          <h2 id="film-title" class="mb-2 text-3xl font-bold leading-tight text-white md:text-4xl">{film.title}</h2>
+          <p class="mb-6 text-lg text-slate-300">Ein Film von {film.director}</p>
+
+          <p class="mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+            <svg class="h-4 w-4 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 21h8m-4-4v4m-5-17h10v5a5 5 0 01-10 0V4zM7 6H4a3 3 0 003 4m10-4h3a3 3 0 01-3 4" />
+            </svg>
+            Alternativer Medienpreis 2017 · Kategorie „Macht“
+          </p>
+
+          <p class="mb-6 text-slate-300">
+            Der Film richtet den Blick auf die US Air Base Ramstein in der Westpfalz. Er ordnet sie
+            in die NATO-Aufrüstung in Osteuropa ein und fragt, welche Rolle der Stützpunkt bei den
+            Kriegen spielt, vor denen Menschen fliehen.
+          </p>
+
+          <blockquote class="mb-8 border-l-4 border-brand-red pl-4">
+            <p class="italic text-slate-200">
+              „Deshalb ist es so wichtig, dass Themen, wie sie Norbert Fleischer mit seiner
+              Dokumentation ‚Ramstein – das letzte Gefecht‘ aufgenommen hat, auf einer möglichst
+              breiten zivilgesellschaftlichen Basis in den öffentlichen Diskurs eingebracht werden.“
+            </p>
+            <footer class="mt-2 text-sm not-italic text-slate-400">
+              Peter Welchering, Laudatio zum Alternativen Medienpreis 2017
+              (<a
+                href={film.nuoflixUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-slate-300 underline decoration-slate-500 underline-offset-2 hover:text-white"
+              >Quelle: NuoFlix</a>)
+            </footer>
+          </blockquote>
+
+          <div class="flex flex-wrap items-center gap-x-6 gap-y-4">
+            <a
+              href={film.nuoflixUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-full bg-brand-red px-7 py-3 font-bold text-white no-underline shadow-lg transition-all duration-200 hover:bg-brand-red-hover hover:shadow-xl focus-ring"
+            >
+              Auf NuoFlix ansehen
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+            <p class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-400">
+              Auch auf
+              {[
+                { label: 'YouTube', href: film.youtubeUrl },
+                { label: 'Odysee', href: film.odyseeUrl },
+              ].map((link) => (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="inline-flex items-center gap-1 font-semibold text-slate-200 no-underline transition-colors hover:text-white focus-ring"
+                >
+                  {link.label}
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+              ))}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </PageLayout>
 
 <style>
@@ -343,3 +456,4 @@ const heroSlides = [
 </style>
 
 <script type="module" src="/scripts/homepage.js"></script>
+<script type="module" src="/scripts/video-consent.js"></script>

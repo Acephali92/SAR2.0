@@ -1,0 +1,135 @@
+---
+/**
+ * @component VideoConsent
+ * @description Zwei-Klick-Video (guidelines.md §14.11): Zeigt ein selbst
+ * gehostetes Vorschaubild. Erst nach einem Klick ersetzt
+ * /scripts/video-consent.js es durch das iFrame des Anbieters. Bis dahin
+ * kontaktiert die Seite keinen fremden Server. Ohne JavaScript öffnet der
+ * Klick den Film beim Anbieter in einem neuen Tab.
+ *
+ * Erlaubte Embed-Adressen stehen in public/scripts/video-consent.js und in
+ * der CSP (frame-src, deploy/).
+ *
+ * Tailwind liest public/ nicht ein. Diese Klassen setzt das Skript am iFrame,
+ * sie müssen deshalb hier stehen: absolute inset-0 h-full w-full border-0
+ *
+ * @example
+ * <VideoConsent
+ *   embedSrc="https://odysee.com/$/embed/…"
+ *   watchUrl="https://odysee.com/…"
+ *   title="Filmtitel"
+ *   provider="Odysee"
+ *   poster="/images/film.jpg"
+ *   posterWebp="/images/film.webp"
+ *   posterAlt="Filmplakat"
+ *   width={1280}
+ *   height={720}
+ * />
+ */
+
+interface Props {
+  /** iFrame-Adresse des Players, wird erst nach dem Klick geladen */
+  embedSrc: string;
+  /** Seite des Films beim Anbieter (Fallback ohne JavaScript) */
+  watchUrl: string;
+  /** Filmtitel, auch Titel des iFrames */
+  title: string;
+  /** Name des Anbieters, z. B. „Odysee“ */
+  provider: string;
+  /** Selbst gehostetes Vorschaubild (JPG) */
+  poster: string;
+  /** Optional: dasselbe Bild als WebP */
+  posterWebp?: string;
+  /** Alternativtext des Vorschaubilds */
+  posterAlt: string;
+  width: number;
+  height: number;
+  /** Link zum passenden Abschnitt der Datenschutzerklärung */
+  privacyHref?: string;
+  class?: string;
+}
+
+const {
+  embedSrc,
+  watchUrl,
+  title,
+  provider,
+  poster,
+  posterWebp,
+  posterAlt,
+  width,
+  height,
+  privacyHref = '/datenschutz/',
+  class: className = '',
+} = Astro.props;
+---
+
+<figure class={className} data-video-consent data-embed-src={embedSrc} data-title={title}>
+  <div
+    class="relative aspect-video overflow-hidden rounded-2xl bg-black shadow-2xl ring-1 ring-white/10"
+    data-video-frame
+  >
+    <a
+      href={watchUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="group absolute inset-0 block no-underline focus-ring"
+      aria-label={`Film „${title}“ abspielen (lädt den Player von ${provider})`}
+      data-video-trigger
+    >
+      <picture>
+        {posterWebp && <source srcset={posterWebp} type="image/webp" />}
+        <img
+          src={poster}
+          alt={posterAlt}
+          width={width}
+          height={height}
+          loading="lazy"
+          decoding="async"
+          class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+        />
+      </picture>
+      <span
+        class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent transition-colors duration-300 group-hover:from-black/75"
+        aria-hidden="true"
+      ></span>
+      <!-- Play-Knopf unten links, damit der Titel im Vorschaubild lesbar bleibt -->
+      <span
+        class="absolute bottom-4 left-4 right-4 flex items-center gap-3 text-white md:bottom-6 md:left-6 md:gap-4"
+        aria-hidden="true"
+      >
+        <span
+          class="video-play flex h-14 w-14 flex-none items-center justify-center rounded-full bg-brand-red transition-transform duration-300 group-hover:scale-110 group-focus-visible:scale-110 motion-reduce:transition-none md:h-20 md:w-20"
+        >
+          <svg class="ml-1 h-7 w-7 md:h-9 md:w-9" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5.14v13.72a1 1 0 0 0 1.52.85l10.29-6.86a1 1 0 0 0 0-1.7L9.52 4.29A1 1 0 0 0 8 5.14z" />
+          </svg>
+        </span>
+        <span class="flex flex-col">
+          <span class="text-base font-bold md:text-lg">Film abspielen</span>
+          <span class="text-xs font-medium text-white/80 md:text-sm">Player von {provider}</span>
+        </span>
+      </span>
+    </a>
+  </div>
+  <figcaption class="mt-3 flex items-start gap-2 text-sm text-slate-400">
+    <svg class="mt-0.5 h-4 w-4 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+    </svg>
+    <span>
+      Datenschutz: Der Film wird erst nach deinem Klick von {provider} geladen. Dabei werden Daten wie
+      deine IP-Adresse an {provider} übertragen.
+      <a href={privacyHref} class="text-slate-300 underline decoration-slate-500 underline-offset-2 hover:text-white">
+        Mehr in der Datenschutzerklärung
+      </a>
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  .video-play {
+    box-shadow:
+      0 0 0 10px rgb(var(--color-brand-red) / 0.25),
+      0 12px 40px -8px rgb(0 0 0 / 0.6);
+  }
+</style>
