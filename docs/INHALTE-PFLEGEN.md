@@ -45,6 +45,8 @@ draft: false            # optional, Standard: false
 | `contactEmail` | Nein | Gültige E-Mail-Adresse |
 | `order` | Nein | Zahl, Standard `0` |
 
+**Ausnahme `mitglied-werden.md`:** Diese Seite hat eine eigene Gestaltung in `src/pages/mitmachen/mitglied-werden.astro`. Aus der Markdown-Datei kommen nur Titel, Description, `contactEmail` und der Abschnitt „Gut zu wissen“ (der Text unter dem Frontmatter). Hero, Schritte, Jahresbeitrag und Abschluss stehen als Texte oben in der `.astro`-Datei.
+
 #### `seiten/` — Statische Seiten (Impressum, Kontakt, …)
 
 | Feld | Pflicht | Werte |

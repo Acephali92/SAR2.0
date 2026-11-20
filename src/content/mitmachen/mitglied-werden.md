@@ -5,58 +5,24 @@ publishedAt: 2024-01-01
 ctaType: "mitgliedschaft"
 contactEmail: "info@stoppramstein.de"
 order: 2
+# Gestaltung, Hero, Schritte und Beitragskasten: src/pages/mitmachen/mitglied-werden.astro.
+# Hier steht nur der Abschnitt „Gut zu wissen“. Quellen: stoppramstein_content/werde-mitglied-foerderverein.md
+# (Vereinszweck, Gemeinnützigkeit), stoppramstein_content/spenden.md (300-Euro-Regel).
 ---
 
-## Fördermitglied werden
+### Der Verein
 
-Wenn Sie die Kampagne Stopp Air Base Ramstein längerfristig unterstützen möchten, können Sie Fördermitglied im Verein **Aktiv für den Frieden – Stopp Ramstein e.V.** werden.
-
-## Über den Verein
-
-**Zweck des Vereins** ist die Förderung internationaler Gesinnung, der Toleranz auf allen Gebieten der Kultur und des Völkerverständigungsgedankens, insbesondere die Förderung des Weltfriedens.
+Als Fördermitglied unterstützen Sie den Verein **Aktiv für den Frieden – Stopp Ramstein e.V.** Zweck des Vereins ist die Förderung internationaler Gesinnung, der Toleranz auf allen Gebieten der Kultur und des Völkerverständigungsgedankens, insbesondere die Förderung des Weltfriedens.
 
 Der Verein erfüllt diese Zwecke durch:
 
 - Aktivitäten in und um die Air Base Ramstein
 - Aufklärungs- und Informationsarbeit
-- Politische Bildung
-- Vorträge, Kongresse und Publikationen
-- Friedenswochen und Demonstrationen
+- politische Aufklärung
+- Vorträge, Kongresse, Publikationen und andere Veranstaltungen
 
-## So werden Sie Mitglied
+### Steuerliche Absetzbarkeit
 
-**Per Post:**
+Der Verein ist als gemeinnützig anerkannt. Fördermitgliedsbeiträge und Spenden sind steuerlich abzugsfähig.
 
-Füllen Sie den Antrag auf Fördermitgliedschaft aus und senden Sie ihn an:
-
-Aktiv für den Frieden – Stopp Ramstein e.V.
-Saarstr. 2
-67366 Weingarten
-
-**Per E-Mail:**
-
-Senden Sie Ihren Antrag an: info@stoppramstein.de
-
-## Mitgliedsbeiträge
-
-Die Höhe des Mitgliedsbeitrags können Sie selbst bestimmen. Jeder Beitrag hilft uns, die Kampagne fortzuführen.
-
-**Empfohlener Mindestbeitrag:** 5 Euro pro Monat
-
-## Steuerliche Vorteile
-
-Wir sind als **gemeinnütziger Verein** anerkannt. Fördermitgliedsbeiträge sind steuerlich abzugsfähig.
-
-Bei Beiträgen bis zu 300 Euro je Zahlung reicht für die Steuererklärung eine Kopie der Buchungsbestätigung oder des Kontoauszuges aus. Auf Wunsch stellen wir Ihnen selbstverständlich eine Zuwendungsbescheinigung aus.
-
-## Einmalig spenden
-
-Sie möchten lieber einmalig spenden?
-
-[Zur Spendenseite →](/mitmachen/spenden/)
-
-## Kontakt
-
-Bei Fragen zur Mitgliedschaft:
-
-**E-Mail:** info@stoppramstein.de
+Bei Beiträgen bis zu 300 Euro je Zahlung ist keine formale Zuwendungsbescheinigung erforderlich. Für die Steuererklärung reicht eine Kopie der Buchungsbestätigung oder des Kontoauszuges. Auf Wunsch stellen wir Ihnen gern eine Zuwendungsbescheinigung aus.

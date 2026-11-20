@@ -81,7 +81,7 @@ flowchart TD
         PAGE[PageLayout.astro<br/>Header + Footer wrapper]
         ART[ArticleLayout.astro<br/>Long-form with ToC]
         EVT[EventLayout.astro<br/>Event metadata display]
-        MIT[MitmachenLayout.astro<br/>Engagement pages]
+        MIT[MitmachenLayout.astro<br/>Engagement pages<br/>außer mitglied-werden]
         ARG[ArgumentLayout.astro<br/>Warum Ramstein articles]
 
         BASE --> PAGE

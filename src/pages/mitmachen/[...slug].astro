@@ -8,7 +8,10 @@ import { getCollection, render, type CollectionEntry } from 'astro:content';
 import MitmachenLayout from '@layouts/MitmachenLayout.astro';
 
 export async function getStaticPaths() {
-  const entries = await getCollection('mitmachen');
+  // Einträge mit eigener Seite in diesem Ordner (mitglied-werden.astro) hier auslassen.
+  // Steht innerhalb der Funktion, weil getStaticPaths keinen Zugriff auf den übrigen Frontmatter hat.
+  const OWN_ROUTES = new Set(['mitglied-werden']);
+  const entries = await getCollection('mitmachen', (entry) => !OWN_ROUTES.has(entry.id));
   return entries.map((entry: CollectionEntry<'mitmachen'>) => ({
     params: { slug: entry.id },
     props: { entry },

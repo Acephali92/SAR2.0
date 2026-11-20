@@ -1,0 +1,408 @@
+---
+/**
+ * @page MitgliedWerden
+ * @description Landingpage für die Fördermitgliedschaft (/mitmachen/mitglied-werden/).
+ *              Eigene Seite statt MitmachenLayout, weil die Mitgliedschaft hier das
+ *              zentrale Ziel ist. [...slug].astro lässt diesen Eintrag deshalb aus.
+ *
+ * Aufbau: Hero → Warum Mitgliedschaft zählt → So werden Sie Mitglied (mit Beitrag
+ *         und „Gut zu wissen“ aus dem Markdown) → Abschluss mit Foto → Kontakt.
+ *
+ * Inhalte:
+ * - Titel, Description, E-Mail und der Abschnitt „Gut zu wissen“ kommen aus
+ *   src/content/mitmachen/mitglied-werden.md.
+ * - Die Texte unten sind seitenspezifisch. Fakten nur mit Quelle ändern (CLAUDE.md).
+ *
+ * Quellen:
+ * - Beitrag 120 € / ermäßigt 60 €, weitere Ermäßigungen möglich: Antrag auf
+ *   Fördermitgliedschaft, Stand 05/2023 (alte WordPress-Uploads). Bestätigung
+ *   durch den Verein steht aus, siehe docs/REDAKTION-TODO.md.
+ * - Seit 2015 aktiv: stoppramstein_content/ueber-uns.md
+ * - Gemeinnützig: stoppramstein_content/werde-mitglied-foerderverein.md
+ * - Jährliche Aktionswochen: stoppramstein_content/was-hat-der-us-voelkerrechtsbruch-…md
+ * - Postanschrift: wie Impressum (src/content/seiten/impressum.md)
+ * - Unabhängigkeit: Bestätigung der Kampagne (2026-11-20)
+ */
+
+import { getEntry, render } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+
+const entry = await getEntry('mitmachen', 'mitglied-werden');
+if (!entry) {
+  throw new Error('Inhalt src/content/mitmachen/mitglied-werden.md fehlt.');
+}
+const { Content } = await render(entry);
+const { title, description } = entry.data;
+const email = entry.data.contactEmail ?? 'info@stoppramstein.de';
+const mailtoHref = `mailto:${email}?subject=${encodeURIComponent('Fördermitgliedschaft')}`;
+
+// ---------------------------------------------------------------------------
+// Seitentexte
+// ---------------------------------------------------------------------------
+
+const pillars = [
+  {
+    title: 'Kontinuität',
+    text: 'Friedensarbeit braucht einen langen Atem. Regelmäßige Beiträge machen es möglich, Aktionswochen, Veranstaltungen und Aufklärungsarbeit über Jahre hinweg zu planen.',
+  },
+  {
+    title: 'Unabhängigkeit',
+    text: 'Die Kampagne ist unabhängig. Damit das so bleibt, braucht sie viele Menschen, die ihre Arbeit aus eigener Überzeugung finanziell mittragen.',
+  },
+  {
+    title: 'Gemeinschaft',
+    text: 'Jedes Mitglied zeigt, wie viele Menschen hinter der Forderung stehen, die Air Base Ramstein zu schließen. Gemeinsam wird der Protest sichtbarer und erreicht mehr Menschen.',
+  },
+];
+
+const postalAddress = ['Aktiv für den Frieden – Stopp Ramstein e.V.', 'Saarstr. 2', '67366 Weingarten'];
+
+const trustIndicators = [
+  { label: 'Gemeinnützig anerkannt', icon: 'shield' },
+  { label: 'Unabhängige Friedensarbeit', icon: 'lock' },
+  { label: 'Seit 2015 aktiv', icon: 'calendar' },
+] as const;
+
+// ---------------------------------------------------------------------------
+// Bilder (erzeugt mit sharp aus Originalfotos der Kampagne, 16:9)
+// ---------------------------------------------------------------------------
+
+const heroImage = {
+  webp: '/images/mitglied-werden-hero-960.webp 960w, /images/mitglied-werden-hero-1920.webp 1920w',
+  jpg: '/images/mitglied-werden-hero-960.jpg 960w, /images/mitglied-werden-hero-1920.jpg 1920w',
+  src: '/images/mitglied-werden-hero-1920.jpg',
+  alt: 'Demonstrationszug mit Friedensfahnen an einem rot durchgestrichenen Wegweiser zur Air Base',
+};
+
+const closingImage = {
+  jpg: '/images/mitglied-werden-gemeinschaft-960.jpg 960w, /images/mitglied-werden-gemeinschaft-1920.jpg 1920w',
+  src: '/images/mitglied-werden-gemeinschaft-1920.jpg',
+};
+
+// ---------------------------------------------------------------------------
+// Icons (eigene SVG-Konstanten, §14.7)
+// ---------------------------------------------------------------------------
+
+const icons = {
+  chevronRight: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />`,
+  arrowDown: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />`,
+  arrowRight: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />`,
+  mail: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />`,
+  shield: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />`,
+  lock: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />`,
+  calendar: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />`,
+} as const;
+
+// Einheitlicher Hauptbutton: Markenrot, weißer Text (Kontrast ca. 4,8:1).
+const primaryButton =
+  'inline-flex items-center justify-center gap-2 rounded-md bg-brand-red px-7 py-4 text-lg font-bold text-white no-underline shadow-lg transition-colors hover:bg-brand-red-active focus:outline-none focus-visible:ring-4 focus-visible:ring-offset-2 motion-reduce:transition-none';
+---
+
+<BaseLayout title={title} description={description} ogImage={heroImage.src}>
+  <div class="flex min-h-screen flex-col bg-white">
+    <Header />
+
+    <main id="main-content" class="flex-1">
+      <!-- ================================================================
+           Hero
+           ================================================================ -->
+      <!--
+        Bis lg: Foto oben (Schild mit rotem Kreuz sichtbar), Text darunter auf Dunkel.
+        Ab lg: Foto vollflächig, Text rechts, damit das Schild links frei bleibt.
+      -->
+      <section
+        class="relative isolate overflow-hidden bg-slate-950 text-white lg:flex lg:min-h-[78vh] lg:flex-col"
+        aria-labelledby="hero-title"
+      >
+        <div class="relative aspect-[16/10] sm:aspect-[16/9] lg:absolute lg:inset-0 lg:-z-10 lg:aspect-auto">
+          <picture>
+            <source type="image/webp" srcset={heroImage.webp} sizes="100vw" />
+            <img
+              src={heroImage.src}
+              srcset={heroImage.jpg}
+              sizes="100vw"
+              width="1920"
+              height="1080"
+              alt={heroImage.alt}
+              class="h-full w-full object-cover object-[30%_45%] lg:object-[20%_40%]"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </picture>
+          <!-- Verläufe: oben für die Brotkrumen, unten Übergang in den Textbereich, ab lg von rechts -->
+          <div class="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-950/75 to-transparent" aria-hidden="true"></div>
+          <div class="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-slate-950 to-transparent lg:hidden" aria-hidden="true"></div>
+          <div class="absolute inset-0 hidden bg-gradient-to-l from-slate-950/95 from-25% via-slate-950/60 via-50% to-transparent to-70% lg:block" aria-hidden="true"></div>
+        </div>
+
+        <div class="absolute inset-x-0 top-0">
+          <div class="container mx-auto px-4 pt-5">
+            <nav aria-label="Brotkrumen">
+              <ol class="m-0 flex list-none flex-wrap items-center gap-2 p-0 text-sm">
+                <li class="m-0">
+                  <a href="/" class="rounded text-slate-100 no-underline transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white">Startseite</a>
+                </li>
+                <li class="m-0" aria-hidden="true">
+                  <svg class="h-4 w-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icons.chevronRight} />
+                </li>
+                <li class="m-0">
+                  <a href="/mitmachen/" class="rounded text-slate-100 no-underline transition-colors hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white">Mitmachen</a>
+                </li>
+                <li class="m-0" aria-hidden="true">
+                  <svg class="h-4 w-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icons.chevronRight} />
+                </li>
+                <li class="m-0"><span class="font-semibold text-white" aria-current="page">{title}</span></li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
+        <div class="container relative mx-auto -mt-12 px-4 pb-14 sm:-mt-16 md:pb-20 lg:mt-0 lg:flex lg:flex-1 lg:items-center lg:justify-end lg:py-28">
+          <div class="max-w-2xl lg:max-w-md xl:max-w-xl">
+            <p class="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-white/90 sm:mb-4 sm:text-sm sm:tracking-[0.16em]">
+              Fördermitgliedschaft <span aria-hidden="true">·</span> Aktiv für den Frieden
+            </p>
+            <h1 id="hero-title" class="mb-4 text-balance sm:mb-6 text-4xl font-bold leading-[1.1] text-white md:text-5xl lg:text-4xl xl:text-6xl">
+              Frieden braucht Menschen, die sich engagieren.
+            </h1>
+            <p class="mb-6 text-base leading-relaxed text-slate-100 sm:mb-8 sm:text-lg">
+              Unterstützen Sie Stopp Air Base Ramstein und werden Sie Teil einer Gemeinschaft, die sich für Frieden, Völkerverständigung und eine Zukunft ohne Krieg einsetzt.
+            </p>
+
+            <div class="flex flex-wrap items-center gap-x-8 gap-y-5">
+              <a href="#so-werden-sie-mitglied" class={`${primaryButton} focus-visible:ring-white focus-visible:ring-offset-slate-950`}>
+                Mitglied werden
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.arrowDown} />
+              </a>
+              <p class="m-0 border-l-2 border-white/40 pl-4 leading-snug">
+                <span class="block text-xl font-bold text-white">Ab 5 € im Monat</span>
+                <span class="block text-sm text-slate-200">ermäßigter Jahresbeitrag 60 €</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           Warum Ihre Mitgliedschaft zählt
+           ================================================================ -->
+      <section class="py-16 md:py-24" aria-labelledby="warum-title">
+        <div class="container mx-auto max-w-content px-4">
+          <div class="grid gap-6 lg:grid-cols-12 lg:gap-12">
+            <div class="lg:col-span-5">
+              <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-brand-red">Warum Mitglied werden</p>
+              <h2 id="warum-title" class="text-balance text-3xl font-bold leading-tight text-slate-900 md:text-4xl">
+                Warum Ihre Mitgliedschaft zählt
+              </h2>
+            </div>
+            <p class="text-lg leading-relaxed text-slate-700 lg:col-span-7 lg:pt-9">
+              Wenn Sie die Kampagne Stopp Air Base Ramstein längerfristig unterstützen möchten, können Sie Fördermitglied im Verein <strong class="font-semibold text-slate-900">Aktiv für den Frieden – Stopp Ramstein e.V.</strong> werden. Ihr Beitrag trägt die Arbeit der Kampagne Jahr für Jahr.
+            </p>
+          </div>
+
+          <ol class="mt-12 list-none p-0 grid gap-10 md:mt-16 md:grid-cols-3 md:gap-8 lg:gap-12">
+            {pillars.map((pillar, i) => (
+              <li class="m-0 border-t-2 border-slate-900 pt-6">
+                <span class="mb-3 block font-mono text-sm font-semibold text-brand-red" aria-hidden="true">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <h3 class="mb-3 text-xl font-bold text-slate-900">{pillar.title}</h3>
+                <p class="leading-relaxed text-slate-700">{pillar.text}</p>
+              </li>
+            ))}
+          </ol>
+
+          <p class="mt-12 max-w-3xl border-l-2 border-slate-300 pl-5 text-slate-700 md:mt-16">
+            <strong class="font-semibold text-slate-900">Fördern oder mitanpacken?</strong>
+            Eine Fördermitgliedschaft ist eine finanzielle Unterstützung. Wenn Sie darüber hinaus selbst aktiv werden möchten, finden Sie Möglichkeiten unter
+            <a href="/mitmachen/ehrenamt/" class="font-medium text-brand-cyan underline decoration-1 underline-offset-2 hover:text-brand-cyan-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan">Ehrenamtlich helfen</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           So werden Sie Mitglied
+           ================================================================ -->
+      <section
+        id="so-werden-sie-mitglied"
+        class="scroll-mt-24 border-t border-slate-200 bg-slate-50 py-16 md:py-24"
+        aria-labelledby="so-title"
+      >
+        <div class="container mx-auto max-w-content px-4">
+          <div class="grid gap-12 lg:grid-cols-12 lg:gap-16">
+            <div class="lg:col-span-7">
+              <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-brand-red">In drei Schritten</p>
+              <h2 id="so-title" class="mb-10 text-3xl font-bold leading-tight text-slate-900 md:text-4xl">So werden Sie Mitglied</h2>
+
+              <ol class="list-none space-y-10 p-0">
+                <li class="m-0 grid grid-cols-[auto_1fr] gap-x-5">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 font-semibold text-white" aria-hidden="true">1</span>
+                  <div>
+                    <h3 class="mb-2 text-xl font-bold text-slate-900">Schreiben Sie uns</h3>
+                    <p class="mb-4 leading-relaxed text-slate-700">
+                      Teilen Sie uns per E-Mail oder Brief mit, dass Sie Fördermitglied werden möchten.
+                    </p>
+                    <dl class="grid gap-4 text-slate-700 sm:grid-cols-2">
+                      <div>
+                        <dt class="text-sm font-semibold uppercase tracking-wider text-slate-500">E-Mail</dt>
+                        <dd>
+                          <a href={mailtoHref} target="_blank" rel="noopener noreferrer" class="break-words font-semibold text-brand-cyan underline decoration-1 underline-offset-2 hover:text-brand-cyan-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan">{email}</a>
+                        </dd>
+                      </div>
+                      <div>
+                        <dt class="text-sm font-semibold uppercase tracking-wider text-slate-500">Post</dt>
+                        <dd>
+                          <address class="not-italic">
+                            {postalAddress.map((line) => <span class="block">{line}</span>)}
+                          </address>
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </li>
+                <li class="m-0 grid grid-cols-[auto_1fr] gap-x-5">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 font-semibold text-white" aria-hidden="true">2</span>
+                  <div>
+                    <h3 class="mb-2 text-xl font-bold text-slate-900">Beitrag wählen</h3>
+                    <p class="leading-relaxed text-slate-700">
+                      Nennen Sie uns die Höhe Ihres Jahresbeitrags. Regulär sind es 120 Euro, ermäßigt 60 Euro im Jahr.
+                    </p>
+                  </div>
+                </li>
+                <li class="m-0 grid grid-cols-[auto_1fr] gap-x-5">
+                  <span class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 font-semibold text-white" aria-hidden="true">3</span>
+                  <div>
+                    <h3 class="mb-2 text-xl font-bold text-slate-900">Steuerlich absetzen</h3>
+                    <p class="leading-relaxed text-slate-700">
+                      Fördermitgliedsbeiträge sind steuerlich abzugsfähig. Bis 300 Euro je Zahlung genügt dem Finanzamt der Kontoauszug.
+                    </p>
+                  </div>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Beitrag -->
+            <aside class="lg:col-span-5" aria-labelledby="beitrag-title">
+              <div class="rounded-lg bg-slate-900 p-8 text-white shadow-xl lg:sticky lg:top-28">
+                <h3 id="beitrag-title" class="mb-6 text-sm font-semibold uppercase tracking-[0.18em] text-slate-300">Jahresbeitrag</h3>
+                <dl class="divide-y divide-white/15">
+                  <div class="flex items-baseline justify-between gap-4 pb-5">
+                    <dt class="text-slate-200">Regulär</dt>
+                    <dd class="text-3xl font-bold">120 €</dd>
+                  </div>
+                  <div class="flex items-baseline justify-between gap-4 py-5">
+                    <dt class="text-slate-200">
+                      Ermäßigt
+                      <span class="block text-sm text-slate-400">entspricht 5 € im Monat</span>
+                    </dt>
+                    <dd class="text-3xl font-bold">60 €</dd>
+                  </div>
+                </dl>
+                <p class="mb-8 border-t border-white/15 pt-5 text-sm leading-relaxed text-slate-300">
+                  Weitere Ermäßigungen sind möglich. Höhere regelmäßige Beiträge sind sehr willkommen.
+                </p>
+                <a href={mailtoHref} target="_blank" rel="noopener noreferrer" class={`${primaryButton} w-full focus-visible:ring-white focus-visible:ring-offset-slate-900`}>
+                  Mitglied werden
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.mail} />
+                </a>
+                <p class="mt-3 text-center text-sm text-slate-400">öffnet Ihr E-Mail-Programm</p>
+              </div>
+            </aside>
+          </div>
+
+          <!-- Gut zu wissen (aus Markdown) -->
+          <div class="mt-16 border-t border-slate-200 pt-12 md:mt-20">
+            <h2 class="mb-2 text-2xl font-bold text-slate-900 md:text-3xl">Gut zu wissen</h2>
+            <article class="prose prose-slate prose-lg max-w-3xl
+              prose-headings:font-sans prose-headings:font-semibold prose-headings:text-slate-900
+              prose-h3:mt-8 prose-h3:mb-3 prose-h3:text-xl
+              prose-p:leading-relaxed prose-p:text-slate-700
+              prose-strong:font-semibold prose-strong:text-slate-900
+              prose-li:my-1 prose-li:text-slate-700 prose-li:marker:text-slate-400
+              prose-a:font-medium prose-a:text-brand-cyan">
+              <Content />
+            </article>
+            <p class="mt-10 text-slate-700">
+              Lieber einmalig unterstützen?
+              <a href="/mitmachen/spenden/" class="group inline-flex items-center gap-1 font-medium text-brand-cyan underline decoration-1 underline-offset-2 hover:text-brand-cyan-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan">
+                Zur Spendenseite
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.arrowRight} />
+              </a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           Abschluss
+           ================================================================ -->
+      <!-- Das Feuer bleibt oben sichtbar, der Text steht darunter über dem dunklen Rasen. -->
+      <section class="relative isolate overflow-hidden bg-slate-950 text-white" aria-labelledby="abschluss-title">
+        <div class="absolute inset-x-0 top-0 -z-10 aspect-video">
+          <img
+            src={closingImage.src}
+            srcset={closingImage.jpg}
+            sizes="100vw"
+            width="1920"
+            height="1080"
+            alt=""
+            class="h-full w-full object-cover object-top"
+            loading="lazy"
+            decoding="async"
+          />
+          <div class="absolute inset-0 bg-gradient-to-b from-slate-950/10 via-slate-950/70 via-50% to-slate-950 to-85%" aria-hidden="true"></div>
+        </div>
+
+        <div class="container mx-auto px-4 pb-20 pt-[42vw] sm:pt-[38vw] md:pb-28 lg:pb-32 lg:pt-[30vw] 2xl:pt-[28vw]">
+          <div class="mx-auto max-w-3xl text-center">
+            <p class="mb-4 text-sm font-semibold uppercase tracking-[0.18em] text-white/85">Gemeinsam für den Frieden</p>
+            <h2 id="abschluss-title" class="mb-6 text-balance text-3xl font-bold leading-tight text-white md:text-5xl">
+              Eine Bewegung lebt von den Menschen, die sie tragen.
+            </h2>
+            <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-slate-100">
+              Seit 2015 setzen sich Menschen in der Kampagne Stopp Air Base Ramstein für eine friedlichere Welt und die Schließung der Air Base ein. Damit diese Arbeit weitergehen kann, braucht sie Menschen, die langfristig hinter ihr stehen.
+            </p>
+            <a href={mailtoHref} target="_blank" rel="noopener noreferrer" class={`${primaryButton} focus-visible:ring-white focus-visible:ring-offset-slate-950`}>
+              Jetzt Fördermitglied werden
+              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={icons.mail} />
+            </a>
+
+            <ul class="mt-14 list-none p-0 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-slate-200" aria-label="Über den Verein">
+              {trustIndicators.map((item) => (
+                <li class="m-0 flex items-center gap-2">
+                  <svg class="h-5 w-5 text-white/70" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true" set:html={icons[item.icon]} />
+                  {item.label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================================
+           Kontakt
+           ================================================================ -->
+      <section class="bg-white py-14 md:py-16" aria-labelledby="kontakt-title">
+        <div class="container mx-auto px-4">
+          <div class="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-lg border border-slate-200 bg-slate-50 p-8 text-center sm:flex-row sm:text-left">
+            <div class="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-slate-900 text-white" aria-hidden="true">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icons.mail} />
+            </div>
+            <div>
+              <h2 id="kontakt-title" class="mb-1 text-xl font-bold text-slate-900">Noch Fragen zur Mitgliedschaft?</h2>
+              <p class="mb-2 text-slate-700">Wir beantworten gerne Ihre Fragen und helfen Ihnen bei den nächsten Schritten.</p>
+              <a href={mailtoHref} target="_blank" rel="noopener noreferrer" class="break-words text-lg font-semibold text-brand-cyan underline decoration-1 underline-offset-2 hover:text-brand-cyan-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan">
+                {email}
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>
