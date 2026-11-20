@@ -2,6 +2,31 @@
 
 Erledigte Fehlerbehebungen, Sicherheitsfixes und größere Umbauten. Neueste zuerst. Jeder Eintrag nennt Problem, Fix und Nachweis. Details stehen in den verlinkten Pull Requests bzw. Commits. Was noch offen ist, steht in [`OFFENE-PUNKTE.md`](./OFFENE-PUNKTE.md).
 
+## 2026-11-20
+
+### Mitgliedsseite als eigene Landingpage
+
+`/mitmachen/mitglied-werden/` lief über das gemeinsame `MitmachenLayout`. Die Seite hatte folgende Schwächen:
+
+- Der Hero war stark abgedunkelt.
+- Der Hauptbutton war `bg-sky-500` mit weißer Schrift. Der Kontrast lag bei etwa 2,8:1 und unter WCAG AA.
+- Am Seitenende standen ein Kreuzmuster, ein Zitat und ein zweiter, konkurrierender Button.
+- Mehrere Angaben waren nicht belegt.
+
+- *Fix:* Die Seite hat jetzt eine eigene Route, `src/pages/mitmachen/mitglied-werden.astro`. `[...slug].astro` lässt den Eintrag aus, die URL bleibt gleich. Titel, Description, E-Mail und der Abschnitt „Gut zu wissen“ kommen weiter aus `src/content/mitmachen/mitglied-werden.md`.
+  - Neuer Aufbau: Hero mit Kampagnenfoto → Warum Mitgliedschaft (Kontinuität, Unabhängigkeit, Gemeinschaft) → So werden Sie Mitglied (Schritte und Jahresbeitrag) → Abschluss mit Lagerfeuer-Foto → Kontakt.
+  - Alle Hauptbuttons sind `bg-brand-red` (Kontrast etwa 4,8:1).
+  - Die Fotos liegen als WebP/JPG in zwei Breiten in `public/images/mitglied-werden-*`.
+  - `MitmachenLayout` und die anderen drei Mitmachen-Seiten sind unverändert.
+- *Inhalt:*
+  - Der Beitrag (120 €/Jahr, ermäßigt 60 €) folgt dem Antrag von 05/2023. Die Bestätigung durch den Verein steht aus.
+  - Gestrichen wurden die unbelegte Angabe „Höhe selbst bestimmen, Mindestbeitrag 5 €“ und die Listenpunkte, die nicht im Originaltext des Vereinszwecks stehen.
+  - Offene Punkte (Beitrag, Postanschrift, aktueller Antrag, Bildnachweis) stehen in `docs/REDAKTION-TODO.md`.
+- *Nachweis:*
+  - `npm run verify` ist grün.
+  - Firefox über WebDriver bei 500, 768, 1024, 1280 und 1440 px Breite: Der Hero-Button liegt im ersten Viewport, es gibt keinen horizontalen Überlauf, die Tab-Reihenfolge ist logisch, und der Ankersprung landet unter dem fixierten Header.
+  - Das Build-HTML von `/mitmachen/aufruf/`, `/mitmachen/ehrenamt/` und `/mitmachen/spenden/` ist identisch mit `master`, abgesehen vom CSS-Dateinamen.
+
 ## 2026-11-10
 
 ### Dokumentarfilm „Ramstein – Das letzte Gefecht“ mit Zwei-Klick-Player
